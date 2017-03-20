@@ -1,6 +1,7 @@
 .DS_Store
 .vagrant/
 *.pid
+reload.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
