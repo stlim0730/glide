@@ -8,6 +8,9 @@ body { padding-top: 70px; padding-bottom: 21px;}
 .height-60 { height: 60%; }
 .height-40 { height: 40%; }
 .y-scroll { overflow-x: hidden; overflow-y: scroll; }
+.navbar button.btn-sm {
+  margin-top: 10px;
+}
 .left-border {
   border-left: 1px solid #222222;
 }
