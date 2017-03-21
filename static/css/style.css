@@ -1,0 +1,39 @@
+html,body{ height:100%; overflow: hidden;}
+body { padding-top: 70px; padding-bottom: 21px;}
+@media screen and (max-width: 768px) {
+  body { padding-top: 0px; }
+}
+.full-height { height: 100%; }
+.height-90 { height: 90%; }
+.height-60 { height: 60%; }
+.height-40 { height: 40%; }
+.y-scroll { overflow-x: hidden; overflow-y: scroll; }
+.left-border {
+  border-left: 1px solid #222222;
+}
+.right-border {
+  border-right: 1px solid #d5d5d5;
+}
+.page-thumbnail-wrapper {
+  margin-bottom: 10px;
+}
+.page-thumbnail-wrapper:hover {
+  opacity: 0.65;
+}
+.page-thumbnail {
+  border: 1px solid #2780e3;
+  border-radius: 4px;
+  color: #2780e3;
+  font-size: 2em;
+  padding-top: 15px;
+  min-height: 70px;
+  text-align: center;
+}
+div[contenteditable].code-editor {
+  margin-top: 10px;
+  resize: none;
+  border: 0px;
+  background-color: #232323;
+  font-size: 1.3em;
+}
+.red { background-color: red; }

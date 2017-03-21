@@ -1,0 +1,13 @@
+{% extends "workspace/default_layout.html" %}
+
+{% block left_panel %}
+  {% include "partials/page_sequence.html" %}
+{% endblock left_panel %}
+
+{% block center_panel %}
+  {% include "partials/editor.html" %}
+{% endblock center_panel %}
+
+{% block right_panel %}
+  {% include "partials/runtime.html" %}
+{% endblock right_panel %}
