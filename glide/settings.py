@@ -37,8 +37,8 @@ INSTALLED_APPS = [
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
-  'workspace'
-  # 'channels'
+  'workspace',
+  'channels'
 ]
 
 MIDDLEWARE = [
@@ -79,7 +79,7 @@ CHANNEL_LAYERS = {
     'CONFIG': {
       'hosts': [('localhost', 6379)],
     },
-    'ROUTING': 'games.routing.channel_routing',
+    'ROUTING': 'glide.routing.channel_routing',
   },
 }
 
