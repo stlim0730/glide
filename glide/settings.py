@@ -73,11 +73,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'glide.wsgi.application'
 
+# To deploy on Heroku
+redisUrl = os.getenv('REDIS_URL')
+redisHost = None
+if redisUrl:
+  redisHost = [redisUrl]
+else:
+  redisHost = [('localhost', 6379)]
 CHANNEL_LAYERS = {
   'default': {
     'BACKEND': 'asgi_redis.RedisChannelLayer',
     'CONFIG': {
-      'hosts': [('localhost', 6379)],
+      'hosts': redisHost,
     },
     'ROUTING': 'glide.routing.channel_routing',
   },
