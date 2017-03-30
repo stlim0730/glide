@@ -20,10 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#jx$!#(86=m2h7ri!y24t+hlg&_m=5((7(obgo=_hrgy!$2nl#'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -74,18 +74,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'glide.wsgi.application'
 
-# To deploy on Heroku
-redisUrl = os.getenv('REDIS_URL')
-redisHost = None
-if redisUrl:
-  redisHost = [redisUrl]
-else:
-  redisHost = [('localhost', 6379)]
 CHANNEL_LAYERS = {
   'default': {
     'BACKEND': 'asgi_redis.RedisChannelLayer',
     'CONFIG': {
-      'hosts': redisHost,
+      'hosts': [os.getenv('REDIS_URL')],
     },
     'ROUTING': 'glide.routing.channel_routing',
   },
@@ -104,13 +97,13 @@ CHANNEL_LAYERS = {
 DATABASES = {
   'default': {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'glide',
-    'USER': 'vagrant',
-    'PASSWORD': '',
-    'PORT': '5432'
+    'NAME': os.getenv('DB_NAME'),
+    'USER': os.getenv('DB_USER'),
+    'PASSWORD': os.getenv('DB_PASSWORD'),
+    'HOST': os.getenv('DB_HOST'),
+    'PORT': os.getenv('DB_PORT')
   }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -161,3 +154,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
   os.path.join(PROJECT_ROOT, 'static'),
 )
+
+
+
+# To override local settings from default settings,
+#   local_settings.py shouldn't exist on the production server.
+#   This should be at the end of settings.py to override default settings.
+try:
+  from .local_settings import *
+except ImportError:
+  pass
