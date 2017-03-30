@@ -74,6 +74,8 @@ def loggingIn(request, repoProvider):
             user.repoUsername=repoUsername
             messages.success(request, 'Welcome to Glide, {}!'.format(repoUsername), fail_silently=True)
           # Update the user
+          else:
+            user = exUser[0]
           user.name = githubUser['name']
           user.repoEmail = githubUser['email']
           user.repoUrl = githubUser['html_url']
