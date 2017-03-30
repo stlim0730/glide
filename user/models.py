@@ -11,6 +11,7 @@ class UserProfile(models.Model):
   name = models.CharField(max_length=100, default='')
   repoEmail = models.EmailField(null=True, default=None)
   repoUrl = models.URLField(null=True, default=None)
+  repoAvatar = models.URLField(null=True, default=None)
   joinedOn = models.DateField(auto_now_add=True)
   isOnline = models.BooleanField(default=False)
 

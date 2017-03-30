@@ -72,11 +72,13 @@ def loggingIn(request, repoProvider):
             user = User.objects.create_user(username, password=repoUsername)
             user.repoProvider=repoProvider
             user.repoUsername=repoUsername
-            user.name=githubUser['name']
-            user.repoEmail=githubUser['email']
-            user.repoUrl=githubUser['html_url']
-            user.save()
             messages.success(request, 'Welcome to Glide, {}!'.format(repoUsername), fail_silently=True)
+          # Update the user
+          user.name = githubUser['name']
+          user.repoEmail = githubUser['email']
+          user.repoUrl = githubUser['html_url']
+          user.repoAvatar = githubUser['avatar_url']
+          user.save()
           # Login the user
           user = authenticate(username=username, password=repoUsername)
           loginUser(request, user)
