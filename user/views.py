@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from urllib.request import urlopen
@@ -14,10 +16,10 @@ import json
 
 def login(request, repoProvider):
   if repoProvider=='github':
-    clientId = '1bcffc14a7141019248d'
-    redirectUrl = 'http://localhost:8888/user/logging_in/' + repoProvider
-    scope = 'user,repo'
-    githubUrl = 'https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope={}'.format(clientId, redirectUrl, scope)
+    clientId = settings.GITHUB_CLIENT_ID
+    redirectUrl = settings.OAUTH_REDIRECT_URI + repoProvider
+    scope = settings.GITHUB_SCOPE
+    githubUrl = settings.GITHUB_AUTH_URL.format(clientId, redirectUrl, scope)
     return redirect(githubUrl)
 
   elif repoProvider=='bitbucket':
@@ -37,17 +39,17 @@ def loggingIn(request, repoProvider):
   https://developer.github.com/v3/oauth/
   '''
   if repoProvider=='github':
-    clientId = '1bcffc14a7141019248d'
-    clientSecret = 'b4398ac47191a0ccaee15117080b0c82709d46ae'
+    clientId = settings.GITHUB_CLIENT_ID
+    clientSecret = settings.GITHUB_CLIENT_SECRET
     code = request.GET.get('code', '')
-    redirectUri = 'http://localhost:8888/user/logging_in/' + repoProvider
+    recirectUrl = settings.OAUTH_REDIRECT_URI + repoProvider
     data = [
       ('client_id', clientId),
       ('client_secret', clientSecret),
-      ('redirect_uri', redirectUri),
+      ('redirect_uri', recirectUrl),
       ('code', code)
     ]
-    githubUrl = 'https://github.com/login/oauth/access_token'
+    githubUrl = settings.GITHUB_ACCESS_TOKEN_URL
     data = urlencode(data).encode('utf-8')
     with urlopen(githubUrl, data) as githubAuthRes:
       res = parse_qs(githubAuthRes.read().decode('utf-8'))
