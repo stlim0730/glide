@@ -156,6 +156,14 @@ STATICFILES_DIRS = (
 )
 
 
+# OAuth credentials and info
+GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')
+GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET')
+OAUTH_REDIRECT_URI = os.getenv('OAUTH_REDIRECT_URI')
+GITHUB_SCOPE = 'user,repo'
+GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope={}'
+GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
+
 
 # To override local settings from default settings,
 #   local_settings.py shouldn't exist on the production server.
