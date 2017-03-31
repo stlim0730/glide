@@ -42,11 +42,11 @@ def loggingIn(request, repoProvider):
     clientId = settings.GITHUB_CLIENT_ID
     clientSecret = settings.GITHUB_CLIENT_SECRET
     code = request.GET.get('code', '')
-    redirectUri = settings.OAUTH_REDIRECT_URI + repoProvider
+    recirectUrl = settings.OAUTH_REDIRECT_URI + repoProvider
     data = [
       ('client_id', clientId),
       ('client_secret', clientSecret),
-      ('redirect_uri', redirectUri),
+      ('redirect_uri', recirectUrl),
       ('code', code)
     ]
     githubUrl = settings.GITHUB_ACCESS_TOKEN_URL
