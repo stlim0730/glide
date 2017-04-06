@@ -4,7 +4,7 @@
 PG_VERSION=9.3
 PROJECT_NAME=glide
 VAGRANT_USERNAME=vagrant
-$WS_PORT=8889
+# WS_PORT=8889
 
 
 # Script-based provision
@@ -35,6 +35,8 @@ sudo apt-get install -y git
 # 
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python-dev python-setuptools python-imaging libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
+sudo export PYTHONPATH=/usr/local/lib/python3.4/dist-packages:$PYTHONPATH # Don't know why it doesn't work
+sudo pip3 install --upgrade pip
 # sudo cp /$PROJECT_NAME/deployment/aliases ~/.bash_aliases
 # sudo easy_install pip
 
@@ -45,7 +47,7 @@ sudo apt-get install -y python-dev python-setuptools python-imaging libssl-dev l
 # cd Python-$PYTHON_VERSION
 # sudo ./configure
 # sudo make install
-# export PYTHONPATH=/usr/local/lib/python2.7/dist-packages:$PYTHONPATH
+
 # sudo pip install --upgrade pip
 # sudo apt-get install -y python-virtualenv # Currently, not using virtualenv
 
