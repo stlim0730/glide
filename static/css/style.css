@@ -40,3 +40,17 @@ div[contenteditable].code-editor {
   font-size: 1.3em;
 }
 .red { background-color: red; }
+.v-middle {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.project-icon-wrapper {
+  margin-left: 10px;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.project-icon-wrapper:hover {
+  background-color: #f5f5f5;
+}

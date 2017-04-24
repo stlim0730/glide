@@ -3,4 +3,3 @@ psycopg2
 asgi_redis
 channels
 daphne
-PyGithub

@@ -19,5 +19,5 @@ from . import views
 urlpatterns = [
   url(r'^login/(?P<repoProvider>.+)', views.login, name='login'),
   url(r'^logging_in/(?P<repoProvider>.+)', views.loggingIn, name='loggingIn'),
-  url(r'^logged_in$', views.loggedIn, name='loggedIn')
+  # url(r'^logged_in$', views.loggedIn, name='loggedIn')
 ]

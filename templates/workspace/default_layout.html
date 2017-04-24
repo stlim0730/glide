@@ -1,15 +1,21 @@
 {% extends "workspace/base.html" %}
 
 {% block content %}
-<div class="row full-height">
-  <div class="col-lg-1 col-md-1 full-height right-border">
-    {% block left_panel %}{% endblock left_panel %}
+
+  <!-- Popup modal blocks -->
+  {% block create_project %}{% endblock create_project %}
+  {% block project_browser %}{% endblock project_browser %}
+
+  <div class="row full-height">
+    <div class="col-lg-1 col-md-1 full-height right-border">
+      {% block left_panel %}{% endblock left_panel %}
+    </div>
+    <div class="col-lg-6 col-md-6 full-height right-border">
+      {% block center_panel %}{% endblock center_panel %}
+    </div>
+    <div class="col-lg-5 col-md-5 full-height">
+      {% block right_panel %}{% endblock right_panel %}
+    </div>
   </div>
-  <div class="col-lg-6 col-md-6 full-height right-border">
-    {% block center_panel %}{% endblock center_panel %}
-  </div>
-  <div class="col-lg-5 col-md-5 full-height">
-    {% block right_panel %}{% endblock right_panel %}
-  </div>
-</div>
+
 {% endblock content %}

@@ -1,7 +1,15 @@
 {% extends "workspace/default_layout.html" %}
 
+{% block create_project %}
+  {% include "partials/create_project.html" %}
+{% endblock create_project %}
+
+{% block project_browser %}
+  {% include "partials/project_browser.html" %}
+{% endblock project_browser %}
+
 {% block left_panel %}
-  {% include "partials/page_sequence.html" %}
+  {% include "partials/page_list.html" %}
 {% endblock left_panel %}
 
 {% block center_panel %}

@@ -42,15 +42,15 @@ def loggingIn(request, repoProvider):
     clientId = settings.GITHUB_CLIENT_ID
     clientSecret = settings.GITHUB_CLIENT_SECRET
     code = request.GET.get('code', '')
-    recirectUrl = settings.OAUTH_REDIRECT_URI + repoProvider
+    redirectUrl = settings.OAUTH_REDIRECT_URI + repoProvider
     data = [
       ('client_id', clientId),
       ('client_secret', clientSecret),
-      ('redirect_uri', recirectUrl),
+      ('redirect_uri', redirectUrl),
       ('code', code)
     ]
-    githubUrl = settings.GITHUB_ACCESS_TOKEN_URL
     data = urlencode(data).encode('utf-8')
+    githubUrl = settings.GITHUB_ACCESS_TOKEN_URL
     with urlopen(githubUrl, data) as githubAuthRes:
       res = parse_qs(githubAuthRes.read().decode('utf-8'))
       accessToken = res['access_token'][0]
@@ -72,24 +72,22 @@ def loggingIn(request, repoProvider):
           if not exUser:
             # Welcome this newbie!
             user = User.objects.create_user(username, password=repoUsername)
-            user.repoProvider=repoProvider
-            user.repoUsername=repoUsername
+            user.userprofile.repoProvider = repoProvider
+            user.userprofile.repoUsername = repoUsername
             messages.success(request, 'Welcome to Glide, {}!'.format(repoUsername), fail_silently=True)
           # Update the user
           else:
             user = exUser[0]
-          user.name = githubUser['name']
-          user.repoEmail = githubUser['email']
-          user.repoUrl = githubUser['html_url']
-          user.repoAvatar = githubUser['avatar_url']
+          user.userprofile.name = githubUser['name']
+          user.userprofile.repoEmail = githubUser['email']
+          user.userprofile.repoUrl = githubUser['html_url']
+          user.userprofile.repoAvatar = githubUser['avatar_url']
           user.save()
           # Login the user
           user = authenticate(username=username, password=repoUsername)
           loginUser(request, user)
           if exUser:
             messages.info(request, 'Welcome back, {}!'.format(repoUsername), fail_silently=True)
-          # return HttpResponse(username)
-          # return HttpResponse(json.dumps(githubUser), content_type='application/json') # For Python object
           return redirect('/workspace')
       else:
         # TODO: better error handling in case the user's not authenticated
@@ -101,7 +99,3 @@ def loggingIn(request, repoProvider):
   else:
     # Error! unidentified repoProvider
     pass
-
-
-def loggedIn(request):
-  return HttpResponse(request.GET.get('access_token', 'molla'))

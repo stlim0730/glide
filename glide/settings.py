@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+CSRF_USE_SESSIONS = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -71,6 +74,10 @@ TEMPLATES = [
     },
   },
 ]
+
+MESSAGE_TAGS = {
+  messages.ERROR: 'danger'
+}
 
 WSGI_APPLICATION = 'glide.wsgi.application'
 

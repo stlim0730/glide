@@ -1,65 +1,73 @@
-<div class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-      <a href="../" class="navbar-brand">Glide</a>
-      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <form>
+    <div class="container">
+      <div class="navbar-header">
+        <a href="../" class="navbar-brand">Glide</a>{{request.session.accessToken}}
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+
+      <div class="navbar-collapse collapse" id="navbar-main">
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes" aria-expanded="false">Projects <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="#" data-toggle="modal" data-target="#project-browser-modal" class="project-browser">
+                  Browse Projects...
+                </a>
+              </li>
+              <li>
+                <a href="#" data-toggle="modal" data-target="#create-project-modal">
+                  Create New...
+                </a>
+              </li>
+              {% if project %}
+                <li>
+                  <a href="#">Close</a>
+                </li>
+              {% endif %}
+              <!-- <li class="divider"></li>
+              <li>
+                <a href="#">My Recent Project</a>
+              </li>
+              -->
+            </ul>
+          </li>
+          {% if project %}
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Templates <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Browse Templates...</a></li>
+                <!-- <li class="divider"></li>
+                <li><a href="#">Flatly</a></li>
+                <li><a href="#">Journal</a></li>
+                <li><a href="#">Lumen</a></li>
+                <li><a href="#">Paper</a></li>
+                <li><a href="#">Readable</a></li>
+                <li><a href="#">Sandstone</a></li> -->
+              </ul>
+            </li>
+          {% endif %}
+        </ul>
+
+        <!-- <ul class="nav navbar-nav navbar-right">
+          <li>
+            <form class="navbar-form navbar-left" role="search">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search in Project">
+              </div>
+              <button type="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+              </button>
+            </form>
+          </li>
+        </ul> -->
+
+      </div>
     </div>
-
-    <div class="navbar-collapse collapse" id="navbar-main">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="themes" aria-expanded="false">Projects <span class="caret"></span></a>
-          <ul class="dropdown-menu" aria-labelledby="themes">
-            <li><a href="#">New</a></li>
-            <li><a href="#">Open Project Browser...</a></li>
-            <li class="divider"></li>
-            <li><a href="#">My Recent Project</a></li>
-            <li><a href="#">Another Recent Project</a></li>
-            <li><a href="#">Example Project</a></li>
-          </ul>
-        </li>
-
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="download" aria-expanded="false">Templates <span class="caret"></span></a>
-          <ul class="dropdown-menu" aria-labelledby="download">
-            <li><a href="#">Open Template Browser...</li>
-            <li class="divider"></li>
-            <li><a href="#">Flatly</a></li>
-            <li><a href="#">Journal</a></li>
-            <li><a href="#">Lumen</a></li>
-            <li><a href="#">Paper</a></li>
-            <li><a href="#">Readable</a></li>
-            <li><a href="#">Sandstone</a></li>
-          </ul>
-        </li>
-      </ul>
-
-      <ul class="nav navbar-nav">
-        &emsp;&emsp;&emsp;&emsp;
-        <button class="btn btn-sm btn-default">Copy</button>
-        <button class="btn btn-sm btn-default">Cut</button>
-        <button class="btn btn-sm btn-default">Paste</button>
-        <button class="btn btn-sm btn-success">Validate</button>
-        <button class="btn btn-sm btn-danger">Run &gt;&gt;</button>
-      </ul>
-
-      <ul class="nav navbar-nav navbar-right">
-        <li>
-          <form class="navbar-form navbar-left" role="search">
-            <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search in Project">
-            </div>
-            <button type="submit" class="btn btn-default">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            </button>
-          </form>
-        </li>
-      </ul>
-
-    </div>
-  </div>
+  </form>
 </div>

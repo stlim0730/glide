@@ -17,5 +17,9 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-  url(r'^$', views.default, name='default'),
+  url(r'^$', views.start, name='start'),
+  url(r'^open/(?P<slug>.+)$', views.open, name='open'),
+  # url(r'^default', views.default, name='default'),
+  url(r'^createproject', views.createproject, name='createproject'),
+  # url(r'^projects', views.projects, name='projects'),
 ]

@@ -1,0 +1,22 @@
+<div>
+  
+  <label class="h5">Pages</label>
+
+  <div class="y-scroll">
+
+    {% for file in tree.tree %}
+      <div class="page-thumbnail-wrapper">
+        {{ file.path }}
+      </div>
+    {% endfor %}
+
+    <div class="page-thumbnail-wrapper">
+      <div class="page-thumbnail-no">Add New</div>
+      <div class="page-thumbnail">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+      </div>
+    </div>  
+
+  </div>
+
+</div>
