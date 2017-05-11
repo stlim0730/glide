@@ -1,7 +1,7 @@
 <div id='create-project-modal' class="modal fade" tabindex="-1" role="dialog">
   <form class="form-horizontal" method="POST">
     {% csrf_token %}
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -9,6 +9,7 @@
         </div>
         <div class="modal-body">
           <div class="row">
+
             <fieldset>
               <div class="form-group">
                 <label for="project-title" class="col-md-2 col-md-offset-1 control-label">Project Title</label>
@@ -16,18 +17,41 @@
                   <input type="text" class="form-control" id="project-title" maxlength="100"/>
                 </div>
               </div>
+
               <div class="form-group">
                 <label for="project-description" class="col-md-2 col-md-offset-1 control-label">Description</label>
                 <div class="col-md-7">
                   <input type="text" class="form-control" id="project-description" maxlength="250" placeholder="Optional" />
                 </div>
               </div>
+
               <div class="form-group">
-                <div class="col-md-9 col-md-offset-1">
+                <div class="col-md-7 col-md-offset-3">
                   <span class="help-block hidden" id="repo-note">Your project repository will be:<br/><span id="github-url-to-be" class="text-primary"></span></span>
                 </div>
               </div>
+
+              <div class="form-group">
+                <label for="" class="col-md-2 col-md-offset-1 control-label">
+                  Select a Theme
+                </label><br/>
+                <div class="col-md-9 col-md-offset-3">
+                  {% for theme in themes %}
+                    <div class="radio col-md-3">
+                      <label>
+                        <input type="radio" name="theme" value="{{ theme.slug }}" />
+                        {{ theme.name }}
+                      </label>
+                    </div>
+
+                    {% if forloop.counter|divisibleby:3 %}
+                      <div class="col-md-3"></div>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
             </fieldset>
+
           </div>
         </div>
         <div class="modal-footer">
@@ -58,7 +82,11 @@
 
     if(slug.length > 0) {
       $('#repo-note').removeClass('hidden');
-      $('#submit-create-project').prop('disabled', false);
+
+      if($('input[name="theme"]:checked').length > 0) {
+        // A theme has been selected
+        $('#submit-create-project').prop('disabled', false);
+      }
     }
     else {
       $('#repo-note').addClass('hidden');
@@ -71,14 +99,32 @@
     $('#github-url-to-be').text(repoPrefix + username + '/' + slug);
   });
 
+  $('input[name="theme"]').click(function (e) {
+    if($('input[name="theme"]:checked').length > 0) {
+      // A theme has been selected
+
+      var title = $('#project-title').val().trim();
+      var slug = slugify(title);
+
+      if(slug.length > 0) {
+        // Project title form has been filled out
+        $('#submit-create-project').prop('disabled', false);
+      }
+    }
+    else {
+      $('#submit-create-project').prop('disabled', true);
+    }
+  });
+
   $('#submit-create-project').click(function (e) {
     
-    // TODO: Ajax-post the project metadata
+    // Ajax-post the project metadata
     var csrftoken = $('[name="csrfmiddlewaretoken"]').val();
     var title = $('#project-title').val().trim();
     var description = $('#project-description').val().trim();
     var slug = slugify(title);
     var repoUrl = $('#github-url-to-be').text().trim();
+    var theme = $('input[name="theme"]:checked').val();
 
     $.ajax({
       url: '/workspace/createproject/',
@@ -89,7 +135,8 @@
         title: title,
         description: description,
         slug: slug,
-        repoUrl: repoUrl
+        repoUrl: repoUrl,
+        theme: theme
       }),
       contentType: 'application/x-www-form-urlencoded',//'application/json; charset=utf-8',
       success: function (data) {
@@ -113,9 +160,11 @@
     $('#project-title').focus();
   });
 
-  $('#create-project-modal button[data-dismiss=modal]').click(function (e) {
+  $('#create-project-modal button[data-dismiss="modal"]').click(function (e) {
     // Reset the form when dismissed
     $('#create-project-modal input').val('');
+    $('#repo-note').addClass('hidden');
+    $('#submit-create-project').prop('disabled', true);
   });
 
 </script>

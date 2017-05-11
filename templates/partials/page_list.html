@@ -2,21 +2,90 @@
   
   <label class="h5">Pages</label>
 
-  <div class="y-scroll">
+  <div class="list-group y-scroll">
 
-    {% for file in tree.tree %}
-      <div class="page-thumbnail-wrapper">
-        {{ file.path }}
-      </div>
+    {% for file in repoTree.tree %}
+      <button class="list-group-item page-list-item repo-file-link"
+        data-path="{{ file.path }}"
+        {% if file.downloadUrl %} data-download-url="{{ file.downloadUrl}}"
+        {% else %} data-download-url=""
+        {% endif %}>
+        <h5 class="list-group-item-heading">{{ file.path }}</h5>
+        <p class="list-group-item-text">
+          {{ file.path }}
+        </p>
+      </button>
+
     {% endfor %}
 
-    <div class="page-thumbnail-wrapper">
-      <div class="page-thumbnail-no">Add New</div>
-      <div class="page-thumbnail">
-        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-      </div>
-    </div>  
+    <a href="#" class="list-group-item" data-toggle="modal" data-target="#create-page-modal">
+      Create New...
+    </a>
 
   </div>
 
 </div>
+
+<script>
+  
+  $('.repo-file-link').click(function (e) {
+
+    // Handle editor behavior
+    if($(this).hasClass('active')) {
+      // Deselect
+      $('.repo-file-link').removeClass('active');
+      $('#editor-wrapper').addClass('hidden');
+    }
+    else {
+      // Select
+      $('.repo-file-link').removeClass('active');
+      $(this).addClass('active');
+      $('#editor-wrapper').removeClass('hidden');
+      var fileName = $(this).children('.list-group-item-heading').text();
+      $('.file-being-edited').text(fileName);
+    }
+
+    // Get content from GitHub
+    var downloadUrl = $(this).data('download-url');
+    // downloadUrl = 'https://raw.githubusercontent.com/stlim0730/glide/master/manage.py?access_token=';
+    var path = $(this).data('path');
+    var ext = path.split('.');
+    ext = ext[ext.length - 1]
+    
+    console.info(downloadUrl);
+    if(downloadUrl!='') {
+      $.get(downloadUrl, function(data, status) {
+        // console.info(data);
+
+        // TODO: Save changes
+
+        if(typeof data === 'string') {
+          // Editable content
+          switch(ext) {
+            case 'glide':
+            case 'md':
+              $('a[href="#data-editor"]').click();
+              $('#data-editor .code-editor').html(data);
+              break;
+            case 'html':
+              //
+              break;
+            case 'css':
+              //
+              break;
+            default:
+              // 
+              break;
+          }
+        }
+        else {
+          // TODO: Non-editable content
+        }
+      });
+    }
+  });
+
+  // console.info('{{ repoTree }}');
+  // console.info('{{ themeTree }}');
+
+</script>

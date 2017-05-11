@@ -23,8 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
+# TODO: How to configure Django Admin password from code?
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 CSRF_USE_SESSIONS = True
 
@@ -173,7 +175,7 @@ GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 
 
 # To override local settings from default settings,
-#   local_settings.py shouldn't exist on the production server.
+#   local_settings.py must not exist on the production server or in shared repository.
 #   This should be at the end of settings.py to override default settings.
 try:
   from .local_settings import *
