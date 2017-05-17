@@ -110,11 +110,17 @@ def _getRepoTree(accessToken, repoUsername, projectSlug):
     res = repoTreeRes.read().decode('utf-8')
     repoTree = json.loads(res)
     for file in repoTree['tree']:
-      if file['type'] != 'tree':
-        downloadUrl = 'https://raw.githubusercontent.com/{}/{}/master/{}?access_token={}'
-        file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, file['path'], accessToken)
-      else:
-        file['downloadUrl'] = None
+      # if file['type'] != 'tree':
+      file['ext'] = file['path'].split('.')[-1]
+      if file['path'] == file['ext']:
+        file['ext'] = ''
+      file['name'] = file['path'].split('/')[-1]
+      downloadUrl = 'https://raw.githubusercontent.com/{}/{}/master/{}?access_token={}'
+      file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, file['path'], accessToken)
+      # else:
+        # file['downloadUrl'] = None
+        # file = None
+    repoTree['tree'] = [file for file in repoTree['tree'] if file['type'] != 'tree']
     return repoTree
     # https://raw.githubusercontent.com/stlim0730/yyy/master/README.md
 
@@ -137,7 +143,7 @@ def open(request, slug):
   # TODO: How to concatenate two or more QuerySets?
   project = projects.filter(slug=slug)[0]
   theme = themes.filter(slug=project.theme.slug)[0]
-  accessToken = request.session['accessToken']
+  accessToken = request.session.get('accessToken', None)
   # TODO: If projects has nothing or project has nothing, raise an error
   # TODO: messages.error(request, 'Couldn\'t find the project.', fail_silently=True)
   # TODO: return redirect('/workspace')
@@ -151,33 +157,4 @@ def open(request, slug):
     'repoTree': repoTree, 'themeTree': themeTree
   }
   return render(request, 'workspace/default.html', context=context)
-  # commitsUrl = 'https://api.github.com/repos/{}/{}/commits?access_token={}'
-  # commitsUrl = commitsUrl.format(repoUsername, project.slug, accessToken)
-  # try:
-  #   with urlopen(commitsUrl) as commitsRes:
-  #     res = commitsRes.read().decode('utf-8')
-  #     commits = json.loads(res)
-  #     # commits[0] is guaranteed
-  #     #   as every repo has been created with the option 'auto_init': True
-  #     latestCommit = commits[0]
-  #     latestSha = latestCommit['sha']
-  #     # GET the tree structure of the repository
-  #     repoTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees/{}?recursive=1?access_token={}'
-  #     repoTreeUrl = repoTreeUrl.format(repoUsername, project.slug, latestSha, accessToken)
-  #     with urlopen(repoTreeUrl) as repoTreeRes:
-  #       # TODO: This API request sometimes gives 409 conflicts response. # Why?
-  #       res = repoTreeRes.read().decode('utf-8')
-  #       repoTree = json.loads(res)
-  #       # TODO: tree has limit (supposedly large enough) in the array size.
-  #       # TODO: Lookup truncated and handle accordingly.
-  #       context = {
-  #         'project': project, 'projects': projects,
-  #         'theme': theme, 'themes': themes,
-  #         'repoTree': repoTree
-  #       }
-  #       return render(request, 'workspace/default.html', context=context)
-  # except urllib.error.HTTPError as e:
-  #   if e.code == 404:
-  #     messages.error(request, 'Project "{}" doesn\'t exist on GitHub.'.format(project.slug), fail_silently=True)
-  #     # return render(request, 'workspace/start.html', context={'projects': projects})
-  #     return redirect('/workspace')
+  

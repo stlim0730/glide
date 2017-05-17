@@ -1,28 +1,10 @@
-<div>
+<div class="full-height y-scroll">
+
+  {% include "partials/file_list_group.html" with list_group_name="Glide Data" default=True tree=repoTree extFilter="md glide" %}
   
-  <label class="h5">Pages</label>
+  {% include "partials/file_list_group.html" with list_group_name="Template HTML" default=False tree=themeTree extFilter="html" %}
 
-  <div class="list-group y-scroll">
-
-    {% for file in repoTree.tree %}
-      <button class="list-group-item page-list-item repo-file-link"
-        data-path="{{ file.path }}"
-        {% if file.downloadUrl %} data-download-url="{{ file.downloadUrl}}"
-        {% else %} data-download-url=""
-        {% endif %}>
-        <h5 class="list-group-item-heading">{{ file.path }}</h5>
-        <p class="list-group-item-text">
-          {{ file.path }}
-        </p>
-      </button>
-
-    {% endfor %}
-
-    <a href="#" class="list-group-item" data-toggle="modal" data-target="#create-page-modal">
-      Create New...
-    </a>
-
-  </div>
+  {% include "partials/file_list_group.html" with list_group_name="Template CSS" default=False tree=themeTree extFilter="css" %}
 
 </div>
 
@@ -52,7 +34,7 @@
     var ext = path.split('.');
     ext = ext[ext.length - 1]
     
-    console.info(downloadUrl);
+    // console.info(downloadUrl);
     if(downloadUrl!='') {
       $.get(downloadUrl, function(data, status) {
         // console.info(data);
