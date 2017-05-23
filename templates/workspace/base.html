@@ -16,6 +16,9 @@
     <!--[if lt IE 9]>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
     <![endif]-->
+
+    <script src="/static/js/jquery/jquery-3.1.1.min.js"></script>
+    <script src="/static/js/bootstrap/bootstrap.min.js"></script>
   </head>
 
   <body>
@@ -42,8 +45,12 @@
 
     <!-- Footer -->
     {% include "partials/footer.html" %}
-
-    <script src="/static/js/jquery/jquery-3.1.1.min.js"></script>
-    <script src="/static/js/bootstrap/bootstrap.min.js"></script>
+    
   </body>
+
+  <script>
+    // Activate Bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+  </script>
+
 </html>

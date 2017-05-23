@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,8 +23,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
+# TODO: How to configure Django Admin password from code?
+
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
+CSRF_USE_SESSIONS = True
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -71,6 +78,10 @@ TEMPLATES = [
     },
   },
 ]
+
+MESSAGE_TAGS = {
+  messages.ERROR: 'danger'
+}
 
 WSGI_APPLICATION = 'glide.wsgi.application'
 
@@ -166,7 +177,7 @@ GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 
 
 # To override local settings from default settings,
-#   local_settings.py shouldn't exist on the production server.
+#   local_settings.py must not exist on the production server or in shared repository.
 #   This should be at the end of settings.py to override default settings.
 try:
   from .local_settings import *

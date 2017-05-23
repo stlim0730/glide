@@ -1,0 +1,24 @@
+<button href="#" class="btn btn-link" data-toggle="collapse" data-target="#{{ list_group_name|slugify }}-list-group">
+  {{ list_group_name }}&emsp;
+  <span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+</button>
+
+<ul id="{{ list_group_name|slugify }}-list-group" class="list-group collapse {% if default %}in{% endif %}">
+  {% for file in tree.tree %}
+    {% if file.editable == editor %}
+      <button class="list-group-item page-list-item repo-file-link"
+        data-path="{{ file.path }}" data-file-name="{{ file.name }}"
+        data-editor="{{ file.editable }}" data-toggle="tooltip"
+        data-placement="right" data-original-title="Click to open"
+        {% if file.downloadUrl %} data-download-url="{{ file.downloadUrl }}"
+        {% else %} data-download-url=""
+        {% endif %}>
+        {{ file.name }}
+      </button>
+    {% endif %}
+  {% endfor %}
+
+  <button class="list-group-item" data-toggle="modal" data-target="#create-page-modal">
+    Create New...
+  </button>
+</ul>

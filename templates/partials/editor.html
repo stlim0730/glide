@@ -1,63 +1,87 @@
-<div class="full-height">
-  <label>Editor</label>
+<div class="height-95 hidden" id="editor-wrapper">
+  <label class="h5">Editor</label>&emsp;-&emsp;<span class="lead file-being-edited"></span>
 
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#data-editor" data-toggle="tab">Content Data</a></li>
-    <li><a href="#html-template-editor" data-toggle="tab">Template HTML</a></li>
-    <li><a href="#css-template-editor" data-toggle="tab">Template CSS</a></li>
+    <!-- <script id="editor-tab-template" type="x-template">
+      <li>
+        <a data-toggle="tab">
+        </a>
+      </li>
+    </script> -->
+    <li class="active">
+      <a href="#data-editor" data-toggle="tab" data-current-file="">
+        Glide Data
+      </a>
+    </li>
+    <li>
+      <a href="#html-editor" data-toggle="tab" data-current-file="">
+        Template HTML
+      </a>
+    </li>
+    <li>
+      <a href="#css-editor" data-toggle="tab" data-current-file="">
+        Template CSS
+      </a>
+    </li>
   </ul>
 
-  <div class="tab-content full-height">
-
-    <div class="tab-pane fade active in height-90" id="data-editor">
-      <h4>Editing <em>title.glide</em></h4>
-      <div class="code-editor col-md-12 height-90" contenteditable>
-        <p>
-          <span class="text-primary">title</span>
-          <span class="text-muted">:</span>
-          <span class="text-warning">Journey to Adoption</span>
-        </p>
-        <p>
-          <span class="text-primary">text</span>
-          <span class="text-muted">:</span>
-          <span class="text-warning">This is an introduction to the issue. The fact that is not that simple to get adopted. Now put yourself in someone else's shoes. You’re single person who has love in their heart and wants to raise a child. For one reason or another you cannot have a child… You meet Chuck and adorable 8 year old…. What do you do?</span>
-        </p>
-        <p>
-          <span class="text-primary">fosterParentButton</span>
-          <span class="text-muted">:</span>
-          <span class="text-danger">Button</span>
-          <span class="text-muted">[</span>
-          <span class="text-success">Be a Foster Parent</span>
-          <span class="text-muted">](</span>
-          <span class="text-info">fosterParent</span>
-          <span class="text-muted">)</span>
-        </p>
-        <p>
-          <span class="text-primary">readyToAdoptButton</span>
-          <span class="text-muted">:</span>
-          <span class="text-danger">Button</span>
-          <span class="text-muted">[</span>
-          <span class="text-success">I'm Ready to Adopt</span>
-          <span class="text-muted">](</span>
-          <span class="text-info">adopt</span>
-          <span class="text-muted">)</span>
-        </p>
-      </div>
-    </div>
-
-    <div class="tab-pane fade height-90" id="html-template-editor">
-      <h4>Editing <em>title.html</em></h4>
-      <div class="code-editor col-md-12 height-90" contenteditable>
-        html editor
-      </div>
-    </div>
-
-    <div class="tab-pane fade height-90" id="css-template-editor">
-      <h4>Editing <em>style.css</em></h4>
-      <div class="code-editor col-md-12 height-90" contenteditable>
-        css editor
-      </div>
-    </div>
-
+  <div class="tab-content height-95" id="editors">
+    <!-- <script id="editor-template" type="x-template">
+      <div class="tab-pane fade height-95 code-editor" id="{{ fileName }}-editor"></div>
+    </script> -->
+    <div class="tab-pane fade height-95 active in code-editor" id="data-editor"></div>
+    <div class="tab-pane fade height-95 code-editor" id="html-editor"></div>
+    <div class="tab-pane fade height-95 code-editor" id="css-editor"></div>
   </div>
 </div>
+
+<script src="/static/js/ace/ace.js"></script>
+<script>
+
+  var workspaceContext = workspaceContext || {
+    fileStatus: {},
+    editors: {}
+  };
+
+  var codeEditors = codeEditors || {};
+  var codeSessions = codeSessions || {};
+  var codeDocuments = codeSessions || {};
+
+  // Initialize
+  (function () {
+    codeEditors = {
+      data: ace.edit('data-editor'),
+      html: ace.edit('html-editor'),
+      css: ace.edit('css-editor')
+    };
+
+    // Ace.js gives warning in using document.setValue(string):
+    //   Automatically scrolling cursor into view after selection change.
+    //   This will be disabled in the next version.
+    //   Set editor.$blockScrolling = Infinity to disable this message.
+    for(key in codeEditors) {
+      codeEditors[key].$blockScrolling = Infinity;
+    }
+
+    for(key in codeEditors) {
+      codeSessions[key] = codeEditors[key].getSession();
+      if(key != 'data')
+        codeSessions[key].setMode('ace/mode/' + key);
+      else
+        codeSessions[key].setMode('ace/mode/yaml');
+    }
+
+    for(key in codeEditors) {
+      codeDocuments[key] = codeSessions[key].getDocument();
+    }
+  })();
+
+  $('li a[data-toggle="tab"]').click(function(e) {
+    var fileName = $(e.target).data('current-file').trim();
+    // console.info(fileName);
+    // console.info($('.repo-file-link.opened[data-file-name="'+ fileName +'"]'));
+    $('.repo-file-link').removeClass('active');
+    $('.repo-file-link.opened[data-file-name="'+ fileName +'"]').addClass('active');
+  });
+
+</script>

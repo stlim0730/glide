@@ -100,6 +100,7 @@ cd /$PROJECT_NAME && python3 manage.py migrate
 # 
 # Populate local database
 # 
+# cd /$PROJECT_NAME && python3 manage.py loaddata deployment/initial_data.json
 # sudo createuser -U postgres -d hjgblmqzztzppf
 # sudo pg_restore -U hjgblmqzztzppf -d $PROJECT_NAME --clean /$PROJECT_NAME/deployment/initial_dataset_feb_8_2017
 # sudo psql -d $PROJECT_NAME -U postgres -c "REASSIGN OWNED BY hjgblmqzztzppf TO vagrant"

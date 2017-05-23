@@ -8,7 +8,7 @@ class UserProfile(models.Model):
   user = models.OneToOneField(User, on_delete=models.CASCADE, to_field='username')
   repoProvider = models.CharField(max_length=20)
   repoUsername = models.CharField(max_length=50)
-  name = models.CharField(max_length=100, default='')
+  name = models.CharField(null=True, max_length=100, default='')
   repoEmail = models.EmailField(null=True, default=None)
   repoUrl = models.URLField(null=True, default=None)
   repoAvatar = models.URLField(null=True, default=None)
@@ -24,3 +24,6 @@ class UserProfile(models.Model):
   def saveProfile(sender, instance, **kwargs):
     if not instance.is_superuser:
       instance.userprofile.save()
+
+  def __str__(self):
+    return self.user.username
