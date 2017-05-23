@@ -1,6 +1,6 @@
 html,body{ height:100%; overflow: hidden;}
 body { padding-top: 70px; padding-bottom: 21px;}
-*:focus { outline: 0; }  /* To disable web browser's highlight box */
+*:focus { outline: none !important; }  /* To disable web browser's highlight box */
 @media screen and (max-width: 768px) {
   body { padding-top: 0px; }
 }
@@ -34,13 +34,16 @@ body { padding-top: 70px; padding-bottom: 21px;}
   min-height: 70px;
   text-align: center;
 }
-div[contenteditable].code-editor {
+.repo-file-link.opened {
+  font-weight: bold;
+}
+/*div[contenteditable].code-editor {
   margin-top: 10px;
   resize: none;
   border: 0px;
   background-color: #232323;
   font-size: 1.3em;
-}
+}*/
 .red { background-color: red; }
 .v-middle {
   position: relative;

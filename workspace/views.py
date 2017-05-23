@@ -110,10 +110,17 @@ def _getRepoTree(accessToken, repoUsername, projectSlug):
     res = repoTreeRes.read().decode('utf-8')
     repoTree = json.loads(res)
     for file in repoTree['tree']:
-      # if file['type'] != 'tree':
       file['ext'] = file['path'].split('.')[-1]
       if file['path'] == file['ext']:
+        # It's a folder
         file['ext'] = ''
+      file['editable'] = ''
+      if file['ext'] in ['glide', 'md', 'yml', 'yaml']:
+        file['editable'] = 'data'
+      elif file['ext'] in ['html', 'htm']:
+        file['editable'] = 'html'
+      elif file['ext'] in ['css']:
+        file['editable'] = 'css'
       file['name'] = file['path'].split('/')[-1]
       downloadUrl = 'https://raw.githubusercontent.com/{}/{}/master/{}?access_token={}'
       file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, file['path'], accessToken)
