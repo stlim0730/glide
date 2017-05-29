@@ -4,3 +4,4 @@ asgi_redis
 channels
 daphne
 jinja2
+django-webpack-loader

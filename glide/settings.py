@@ -44,6 +44,7 @@ INSTALLED_APPS = [
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
+  'webpack_loader',
   'workspace',
   'user',
   'channels'
@@ -60,6 +61,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'glide.urls'
+
+WEBPACK_LOADER = {
+  'DEFAULT': {
+    'BUNDLE_DIR_NAME': '',
+    'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+  }
+}
 
 TEMPLATES = [
   {
