@@ -1,4 +1,5 @@
 var path = require('path');
+var webpack = require('webpack');
 var BundleTracker = require('webpack-bundle-tracker');
 var PROJECT_ROOT = path.resolve(__dirname, '../');
 
@@ -25,19 +26,26 @@ module.exports = {
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-        loader: 'url-loader',/*?limit=100000'*/
+        loader: 'url-loader'/*,?limit=100000'*/
       },
       {
-        test: /\.jsx$/,
+        test: /\.jsx?$/,
         loader: 'babel-loader',
         exclude: path.resolve(PROJECT_ROOT, 'node_modules'),
         options: {
-          presets: [
-            'es2015',
-            'react'
-          ]
+          presets: ['es2015', 'react']
         }
       }
     ]
-  }
+  },
+
+  plugins: [
+    new webpack.ProvidePlugin({
+      'React': 'react',
+      'ReactDOM': 'react-dom',
+      '$': 'jquery',
+      'jQuery': 'jquery'
+      // '_':          'lodash'
+    })
+  ]
 };

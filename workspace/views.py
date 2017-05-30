@@ -13,14 +13,20 @@ from .models import Project, Theme
 @login_required
 def start(request):
   """
+  Old version:
   Opens an empty workspace UI.
   Serves a list of existing projects that the user owns
   """
-  username = request.user.username
-  projects = Project.objects.filter(owner__username=username)
-  themes = Theme.objects.all()
-  context={'projects': projects, 'themes': themes}
-  return render(request, 'workspace/start.html', context=context)
+  # username = request.user.username
+  # projects = Project.objects.filter(owner__username=username)
+  # themes = Theme.objects.all()
+  # context={'projects': projects, 'themes': themes}
+  # return render(request, 'workspace/start.html', context=context)
+  """
+  New version:
+  Serves the whole application package
+  """
+  return render(request, 'workspace.html', context={})
 
 
 @login_required
