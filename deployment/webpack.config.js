@@ -41,11 +41,10 @@ module.exports = {
 
   plugins: [
     new webpack.ProvidePlugin({
-      'React': 'react',
-      'ReactDOM': 'react-dom',
-      '$': 'jquery',
-      'jQuery': 'jquery'
-      // '_':          'lodash'
+      React: 'react',
+      ReactDOM: 'react-dom',
+      $: 'jquery',
+      jQuery: 'jquery'
     })
   ]
 };

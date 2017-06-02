@@ -1,8 +1,59 @@
+import NavMenuList from './NavMenuList.js';
+
 // 
 // NavBar component
 // 
 class NavBar extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      menu: [
+        {
+          // slug: 'projects',
+          label: 'Projects',
+          disabled: false,
+          children: [
+            {
+              slug: 'browseProjects',
+              label: 'Browse Projects...',
+              targetModal: '#browse-projects-modal',
+              disabled: false
+            },
+            {
+              slug: 'createProject',
+              label: 'Create New...',
+              targetModal: '#create-project-modal',
+              disabled: false
+            },
+            {
+              slug: 'closeProject',
+              label: 'Close',
+              disabled: true
+            }
+          ]
+        },
+        {
+          // slug: 'templates',
+          label: 'Templates',
+          disabled: false,
+          children: [
+            {
+              slug: 'browseTemplates',
+              label: 'Browse Templates...',
+              disabled: false
+            }
+          ]
+        }
+      ]
+    };
+  }
+
   render () {
+    let menu = this.state.menu.map(function(menuItem, index){
+      return <NavMenuList key={'menuItem_' + index} label={menuItem.label} disabled={menuItem.disabled} children={menuItem.children} />;
+    });
+
     return (
       <div className="navbar navbar-inverse navbar-fixed-top">
         <form>
@@ -18,41 +69,9 @@ class NavBar extends React.Component {
   
             <div className="navbar-collapse collapse" id="navbar-main">
               <ul className="nav navbar-nav">
-                <li className="dropdown">
-                  <a className="dropdown-toggle" data-toggle="dropdown" href="#" id="themes" aria-expanded="false">Projects <span className="caret"></span></a>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a href="#" data-toggle="modal" data-target="#project-browser-modal" className="project-browser">
-                        Browse Projects...
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" data-toggle="modal" data-target="#create-project-modal">
-                        Create New...
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">Close</a>
-                    </li>
-                    <li className="divider"></li>
-                    <li>
-                      <a href="#">My Recent Project</a>
-                    </li>
-                  </ul>
-                </li>
-                <li className="dropdown">
-                  <a className="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">Templates <span className="caret"></span></a>
-                  <ul className="dropdown-menu">
-                    <li><a href="#">Browse Templates...</a></li>
-                    <li className="divider"></li>
-                    <li><a href="#">Flatly</a></li>
-                    <li><a href="#">Journal</a></li>
-                    <li><a href="#">Lumen</a></li>
-                    <li><a href="#">Paper</a></li>
-                    <li><a href="#">Readable</a></li>
-                    <li><a href="#">Sandstone</a></li>
-                  </ul>
-                </li>
+
+                { menu }
+                
               </ul>
             </div>
           </div>
