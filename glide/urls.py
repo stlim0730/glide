@@ -17,10 +17,10 @@ from django.conf.urls import url, include
 from django.views.generic import TemplateView
 from django.contrib import admin
 
-
 urlpatterns = [
   url(r'^workspace/', include('workspace.urls')),
   url(r'^user/', include('user.urls')),
+  url(r'^api/', include('api.urls')),
   url(r'^$', TemplateView.as_view(template_name='index.html')),
   url(r'^admin/', include(admin.site.urls)),
 ]
