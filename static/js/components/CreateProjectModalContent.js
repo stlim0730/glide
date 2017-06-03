@@ -6,23 +6,81 @@ class CreateProjectModalContent extends React.Component {
     super(props);
 
     this.state = {
+      projectTitle: '',
       githubUrl: '',
-      themeSelected: false
+      description: '',
+      themeSelected: null,
+      themes: []
     };
 
-    this.handleChange = this.handleChange.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
+    this.handleDescChange = this.handleDescChange.bind(this);
+    this.handleThemeClick = this.handleThemeClick.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.reset = this.reset.bind(this);
   }
 
-  handleChange(e) {
-    this.setState({
-      githubUrl: e.target.value.toLowerCase()
-        .replace(/\s+/g, '-') // Replace spaces with -
-        .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-        .replace(/\-\-+/g, '-') // Replace multiple - with single -
-        .replace(/^-+/, '') // Trim - from start of text
-        .replace(/-+$/, '') // Trim - from end of text
-        .trim()
+  componentDidMount() {
+    // GET all themes
+    let url = '/api/theme';
+    let self = this;
+    $.ajax({
+      url: url,
+      success: function(response) {        
+        self.setState({
+          themes: response
+        });
+      }
     });
+  }
+
+  handleTitleChange(e) {
+    this.state.projectTitle = e.target.value;
+    if(this.state.projectTitle.trim() != '') {
+      let prefix = 'https://github.com/';
+      let username = window.glide.username.split('@')[0];
+      this.setState({
+        githubUrl: (prefix + username + '/' +
+          e.target.value.toLowerCase()
+            .replace(/\s+/g, '-') // Replace spaces with -
+            .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+            .replace(/\-\-+/g, '-') // Replace multiple - with single -
+            .replace(/^-+/, '') // Trim - from start of text
+            .replace(/-+$/, '') // Trim - from end of text
+            .trim())
+      });
+    }
+    else {
+      this.setState({
+        githubUrl: ''
+      });
+    }
+  }
+
+  handleDescChange(e) {
+    this.state.description = e.target.value;
+  }
+
+  handleThemeClick(e) {
+    this.setState({
+      themeSelected: e.target.value
+    });
+  }
+
+  reset() {
+    this.setState({
+      githubUrl: '',
+      themeSelected: null
+    });
+
+    this.titleInput.value = '';
+    this.descInput.value = '';
+  }
+
+  handleSubmit(e) {
+    console.info(this.state);
+
+    this.reset();
   }
 
   render() {
@@ -37,9 +95,9 @@ class CreateProjectModalContent extends React.Component {
           <div className="row">
             <fieldset>
               <div className="form-group">
-                <label htmlFor="project-title" className="col-md-2 col-md-offset-1 control-label">Project Title</label>
+                <label className="col-md-2 col-md-offset-1 control-label">Project Title</label>
                 <div className="col-md-7">
-                  <input type="text" onChange={this.handleChange} className="form-control" maxLength="20"/>
+                  <input type="text" ref={(c) => this.titleInput = c} onChange={this.handleTitleChange} className="form-control" maxLength="20"/>
                 </div>
               </div>
 
@@ -55,18 +113,30 @@ class CreateProjectModalContent extends React.Component {
               </div>
 
               <div className="form-group">
-                <label htmlFor="project-description" className="col-md-2 col-md-offset-1 control-label">Description</label>
+                <label className="col-md-2 col-md-offset-1 control-label">Description</label>
                 <div className="col-md-7">
-                  <input type="text" className="form-control" maxLength="100" placeholder="Optional" />
+                  <input type="text" ref={(c) => this.descInput = c} onChange={this.handleDescChange} className="form-control" maxLength="100" placeholder="Optional" />
                 </div>
               </div>
 
               <div className="form-group">
-                <label htmlFor="" className="col-md-2 col-md-offset-1 control-label">
+                <label className="col-md-2 col-md-offset-1 control-label">
                   Select a Theme
-                </label><br/>
-                <div className="col-md-9 col-md-offset-3">
-                  Here goes the theme list.
+                </label>
+                <div className="col-md-9">
+                  {
+                    this.state.themes.map(function(item, index) {
+                      return (
+                        <div key={item.slug} className="radio col-md-3">
+                          <label>
+                            <input type="radio" name="theme" value={item.slug}
+                            onClick={this.handleThemeClick} checked={this.state.themeSelected === item.slug}/>
+                            {item.name}
+                          </label>
+                        </div>
+                      );
+                    }.bind(this))
+                  }
                 </div>
               </div>
             </fieldset>
@@ -74,8 +144,11 @@ class CreateProjectModalContent extends React.Component {
         </div>
         
         <div className="modal-footer">
-          <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" className="btn btn-primary" data-dismiss="modal" disabled={!this.state.themeSelected || this.state.githubUrl==''}>Submit</button>
+          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.reset}>Close</button>
+          <button type="submit" className="btn btn-primary" data-dismiss="modal"
+            disabled={!this.state.themeSelected || this.state.githubUrl==''} onClick={this.handleSubmit}>
+            Submit
+          </button>
         </div>
       </div>
     );
@@ -83,16 +156,3 @@ class CreateProjectModalContent extends React.Component {
 }
 
 export default CreateProjectModalContent;
-
-// {% for theme in themes %}
-//   <div className="radio col-md-3">
-//     <label>
-//       <input type="radio" name="theme" value="{{ theme.slug }}" />
-//       {{ theme.name }}
-//     </label>
-//   </div>
-
-//   {% if forloop.counter|divisibleby:3 %}
-//     <div className="col-md-3"></div>
-//   {% endif %}
-// {% endfor %}

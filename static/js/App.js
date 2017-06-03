@@ -53,7 +53,7 @@ class App extends React.Component {
         return (
           <div>
             <NavBar />
-            <Modal id="create-project-modal" modalContent={<CreateProjectModalContent />} large={true} />
+            <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} />} large={true} />
             <Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent />} large={true} />
           </div>
           // <StartPanel />
