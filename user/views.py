@@ -76,7 +76,8 @@ def loggingIn(request, repoProvider):
           githubUser = json.loads(githubUserRes.read().decode('utf-8'))
           repoUsername = githubUser['login']
           username = '{}@{}'.format(repoUsername, repoProvider)
-          # See if the user exists
+          request.session['username'] = username
+          # See if the user exists on Glide server
           exUser = User.objects.filter(username=username)
           if not exUser:
             # Welcome this newbie!

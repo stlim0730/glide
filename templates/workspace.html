@@ -16,7 +16,9 @@
     <div id="content" class="container"></div>
     <script>
       window.glide = {
-        username: '{{request.user.username}}'
+        username: '{{ request.user.username }}', // Also in session variable
+        csrfToken: '{{ csrf_token }}'
+        // accessToken: '{{request.session.accessToken}}', // In session variable
       };
     </script>
     {% render_bundle "main" %}

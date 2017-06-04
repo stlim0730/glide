@@ -7,7 +7,8 @@ class CreateProjectModalContent extends React.Component {
 
     this.state = {
       projectTitle: '',
-      githubUrl: '',
+      slug: '',
+      repoUrl: '',
       description: '',
       themeSelected: null,
       themes: []
@@ -36,23 +37,23 @@ class CreateProjectModalContent extends React.Component {
 
   handleTitleChange(e) {
     this.state.projectTitle = e.target.value;
+    this.state.slug = this.state.projectTitle.toLowerCase()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+      .replace(/\-\-+/g, '-') // Replace multiple - with single -
+      .replace(/^-+/, '') // Trim - from start of text
+      .replace(/-+$/, '') // Trim - from end of text
+      .trim();
     if(this.state.projectTitle.trim() != '') {
       let prefix = 'https://github.com/';
       let username = window.glide.username.split('@')[0];
       this.setState({
-        githubUrl: (prefix + username + '/' +
-          e.target.value.toLowerCase()
-            .replace(/\s+/g, '-') // Replace spaces with -
-            .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-            .replace(/\-\-+/g, '-') // Replace multiple - with single -
-            .replace(/^-+/, '') // Trim - from start of text
-            .replace(/-+$/, '') // Trim - from end of text
-            .trim())
+        repoUrl: (prefix + username + '/' + this.state.slug)
       });
     }
     else {
       this.setState({
-        githubUrl: ''
+        repoUrl: ''
       });
     }
   }
@@ -69,7 +70,7 @@ class CreateProjectModalContent extends React.Component {
 
   reset() {
     this.setState({
-      githubUrl: '',
+      repoUrl: '',
       themeSelected: null
     });
 
@@ -78,7 +79,26 @@ class CreateProjectModalContent extends React.Component {
   }
 
   handleSubmit(e) {
-    console.info(this.state);
+    // POST new project info
+    let url = '/api/project/create';
+    let self = this;
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        title: self.state.projectTitle,
+        description: self.state.description,
+        slug: self.state.slug,
+        repoUrl: self.state.repoUrl,
+        theme: self.state.themeSelected
+      }),
+      contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded',//,
+      success: function(response) {
+        console.info(response);
+      }
+    });
 
     this.reset();
   }
@@ -106,7 +126,7 @@ class CreateProjectModalContent extends React.Component {
                   <span className="help-block">Your project repository will be:
                     <br />
                     <span className="text-primary">
-                      {this.state.githubUrl}
+                      {this.state.repoUrl}
                     </span>
                   </span>
                 </div>
@@ -146,7 +166,7 @@ class CreateProjectModalContent extends React.Component {
         <div className="modal-footer">
           <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.reset}>Close</button>
           <button type="submit" className="btn btn-primary" data-dismiss="modal"
-            disabled={!this.state.themeSelected || this.state.githubUrl==''} onClick={this.handleSubmit}>
+            disabled={!this.state.themeSelected || this.state.repoUrl==''} onClick={this.handleSubmit}>
             Submit
           </button>
         </div>
