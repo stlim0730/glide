@@ -97,13 +97,26 @@ class CreateProjectModalContent extends React.Component {
       contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded',//,
       success: function(response) {
         console.info(response);
+        if('error' in response) {
+
+        }
+        else {
+          self.reset();
+          let project = JSON.parse(response.project);
+          let app = self.props.app;
+          let projects = response.projects;
+          app.setState({
+            phase: app.state.constants.APP_PHASE_OPEN,
+            project: project.name,
+            projects: projects
+          });
+        }
       }
     });
-
-    this.reset();
   }
 
   render() {
+    // console.info('CreateProjectModalContent', this.state);
     return (
       <div className="modal-content">
         <div className="modal-header">

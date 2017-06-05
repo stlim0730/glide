@@ -11,6 +11,6 @@ class ProjectSerializer(serializers.ModelSerializer):
     model = Project
     fields = (
       'owner', 'contributors', 'title', 'slug',
-      'description', 'repoUrl', 'gitUrl', 'isPrivate',
+      'description', 'repoUrl', 'isPrivate',
       'createdAt', 'updatedAt', 'theme'
     )

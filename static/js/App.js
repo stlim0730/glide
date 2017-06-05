@@ -17,13 +17,7 @@ import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
 import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
-
-// 
-// Constants
-// 
-const APP_PHASE_CLEAN_SLATE = 'clean_slate';
-const APP_PHASE_OPEN = 'open';
-const APP_PHASE_LOADING = 'loading';
+import FileSideBar from './components/FileSideBar.js';
 
 // 
 // App component
@@ -35,40 +29,63 @@ class App extends React.Component {
 
     // Can't use this.setState() before it's mounted.
     this.state = {
-      phase: APP_PHASE_CLEAN_SLATE
+      constants: {
+        APP_PHASE_CLEAN_SLATE: 'clean_slate',
+        APP_PHASE_OPEN: 'open',
+        APP_PHASE_LOADING: 'loading'
+      },
+
+      phase: 'clean_slate',
+      project: null,
+      projects: []
     };
 
     // this.clickHandler = this.clickHandler.bind(this);
   }
+
+  // componentDidUpdate(prevProps, prevState) {
+    
+  // }
 
   // clickHandler() {
   //   this.setState({phase: APP_PHASE_OPEN});
   // }
 
   render() {
+    console.info('App', this.state);
+    let modals = (
+      <div>
+        <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />
+        <Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />
+      </div>
+    );
 
     switch(this.state.phase) {
-      case APP_PHASE_CLEAN_SLATE:
+      case this.state.constants.APP_PHASE_CLEAN_SLATE:
 
         return (
           <div>
             <NavBar />
-            <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} />} large={true} />
-            <Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent />} large={true} />
+            { modals }
           </div>
           // <StartPanel />
         );
 
-      case APP_PHASE_OPEN:
+      case this.state.constants.APP_PHASE_OPEN:
         return (
-          <NavBar />
-          // <StartPanel />
+          <div>
+            <NavBar />
+            { modals }
+            <FileSideBar app={this} project={this.state.project} />
+          </div>
         );
 
-      case APP_PHASE_LOADING:
+      case this.state.constants.APP_PHASE_LOADING:
         return (
-          <NavBar />
-          // <StartPanel />
+          <div>
+            <NavBar />
+            { modals }
+          </div>
         );
       
       default:
