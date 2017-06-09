@@ -1,4 +1,6 @@
 // import FileListGroup from './FileListGroup.js';
+// import FolderButton from './FolderButton.js';
+import FileNode from './FileNode.js';
 
 // 
 // FileSideBar component
@@ -13,7 +15,7 @@ class FileSideBar extends React.Component {
         FOLDER_VIEW: 'path'
       },
       groupBy: 'path',
-      files: [],
+      tree: {},
       project: this.props.project
     };
 
@@ -21,7 +23,7 @@ class FileSideBar extends React.Component {
   }
 
   _loadTree(project) {
-    // GET project tree
+    // GET project file structure
     let url = '/api/project/tree/' + project;
     let self = this;
     $.ajax({
@@ -35,7 +37,7 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            files: _.concat(response.repoTree.tree, response.themeTree.tree),
+            tree: response.tree,
             project: project
           });
         }
@@ -48,19 +50,18 @@ class FileSideBar extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // console.info('FileSideBar is changing to', nextProps);
     this._loadTree(nextProps.project);
   }
 
   render () {
     return (
-      <div>
+      <div className="col-lg-2 col-md-2 full-height right-border">
         <label className="h5">Files in {this.state.project}</label>
         {
           this.state.groupBy == 'type'
           ?
           (
-            <div className="full-height y-scroll">
+            <div className="auto-scroll full-height">
               <FileListGroup label="Glide Data" default={true} />
               <FileListGroup label="Template HTML" default={false} />
               <FileListGroup label="Template CSS" default={false} />
@@ -68,14 +69,8 @@ class FileSideBar extends React.Component {
           )
           :
           (
-            <div className="full-height y-scroll">
-              {
-                this.state.files.map(function(item, index) {
-                  return (
-                    <div key={index}>{item.path}</div>
-                  );
-                })
-              }
+            <div className="auto-scroll full-height">
+              <FileNode nodes={this.state.tree.nodes} />
             </div>
           )
         }

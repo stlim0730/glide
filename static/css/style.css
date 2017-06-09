@@ -9,7 +9,7 @@ body { padding-top: 70px; padding-bottom: 21px;}
 .height-90 { height: 90%; }
 .height-60 { height: 60%; }
 .height-40 { height: 40%; }
-.y-scroll { overflow-x: hidden; overflow-y: auto; }
+.auto-scroll { overflow-x: auto; overflow-y: auto; }
 .navbar button.btn-sm {
   margin-top: 10px;
 }
@@ -33,6 +33,10 @@ body { padding-top: 70px; padding-bottom: 21px;}
   padding-top: 15px;
   min-height: 70px;
   text-align: center;
+}
+button.file-node-folder + ul .file-node-folder,
+button.file-node-folder + ul .file-node-file {
+  margin-left: 10px;
 }
 .repo-file-link.opened {
   font-weight: bold;

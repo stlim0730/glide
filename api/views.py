@@ -137,13 +137,116 @@ def getProjectTree(request, slug):
   repoTree = _getRepoTree(accessToken, repoUsername, project.slug)
   # GET the tree structure of the theme repository
   themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
+  # Resolve path strings:
+  #   Trees from GitHub have meta data on path.
+  #   Build file structrue using the meta data.
   paths = list(set([file['path'] for file in repoTree['tree'] if file['type']=='tree'] + [file['path'] for file in themeTree['tree'] if file['type']=='tree']))
-  def compare(item1, item2):
-    if len(item1.split('/')) < len(item2.split('/')):
-      return -1
-    elif len(item1.split('/')) > len(item2.split('/')):
-      return 1
-    else:
-      return 0
-  paths = sorted(paths, key=lambda x:len(x.split('/')))
-  return Response({'repoTree': repoTree, 'themeTree': themeTree, 'paths':paths})
+  # paths must have path strings in descending order: deepest first!
+  paths = sorted(paths, key=lambda x:len(x.split('/')), reverse=True)
+  
+  def pathToDict(pathString):
+    """
+    Convert a sigle path string into a nested dictionary.
+    """
+    pathList = pathString.split('/')
+    pathList.reverse()
+    stack = [{}]
+    for path in pathList:
+      stack.append({path: stack.pop()})
+    return stack[0]
+
+  def mergeDicts(d1, d2):
+    """
+    Merge two nested dictionaries into one.
+    """
+    if d1 == {}:
+      return d2
+    if d2 == {}:
+      return d1
+    res = {}
+    commonKeys = list(set(d1.keys()) & set(d2.keys()))
+    for commonKey in commonKeys:
+      res[commonKey] = mergeDicts(d1[commonKey], d2[commonKey])
+    for key in list(d1.keys()):
+      if not key in commonKeys:
+        res[key] = d1[key]
+    for key in list(d2.keys()):
+      if not key in commonKeys:
+        res[key] = d2[key]
+    return res
+
+  def traversFs(fsDict, stack, f):
+    """
+    Traverses fsDict to return:
+    {
+      "file-or-folder-name": {"content": "...", "file": {...}}
+    }
+    """
+    for folder in list(fsDict.keys()):
+      stack.append(folder)
+      traversFs(fsDict[folder], stack, f)
+      filesInFolder = [file for file in f if file['type'] != 'tree' and file['path'].startswith('/'.join(stack))]
+      # print('{}: {}'.format('/'.join(stack), filesInFolder))
+      for file in filesInFolder:
+        name = file['name']
+        file['content'] = None
+        fsDict[folder][name] = file
+        f.remove(file)
+      stack.pop()
+
+  def transformFs(fsDict, res, parentPath):
+    # def _isFolder(x):
+    #   if not 'content' in x:
+    #     return True
+    #   else:
+    #     return False
+    # res['folders'] = []
+    # res['files'] = []
+    # for key in fsDict:
+    #   if _isFolder(fsDict[key]):
+    #     path = '/'.join([parentPath, key])
+    #     thisFolder = {'name': key, 'path': path}
+    #     res['folders'].append(transformFs(fsDict[key], thisFolder, path))
+    #   else:
+    #     res['files'].append(fsDict[key])
+    # return res
+    def _isFolder(x):
+      if not 'content' in x:
+        return True
+      else:
+        return False
+    res['nodes'] = []
+    for key in fsDict:
+      if _isFolder(fsDict[key]):
+        path = '/'.join([parentPath, key])
+        thisFolder = {'name': key, 'path': path, 'type': 'tree'}
+        res['nodes'].append(transformFs(fsDict[key], thisFolder, path))
+      else:
+        fsDict[key]['nodes'] = []
+        res['nodes'].append(fsDict[key])
+    return res
+
+
+  pathDicts = []
+  fs = {}
+  for path in paths:
+    pathDict = pathToDict(path)
+    pathDicts.append(pathDict)
+  for pathDict in pathDicts:
+    fs = mergeDicts(fs, pathDict)
+  # Remove file name duplicates from repo and theme
+  themePaths = set([file['path'] for file in themeTree['tree']])
+  repoPaths = set([file['path'] for file in repoTree['tree']])
+  duplicates = list(themePaths & repoPaths)
+  files = [file for file in themeTree['tree'] if not file['path'] in duplicates] + repoTree['tree']
+  # Fill out the file structure with files.
+  traversFs(fs, [], files)
+  # Add files from root
+  rootFiles = [file for file in themeTree['tree'] if not file['path'] in duplicates and file['path'] == file['name'] and file['type'] != 'tree'] + [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
+  for file in rootFiles:
+    name = file['name']
+    file['content'] = None
+    fs[file['name']] = file
+  # Transform fs for React-friendly form
+  tree = transformFs(fs, {}, '')
+  return Response({'tree': tree})
