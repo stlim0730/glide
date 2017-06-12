@@ -17,7 +17,7 @@ import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
 import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
-import ProjectLabel from './components/ProjectLabel.js';
+import ProjectToolBar from './components/ProjectToolBar.js';
 import FileSideBar from './components/FileSideBar.js';
 import EditorPane from './components/EditorPane.js';
 import RuntimePane from './components/RuntimePane.js';
@@ -81,7 +81,7 @@ class App extends React.Component {
           <div className="row full-height">
             <NavBar />
             {modals}
-            <ProjectLabel project={this.state.project} />
+            <ProjectToolBar app={this} project={this.state.project} />
             <FileSideBar app={this} project={this.state.project} />
             <EditorPane app={this} fileActive={this.state.fileActive} fileOpened={this.state.fileOpened} />
             <RuntimePane app={this} />
