@@ -4,20 +4,17 @@ body { padding-top: 70px; padding-bottom: 21px;}
 @media screen and (max-width: 768px) {
   body { padding-top: 0px; }
 }
-.full-height { height: 100%; }
+.full-height { height: 98.8%; }
 .height-95 { height: 95%; }
 .height-90 { height: 90%; }
-.height-60 { height: 60%; }
-.height-40 { height: 40%; }
-.y-scroll { overflow-x: hidden; overflow-y: auto; }
+.height-60 { height: 59%; }
+.height-40 { height: 38.5%; }
+.auto-scroll { overflow-x: auto; overflow-y: auto; }
+div.panel + div.panel {
+  margin-top: -15px;
+}
 .navbar button.btn-sm {
   margin-top: 10px;
-}
-.left-border {
-  border-left: 1px solid #222222;
-}
-.right-border {
-  border-right: 1px solid #d5d5d5;
 }
 .page-thumbnail-wrapper {
   margin-bottom: 10px;
@@ -33,6 +30,10 @@ body { padding-top: 70px; padding-bottom: 21px;}
   padding-top: 15px;
   min-height: 70px;
   text-align: center;
+}
+button.file-node-folder + ul .file-node-folder,
+button.file-node-folder + ul .file-node-file {
+  margin-left: 10px;
 }
 .repo-file-link.opened {
   font-weight: bold;

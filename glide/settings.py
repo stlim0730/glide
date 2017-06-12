@@ -44,9 +44,15 @@ INSTALLED_APPS = [
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
+
+  # Third-party apps
+  'channels',
+  'webpack_loader',
+  
+  # Local apps
   'workspace',
   'user',
-  'channels'
+  'api'
 ]
 
 MIDDLEWARE = [
@@ -60,6 +66,13 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'glide.urls'
+
+WEBPACK_LOADER = {
+  'DEFAULT': {
+    'BUNDLE_DIR_NAME': '',
+    'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
+  }
+}
 
 TEMPLATES = [
   {
@@ -149,6 +162,22 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+REST_FRAMEWORK = {
+  'DEFAULT_RENDERER_CLASSES': (
+    'rest_framework.renderers.JSONRenderer',
+  ),
+  'DEFAULT_PARSER_CLASSES': (
+    'rest_framework.parsers.JSONParser',
+  ),
+  'DEFAULT_AUTHENTICATION_CLASSES': (
+    'rest_framework.authentication.SessionAuthentication',
+  ),
+  'DEFAULT_PERMISSION_CLASSES': (
+    'rest_framework.permissions.IsAuthenticated',
+  )
+}
 
 
 # Static files (CSS, JavaScript, Images)

@@ -1,0 +1,26 @@
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Learn, Build, and Test Your Storytelling!">
+    <meta name="author" content="Seongtaek Lim">
+    <title>Glide: IDE to learn web development</title>
+  </head>
+
+  <body>
+    <div id="content" class="container-fluid full-height"></div>
+    <script>
+      window.glide = {
+        username: '{{ request.user.username }}', // Also in session variable
+        csrfToken: '{{ csrf_token }}'
+        // accessToken: '{{request.session.accessToken}}', // In session variable
+      };
+    </script>
+    {% render_bundle "main" %}
+  </body>
+</html>

@@ -35,7 +35,7 @@ sudo apt-get install -y git
 # 
 sudo apt-get install -y python3-pip
 sudo apt-get install -y python-dev python-setuptools python-imaging libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
-sudo export PYTHONPATH=/usr/local/lib/python3.4/dist-packages:$PYTHONPATH # Don't know why it doesn't work
+# sudo export PYTHONPATH=/usr/local/lib/python3.4/dist-packages:$PYTHONPATH # Don't know why it doesn't work
 sudo pip3 install --upgrade pip
 # sudo cp /$PROJECT_NAME/deployment/aliases ~/.bash_aliases
 # sudo easy_install pip
@@ -123,6 +123,22 @@ cd /$PROJECT_NAME && sudo uwsgi --daemonize /var/log/uwsgi-daemon.log --socket :
 # TODO: Deamonize Redis server
 # 
 # sudo redis-server
+
+
+# 
+# Install NodeJS
+# 
+curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo apt-get install -y npm
+# sudo npm install npm --global # To update npm
+# sudo npm install -g babel webpack webpack-dev-server
+
+
+# 
+# Install NodeJS Packages
+# 
+cd /$PROJECT_NAME && sudo npm install
 
 
 # 
