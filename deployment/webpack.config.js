@@ -8,14 +8,8 @@ module.exports = {
 
   output: {
     filename: 'Glide.js',
-    path: path.resolve(PROJECT_ROOT, 'static')
+    path: path.resolve(PROJECT_ROOT, 'static/js')
   },
-
-  plugins: [
-    new BundleTracker({
-      filename: './webpack-stats.json'
-    }),
-  ],
 
   module: {
     rules: [
@@ -46,6 +40,9 @@ module.exports = {
       $: 'jquery',
       jQuery: 'jquery',
       _: 'lodash'
+    }),
+    new BundleTracker({
+      filename: './webpack-stats.json'
     })
   ]
 };

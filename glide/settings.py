@@ -67,9 +67,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'glide.urls'
 
+# 
+# TODO: JS bundle is not loaded on production server
+# 
 WEBPACK_LOADER = {
   'DEFAULT': {
-    'BUNDLE_DIR_NAME': '',
+    'BUNDLE_DIR_NAME': 'js/',
     'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json')
   }
 }
