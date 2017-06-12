@@ -17,7 +17,10 @@ import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
 import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
+import ProjectLabel from './components/ProjectLabel.js';
 import FileSideBar from './components/FileSideBar.js';
+import EditorPane from './components/EditorPane.js';
+import RuntimePane from './components/RuntimePane.js';
 
 // 
 // App component
@@ -37,7 +40,9 @@ class App extends React.Component {
 
       phase: 'clean_slate',
       project: null,
-      projects: []
+      projects: [],
+      fileOpened: [],
+      fileActive: null
     };
 
     // this.clickHandler = this.clickHandler.bind(this);
@@ -66,7 +71,7 @@ class App extends React.Component {
         return (
           <div className="row full-height">
             <NavBar />
-            { modals }
+            {modals}
           </div>
           // <StartPanel />
         );
@@ -75,8 +80,11 @@ class App extends React.Component {
         return (
           <div className="row full-height">
             <NavBar />
-            { modals }
+            {modals}
+            <ProjectLabel project={this.state.project} />
             <FileSideBar app={this} project={this.state.project} />
+            <EditorPane app={this} fileActive={this.state.fileActive} fileOpened={this.state.fileOpened} />
+            <RuntimePane app={this} />
           </div>
         );
 
@@ -84,7 +92,7 @@ class App extends React.Component {
         return (
           <div>
             <NavBar />
-            { modals }
+            {modals}
           </div>
         );
       

@@ -23,7 +23,7 @@ class BrowseProjectsModalContent extends React.Component {
       success: function(response) {
         console.info(response);
         if('error' in response) {
-          //
+          // TODO
         }
         else {
           self.setState({
@@ -44,7 +44,6 @@ class BrowseProjectsModalContent extends React.Component {
   }
 
   handleProjectClick(project, e) {
-    // let project = e.target.getAttribute('data-project');
     let app = this.props.app;
     app.setState({
       phase: app.state.constants.APP_PHASE_OPEN,

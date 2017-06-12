@@ -1,5 +1,3 @@
-// import FileListGroup from './FileListGroup.js';
-// import FolderButton from './FolderButton.js';
 import FileNode from './FileNode.js';
 
 // 
@@ -16,15 +14,17 @@ class FileSideBar extends React.Component {
       },
       groupBy: 'path',
       tree: {},
-      project: this.props.project
+      project: this.props.project,
+      fileOpened: [],
+      fileActive: null
     };
 
     this._loadTree = this._loadTree.bind(this);
   }
 
-  _loadTree(project) {
+  _loadTree(projectSlug) {
     // GET project file structure
-    let url = '/api/project/tree/' + project;
+    let url = '/api/project/tree/' + projectSlug;
     let self = this;
     $.ajax({
       url: url,
@@ -33,7 +33,7 @@ class FileSideBar extends React.Component {
       success: function(response) {
         console.info('_loadTree AJAX success', response);
         if('error' in response) {
-          //
+          // TODO
         }
         else {
           self.setState({
@@ -54,43 +54,28 @@ class FileSideBar extends React.Component {
 
   render () {
     return (
-      <div className="col-lg-2 col-md-2 full-height right-border">
-        <label className="h5">Files in {this.state.project.title}</label>
-        {
-          this.state.groupBy == 'type'
-          ?
-          (
-            <div className="auto-scroll full-height">
-              <FileListGroup label="Glide Data" default={true} />
-              <FileListGroup label="Template HTML" default={false} />
-              <FileListGroup label="Template CSS" default={false} />
-            </div>
-          )
-          :
-          (
-            <div className="auto-scroll full-height">
-              <FileNode nodes={this.state.tree.nodes} />
-            </div>
-          )
-        }
+      <div className="col-lg-2 col-md-2 full-height">
+        <div className="panel panel-default full-height">
+          <div className="panel-heading">Files</div>
+
+          {
+            this.state.groupBy == 'type'
+            ?
+            (
+              <div className="auto-scroll full-height">
+              </div>
+            )
+            :
+            (
+              <div className="auto-scroll full-height panel-body">
+                <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
+              </div>
+            )
+          }
+        </div>
       </div>
     );
   }
 }
 
 export default FileSideBar
-
-// {% include "partials/file_list_group.html" with list_group_name="Glide Data" default=True tree=repoTree editor="data" %}
-// {% include "partials/file_list_group.html" with list_group_name="Template HTML" default=False tree=themeTree editor="html" %}
-// {% include "partials/file_list_group.html" with list_group_name="Template CSS" default=False tree=themeTree editor="css" %}
-
-// <div className="btn-toolbar">
-//   <div className="btn-group">
-//     <a href="#" className={("btn btn-default" + this.state.groupBy=="type" ? " active" : "")}>
-//       <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
-//     </a>
-//     <a href="#" className={("btn btn-default" + this.state.groupBy=="folder" ? " active" : "")}>
-//       <span className="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-//     </a>
-//   </div>
-// </div>

@@ -6,14 +6,12 @@ class FileNode extends React.Component {
     super(props);
 
     this.state = {
-      // tree: {
-        // folders: [],
-        // files: []
-        nodes: []
-      // }
+      nodes: []
     };
 
     this._slugify = this._slugify.bind(this);
+    this.handleFileClick = this.handleFileClick.bind(this);
+    // this._openFile = this._openFile.bind(this);
   }
 
   componentDidMount() {
@@ -33,6 +31,7 @@ class FileNode extends React.Component {
     // This event seems to affect the root node's behavior.
     //   Compared to children nodes, the root node is static
     //   so that the state is determined when it receives props.
+    // 
     let orderedNodes = _.orderBy(nextProps.nodes, ['type','name'], ['desc', 'asc']);
     this.setState({
       nodes: orderedNodes
@@ -49,14 +48,39 @@ class FileNode extends React.Component {
       .trim();
   }
 
+  // _openFile() {
+  //   let fileSideBar = this.props.fileSideBar;
+  //   let file = fileSideBar.state.fileSelected;
+  //   if(fileSideBar.state.fileOpened.length > 0) {
+  //     console.info('openFile', file);
+  //     console.info('openFile', fileSideBar.state.fileOpened);
+  //   }
+  // }
+
+  handleFileClick(file, e) {
+    let fileSideBar = this.props.fileSideBar;
+    let app = this.props.app;
+
+    let fileOpened = fileSideBar.state.fileOpened;
+    fileOpened.push(file);
+    fileSideBar.setState({
+      fileOpened: fileOpened,
+      fileActive: file
+    }, function() {
+      app.setState({
+        fileOpened: fileOpened,
+        fileActive: file
+      });
+    });
+  }
+
   render () {
-    
     return (
       <div>
         {
           this.state.nodes && this.state.nodes.map(function(item, index) {
-
             if(item.type == 'tree') {
+              // Render a folder
               return (
                 <div key={index}>
                   <button href="#" className="btn btn-link file-node-folder" data-toggle="collapse"
@@ -72,47 +96,15 @@ class FileNode extends React.Component {
               );
             }
             else {
+              // Render a file.
               return (
-                <button key={index} className="list-group-item file-node-file" data-download-url={item.downloadUrl}>
+                <button key={index} className="list-group-item file-node-file"
+                data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
                   {item.name}
                 </button>
               );
             }
-
-            // return (
-              // <div key={index}>
-              //   {
-              //     item.type == 'tree'
-              //     ?
-              //     <div>
-              //       <button href="#" className="btn btn-link" data-toggle="collapse"
-              //         data-target={"#" + this._slugify(item.path) + "-list-group"}>
-              //         {item.name}&emsp;
-              //         <span className="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-              //       </button>
-              //       <ul id={this._slugify(item.path) + "-list-group"}
-              //         className="list-group collapse">
-              //         <FileNode nodes={item.nodes} />
-              //       </ul>
-              //     </div>
-              //     :
-              //     // item.name + ': ' + item.size
-              //     <button className="list-group-item" data-download-url={item.downloadUrl}>
-              //       {item.name}
-              //     </button>
-              //   }
-              // </div>
-            // );
           }.bind(this))
-        }
-        {
-          // this.state.tree.files.map(function(item, index) {
-          //   return (
-          //     <div key={item.path}>
-          //       {item.name}: {item.size}
-          //     </div>
-          //   );
-          // })
         }
       </div>
     );
