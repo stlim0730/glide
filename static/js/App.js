@@ -64,7 +64,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_CLEAN_SLATE:
 
         return (
-          <div>
+          <div className="row full-height">
             <NavBar />
             { modals }
           </div>
@@ -73,7 +73,7 @@ class App extends React.Component {
 
       case this.state.constants.APP_PHASE_OPEN:
         return (
-          <div>
+          <div className="row full-height">
             <NavBar />
             { modals }
             <FileSideBar app={this} project={this.state.project} />

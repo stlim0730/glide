@@ -48,7 +48,7 @@ class BrowseProjectsModalContent extends React.Component {
     let app = this.props.app;
     app.setState({
       phase: app.state.constants.APP_PHASE_OPEN,
-      project: project.slug
+      project: project//.slug
     });
   }
 
@@ -90,12 +90,3 @@ class BrowseProjectsModalContent extends React.Component {
 }
 
 export default BrowseProjectsModalContent;
-
-// {% for project in projects %}
-//   <div className="col-md-3 project-icon-wrapper">
-//     <a href="/workspace/open/{{ project.slug }}">
-//       <span>{{ project.title }}</span>
-//     </a><br/>
-//     <span className="text-muted">{{ project.createdAt }}</span>
-//   </div>
-// {% endfor %}

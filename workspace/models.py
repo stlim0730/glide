@@ -7,7 +7,6 @@ class Theme(models.Model):
   slug = models.SlugField(unique=True, max_length=100)
   author = models.CharField(max_length=100, default='')
   repoUrl = models.URLField(default=None, max_length=250)
-  gitUrl = models.CharField(default=None, max_length=250)
 
   def __str__(self):
     return self.name

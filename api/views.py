@@ -10,6 +10,10 @@ from workspace.models import Project, Theme
 
 @api_view(['GET'])
 def theme(request, slug):
+  """
+  Responds with a list of all the themes available
+    or a theme when specified
+  """
   themes = Theme.objects.all()
   if slug:
     themes = themes.filter(slug=slug)
@@ -19,6 +23,9 @@ def theme(request, slug):
 
 @api_view(['GET'])
 def project(request, slug):
+  """
+  Responds with a project specified
+  """
   projects = Project.objects.all()
   if slug:
     projects = projects.filter(slug=slug)
@@ -36,11 +43,19 @@ def createProject(request):
   username = request.session['username']
   user = User.objects.filter(username=username)[0]
   accessToken = request.session['accessToken']
+  # Starting from Django 1.5,
+  #   request.POST object does not contain non-form data anymore (e.g., AJAX).
+  #   It is now in request.body object.
+  # Also, consider using
+  #   'application/x-www-form-urlencoded'
+  #   for contentType of AJAX data (on client side)
+  #   rather than 'application/json; charset=utf-8',
+  #   if something goes wrong.
+  title = request.data['title']
+  slug = request.data['slug']
   description = request.data['description']
   repoUrl = request.data['repoUrl']
-  slug = request.data['slug']
   theme = request.data['theme']
-  title = request.data['title']
   getAllReposUrl = 'https://api.github.com/user/repos?access_token={}'.format(accessToken)
   with urlopen(getAllReposUrl) as allReposRes:
     resStr = allReposRes.read().decode('utf-8')
@@ -67,12 +82,16 @@ def createProject(request):
             theme=theme
           )
           projects = Project.objects.all()
-          serializer = ProjectSerializer(projects, many=True)
-          return Response({'project': resStr, 'projects': serializer.data})
+          # serializer = ProjectSerializer(projects, many=True)
+          return Response({'project': ProjectSerializer(project, many=False).data, 'projects': ProjectSerializer(projects, many=True).data})
+    # Error! The project title is being used.
     return Response({'error': 'The project title is being used. Try with a different title.'})
 
 
 def _getLatestCommit(accessToken, repoUsername, projectSlug):
+  """
+  Returns the latest commit object of a repository
+  """
   commitsUrl = 'https://api.github.com/repos/{}/{}/commits?access_token={}'
   commitsUrl = commitsUrl.format(repoUsername, projectSlug, accessToken)
   with urlopen(commitsUrl) as commitsRes:
@@ -84,11 +103,18 @@ def _getLatestCommit(accessToken, repoUsername, projectSlug):
 
 
 def _getLatestSha(accessToken, repoUsername, projectSlug):
+  """
+  Returns the hash value of the latest commit of a repository
+  """
   latestCommit = _getLatestCommit(accessToken, repoUsername, projectSlug)
   return latestCommit['sha']
 
 
-def _getRepoTree(accessToken, repoUsername, projectSlug):
+def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
+  """
+  Returns the latest tree structure of a repository.
+  The branch can be specified. Otherwise, it assumes master.
+  """
   latestSha = _getLatestSha(accessToken, repoUsername, projectSlug)
   repoTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees/{}?recursive=1?access_token={}'
   repoTreeUrl = repoTreeUrl.format(repoUsername, projectSlug, latestSha, accessToken)
@@ -110,8 +136,8 @@ def _getRepoTree(accessToken, repoUsername, projectSlug):
       elif file['ext'] in ['css']:
         file['editor'] = 'css'
       file['name'] = file['path'].split('/')[-1]
-      downloadUrl = 'https://raw.githubusercontent.com/{}/{}/master/{}?access_token={}'
-      file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, file['path'], accessToken)
+      downloadUrl = 'https://raw.githubusercontent.com/{}/{}/{}/{}?access_token={}'
+      file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, branch, file['path'], accessToken)
     # repoTree['tree'] = [file for file in repoTree['tree'] if file['type'] != 'tree']
     return repoTree
 
@@ -131,10 +157,10 @@ def getProjectTree(request, slug):
   user = User.objects.filter(username=username)[0]
   projects = Project.objects.filter(owner__username=username)
   themes = Theme.objects.all()
-  project = projects.filter(slug=slug)[0]
-  theme = themes.filter(slug=project.theme.slug)[0]
+  project = projects.filter(slug=slug) # Leave it as a queryset: querysets are innately serializable as a response!
+  theme = themes.filter(slug=project[0].theme.slug)[0]
   # GET the tree structure of the project repository
-  repoTree = _getRepoTree(accessToken, repoUsername, project.slug)
+  repoTree = _getRepoTree(accessToken, repoUsername, project[0].slug)
   # GET the tree structure of the theme repository
   themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
   # Resolve path strings:
@@ -195,21 +221,6 @@ def getProjectTree(request, slug):
       stack.pop()
 
   def transformFs(fsDict, res, parentPath):
-    # def _isFolder(x):
-    #   if not 'content' in x:
-    #     return True
-    #   else:
-    #     return False
-    # res['folders'] = []
-    # res['files'] = []
-    # for key in fsDict:
-    #   if _isFolder(fsDict[key]):
-    #     path = '/'.join([parentPath, key])
-    #     thisFolder = {'name': key, 'path': path}
-    #     res['folders'].append(transformFs(fsDict[key], thisFolder, path))
-    #   else:
-    #     res['files'].append(fsDict[key])
-    # return res
     def _isFolder(x):
       if not 'content' in x:
         return True
@@ -225,7 +236,6 @@ def getProjectTree(request, slug):
         fsDict[key]['nodes'] = []
         res['nodes'].append(fsDict[key])
     return res
-
 
   pathDicts = []
   fs = {}

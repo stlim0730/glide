@@ -31,14 +31,13 @@ class FileSideBar extends React.Component {
       method: 'GET',
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       success: function(response) {
-        console.info(response);
+        console.info('_loadTree AJAX success', response);
         if('error' in response) {
           //
         }
         else {
           self.setState({
-            tree: response.tree,
-            project: project
+            tree: response.tree
           });
         }
       }
@@ -46,17 +45,17 @@ class FileSideBar extends React.Component {
   }
 
   componentDidMount() {
-    this._loadTree(this.state.project);
+    this._loadTree(this.state.project.slug);
   }
 
   componentWillReceiveProps(nextProps) {
-    this._loadTree(nextProps.project);
+    this._loadTree(nextProps.project.slug);
   }
 
   render () {
     return (
       <div className="col-lg-2 col-md-2 full-height right-border">
-        <label className="h5">Files in {this.state.project}</label>
+        <label className="h5">Files in {this.state.project.title}</label>
         {
           this.state.groupBy == 'type'
           ?
