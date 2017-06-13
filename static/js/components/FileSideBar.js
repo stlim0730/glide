@@ -22,9 +22,9 @@ class FileSideBar extends React.Component {
     this._loadTree = this._loadTree.bind(this);
   }
 
-  _loadTree(projectSlug) {
+  _loadTree(project) {
     // GET project file structure
-    let url = '/api/project/tree/' + projectSlug;
+    let url = '/api/project/tree/' + project.slug;
     let self = this;
     $.ajax({
       url: url,
@@ -37,7 +37,8 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            tree: response.tree
+            tree: response.tree,
+            project: project
           });
         }
       }
@@ -45,11 +46,14 @@ class FileSideBar extends React.Component {
   }
 
   componentDidMount() {
-    this._loadTree(this.state.project.slug);
+    this._loadTree(this.state.project);
   }
 
   componentWillReceiveProps(nextProps) {
-    this._loadTree(nextProps.project.slug);
+    if(this.state.project.slug != nextProps.project.slug) {
+      // Need to update tree
+      this._loadTree(nextProps.project);
+    }
   }
 
   render () {

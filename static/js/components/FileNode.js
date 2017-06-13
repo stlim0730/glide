@@ -60,8 +60,12 @@ class FileNode extends React.Component {
   handleFileClick(file, e) {
     let fileSideBar = this.props.fileSideBar;
     let app = this.props.app;
-
     let fileOpened = fileSideBar.state.fileOpened;
+
+    if(_.includes(fileOpened, file)) {
+      console.info('file already exists!');
+    }
+
     fileOpened.push(file);
     fileSideBar.setState({
       fileOpened: fileOpened,

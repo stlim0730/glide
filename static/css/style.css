@@ -1,7 +1,8 @@
-html,body{ height:100%; overflow: hidden;}
+html,body{ height:100%; overflow: hidden; }
 body { padding-top: 70px; padding-bottom: 21px;}
 *:focus { outline: none !important; }  /* To disable web browser's highlight box */
 @media screen and (max-width: 768px) {
+  html,body{ height:100%; overflow: hidden; }
   body { padding-top: 0px; }
 }
 .full-height { height: 98.8%; }
