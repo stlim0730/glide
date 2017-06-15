@@ -14,12 +14,23 @@ class FileSideBar extends React.Component {
       },
       groupBy: 'path',
       tree: {},
-      project: this.props.project,
+      project: null,
       fileOpened: [],
       fileActive: null
     };
 
     this._loadTree = this._loadTree.bind(this);
+    this._reset = this._reset.bind(this);
+  }
+
+  _reset() {
+    this.setState({
+      groupBy: 'path',
+      tree: {},
+      project: null,
+      fileOpened: [],
+      fileActive: null
+    });
   }
 
   _loadTree(project) {
@@ -46,12 +57,17 @@ class FileSideBar extends React.Component {
   }
 
   componentDidMount() {
-    this._loadTree(this.state.project);
+    this.setState({
+      project: this.props.project
+    }, function() {
+      this._loadTree(this.state.project);
+    });
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.state.project.slug != nextProps.project.slug) {
+    if(this.state.project && this.state.project.slug != nextProps.project.slug) {
       // Need to update tree
+      this._reset();
       this._loadTree(nextProps.project);
     }
   }

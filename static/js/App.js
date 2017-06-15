@@ -44,20 +44,23 @@ class App extends React.Component {
       fileOpened: [],
       fileActive: null
     };
-
-    // this.clickHandler = this.clickHandler.bind(this);
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-    
-  // }
-
-  // clickHandler() {
-  //   this.setState({phase: APP_PHASE_OPEN});
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    if(prevState.project != this.state.project) {
+      this.setState({
+        fileOpened: [],
+        fileActive: null
+      });
+    }
+    else if(prevState.fileActive != this.state.fileActive) {
+      
+    }
+  }
 
   render() {
     console.info('App', this.state);
+
     let modals = (
       <div>
         <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />
@@ -101,8 +104,6 @@ class App extends React.Component {
           <div>WHERE ARE YOU GOING?</div>
         );
     }
-
-    // return <div onClick={this.clickHandler}>{this.state.phase}</div>;
   }
 }
 

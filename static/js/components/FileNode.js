@@ -11,7 +11,6 @@ class FileNode extends React.Component {
 
     this._slugify = this._slugify.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
-    // this._openFile = this._openFile.bind(this);
   }
 
   componentDidMount() {
@@ -48,32 +47,28 @@ class FileNode extends React.Component {
       .trim();
   }
 
-  // _openFile() {
-  //   let fileSideBar = this.props.fileSideBar;
-  //   let file = fileSideBar.state.fileSelected;
-  //   if(fileSideBar.state.fileOpened.length > 0) {
-  //     console.info('openFile', file);
-  //     console.info('openFile', fileSideBar.state.fileOpened);
-  //   }
-  // }
-
   handleFileClick(file, e) {
     let fileSideBar = this.props.fileSideBar;
     let app = this.props.app;
     let fileOpened = fileSideBar.state.fileOpened;
+    let fileActive = fileSideBar.state.fileActive;
 
     if(_.includes(fileOpened, file)) {
-      console.info('file already exists!');
+      // Already opened
+    }
+    else {
+      fileOpened.push(file);
     }
 
-    fileOpened.push(file);
+    fileActive = file;
+
     fileSideBar.setState({
       fileOpened: fileOpened,
-      fileActive: file
+      fileActive: fileActive
     }, function() {
       app.setState({
         fileOpened: fileOpened,
-        fileActive: file
+        fileActive: fileActive
       });
     });
   }
@@ -94,7 +89,7 @@ class FileNode extends React.Component {
                   </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="list-group collapse">
-                    <FileNode nodes={item.nodes} />
+                    <FileNode nodes={item.nodes} fileSideBar={this.props.fileSideBar} app={this.props.app}/>
                   </ul>
                 </div>
               );
@@ -103,7 +98,7 @@ class FileNode extends React.Component {
               // Render a file.
               return (
                 <button key={index} className="list-group-item file-node-file"
-                data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
+                  data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
                   {item.name}
                 </button>
               );

@@ -1,4 +1,5 @@
-// import FileNode from './FileNode.js';
+// import EditorToolBar from './EditorToolBar.js';
+import TabbedEditors from './TabbedEditors.js';
 
 // 
 // EditorPane component
@@ -16,9 +17,12 @@ class EditorPane extends React.Component {
     };
   }
 
-  // componentDidMount() {
-    
-  // }
+  componentDidMount() {
+    this.setState({
+      fileOpened: this.props.fileOpened,
+      fileActive: this.props.fileActive
+    });
+  }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
@@ -28,14 +32,14 @@ class EditorPane extends React.Component {
   }
 
   render () {
+    console.info('EditorPane', this.state);
+    
     return (
       <div className="col-lg-5 col-md-5 full-height">
         <div className="panel panel-default full-height">
           <div className="panel-heading">Editor</div>
           <div className="auto-scroll full-height panel-body">
-            {
-              this.state.fileActive && JSON.stringify(this.state.fileActive)
-            }
+            <TabbedEditors app={this.props.app} fileOpened={this.state.fileOpened} fileActive={this.state.fileActive} />
           </div>
         </div>
       </div>
@@ -44,3 +48,5 @@ class EditorPane extends React.Component {
 }
 
 export default EditorPane
+
+//<EditorToolBar />
