@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.renderers import JSONRenderer
-from .serializers import ThemeSerializer, ProjectSerializer
+from .serializers import ThemeSerializer, ProjectSerializer, BranchSerializer
 import json
 from urllib.request import urlopen
 from django.contrib.auth.models import User
@@ -31,6 +31,21 @@ def project(request, slug):
     projects = projects.filter(slug=slug)
   serializer = ProjectSerializer(projects, many=True)
   return Response(serializer.data)
+
+
+@api_view(['GET'])
+def branches(request, projectSlug):
+  """
+  """
+  username = request.session['username']
+  accessToken = request.session['accessToken']
+  repoUsername = username.split('@')[0]
+  getBranchesUrl = 'https://api.github.com/repos/{}/{}/branches?access_token={}'.format(repoUsername, projectSlug, accessToken)
+  with urlopen(getBranchesUrl) as branchesRes:
+    resStr = branchesRes.read().decode('utf-8')
+    branches = json.loads(resStr)
+    serializer = BranchSerializer(branches, many=True)
+    return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -143,7 +158,7 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
 
 
 @api_view(['GET'])
-def getProjectTree(request, slug):
+def projectTree(request, projectSlug, branch):
   """
   Returns tree structure of a project.
   The HTTP parameter specifies the project ID (slug).
@@ -157,10 +172,10 @@ def getProjectTree(request, slug):
   user = User.objects.filter(username=username)[0]
   projects = Project.objects.filter(owner__username=username)
   themes = Theme.objects.all()
-  project = projects.filter(slug=slug) # Leave it as a queryset: querysets are innately serializable as a response!
+  project = projects.filter(slug=projectSlug) # Leave it as a queryset: querysets are innately serializable as a response!
   theme = themes.filter(slug=project[0].theme.slug)[0]
   # GET the tree structure of the project repository
-  repoTree = _getRepoTree(accessToken, repoUsername, project[0].slug)
+  repoTree = _getRepoTree(accessToken, repoUsername, project[0].slug, branch)
   # GET the tree structure of the theme repository
   themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
   # Resolve path strings:

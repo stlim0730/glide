@@ -14,3 +14,13 @@ class ProjectSerializer(serializers.ModelSerializer):
       'description', 'repoUrl', 'isPrivate',
       'createdAt', 'updatedAt', 'theme'
     )
+
+class BranchSerializer(serializers.BaseSerializer):
+  def to_representation(self, obj):
+    return {
+      "name": obj['name'],
+      "commit": {
+        "sha": obj['commit']['sha'],
+        "url": obj['commit']['url']
+      }
+    }

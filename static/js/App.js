@@ -34,13 +34,16 @@ class App extends React.Component {
     this.state = {
       constants: {
         APP_PHASE_CLEAN_SLATE: 'clean_slate',
-        APP_PHASE_OPEN: 'open',
+        APP_PHASE_PROJECT_OPEN: 'project_open',
+        APP_PHASE_BRANCH_OPEN: 'branch_open',
         APP_PHASE_LOADING: 'loading'
       },
 
       phase: 'clean_slate',
-      project: null,
       projects: [],
+      project: null,
+      branches: [],
+      branch: null,
       filesOpened: [],
       fileActive: null
     };
@@ -79,13 +82,22 @@ class App extends React.Component {
           // <StartPanel />
         );
 
-      case this.state.constants.APP_PHASE_OPEN:
+      case this.state.constants.APP_PHASE_PROJECT_OPEN:
         return (
           <div className="row full-height">
             <NavBar />
             {modals}
-            <ProjectToolBar app={this} project={this.state.project} />
-            <FileSideBar app={this} project={this.state.project} />
+            <ProjectToolBar app={this} project={this.state.project} branches={this.state.branches} branch={this.state.branch} />
+          </div>
+        );
+
+      case this.state.constants.APP_PHASE_BRANCH_OPEN:
+        return (
+          <div className="row full-height">
+            <NavBar />
+            {modals}
+            <ProjectToolBar app={this} project={this.state.project} branches={this.state.branches} branch={this.state.branch} />
+            <FileSideBar app={this} project={this.state.project} branch={this.state.branch} />
             <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
           </div>
