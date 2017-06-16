@@ -10,6 +10,7 @@ class FileNode extends React.Component {
     };
 
     this._slugify = this._slugify.bind(this);
+    this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
   }
 
@@ -28,8 +29,6 @@ class FileNode extends React.Component {
   componentWillReceiveProps(nextProps) {
     // 
     // This event seems to affect the root node's behavior.
-    //   Compared to children nodes, the root node is static
-    //   so that the state is determined when it receives props.
     // 
     let orderedNodes = _.orderBy(nextProps.nodes, ['type','name'], ['desc', 'asc']);
     this.setState({
@@ -47,30 +46,54 @@ class FileNode extends React.Component {
       .trim();
   }
 
+  _getEditorId(fileObj) {
+    let suffix = '_editor';
+    return fileObj.sha + suffix;
+  }
+
   handleFileClick(file, e) {
+    // Folders don't call this event handler
+
     let fileSideBar = this.props.fileSideBar;
     let app = this.props.app;
-    let fileOpened = fileSideBar.state.fileOpened;
+    let filesOpened = fileSideBar.state.filesOpened;
     let fileActive = fileSideBar.state.fileActive;
 
-    if(_.includes(fileOpened, file)) {
+    if(_.includes(filesOpened, file)) {
       // Already opened
+      // TODO: Change the tab
     }
     else {
-      fileOpened.push(file);
+      if(file.content == null) {
+        // Initial loading: load remote resources
+        // GET file content
+        let url = file.downloadUrl;
+        $.ajax({
+          url: url,
+          method: 'GET',
+          // headers: { 'X-CSRFToken': window.glide.csrfToken },
+          success: function(response) {
+            file.content = response;
+            
+            fileActive = file;
+            filesOpened.push(file);
+
+            fileSideBar.setState({
+              filesOpened: filesOpened,
+              fileActive: fileActive
+            }, function() {
+              app.setState({
+                filesOpened: filesOpened,
+                fileActive: fileActive
+              });
+            });
+          }
+        });
+      }
+      else {
+        // TODO: Use local content
+      }
     }
-
-    fileActive = file;
-
-    fileSideBar.setState({
-      fileOpened: fileOpened,
-      fileActive: fileActive
-    }, function() {
-      app.setState({
-        fileOpened: fileOpened,
-        fileActive: fileActive
-      });
-    });
   }
 
   render () {

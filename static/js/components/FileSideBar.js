@@ -15,7 +15,7 @@ class FileSideBar extends React.Component {
       groupBy: 'path',
       tree: {},
       project: null,
-      fileOpened: [],
+      filesOpened: [],
       fileActive: null
     };
 
@@ -28,7 +28,7 @@ class FileSideBar extends React.Component {
       groupBy: 'path',
       tree: {},
       project: null,
-      fileOpened: [],
+      filesOpened: [],
       fileActive: null
     });
   }
@@ -87,7 +87,7 @@ class FileSideBar extends React.Component {
             )
             :
             (
-              <div className="auto-scroll full-height panel-body">
+              <div className="auto-scroll height-90 panel-body">
                 <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
               </div>
             )

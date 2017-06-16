@@ -1,3 +1,7 @@
+import '../../css/codemirror/codemirror.css';
+var CodeMirror = require('react-codemirror');
+
+
 // 
 // TabbedEditors component
 // 
@@ -6,8 +10,9 @@ class TabbedEditors extends React.Component {
     super(props);
 
     this.state = {
-      fileOpened: [],
-      fileActive: null
+      filesOpened: [],
+      fileActive: null,
+      editors: {}
     };
 
     // this._slugify = this._slugify.bind(this);
@@ -43,52 +48,96 @@ class TabbedEditors extends React.Component {
 
   componentDidMount() {
     this.setState({
-      fileOpened: this.props.fileOpened,
+      filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      fileOpened: nextProps.fileOpened,
+      filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
+    }, function() {
+      let file = this.state.fileActive;
+      if(file) {
+        // let editorId = this._getEditorId(file);
+        // let editor = ace.edit(editorId);
+        // let editors = this.state.editors;
+        // editors[editorId] = editor;
+        // this.setState({
+        //   editors: editors
+        // }, function() {
+          // Default editor settings
+          // editor.getSession().setTabSize(2);
+          // editor.getSession().setUseSoftTabs(true);
+          // editor.$blockScrolling = Infinity;
+          // editor.setValue(file.content);
+          // 
+          // TODO: Editor mode according to file types
+          // 
+          // editor.setMode('ace/mode/yaml');
+          // 
+          // editor.gotoLine(1);
+          // editor.focus();
+          // console.info(this.state.editors);
+        // });
+      }
     });
   }
 
   render () {
-    let tabClassNames = [];
-    let editorClassNames = [];
-    this.state.fileOpened.map(function(item, index) {
+    let tabs = [];
+    let tabbedEditors = [];
+    this.state.filesOpened.map(function(item, index) {
+
       let tabClassName = (item == this.state.fileActive ? "active" : "");
-      let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in" : "tab-pane fade");
-      tabClassNames.push(tabClassName);
-    });
+      tabs.push(
+        <li key={item.path} className={tabClassName}>
+          <a href={"#" + this._getEditorId(item)} data-toggle="tab" onClick={this.handleTabClick.bind(this, item)}>
+            {item.name}
+          </a>
+        </li>
+      );
+      
+      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
+      // tabbedEditors.push(
+      //   <div key={item.path} id={this._getEditorId(item)} className={editorClassName}></div>
+      // );
+
+      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
+      // tabbedEditors.push(
+      //   <AceEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive}/>
+      // );
+
+      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
+      // tabbedEditors.push(
+      //   <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
+      // );
+
+      let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
+      let options = {
+        lineNumbers: true
+      };
+      tabbedEditors.push(
+        // <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
+        <CodeMirror
+          key={item.path}
+          file={item}
+          value={item.content}
+          className={editorClassName}
+          autoFocus={true}
+          options={options} />
+      );
+
+    }.bind(this))
 
     return (
-      <div>
+      <div className="full-height">
         <ul className="nav nav-tabs">
-          {
-            this.state.fileOpened.map(function(item, index) {
-              return (
-                <li key={item.path} className={tabClassNames[index]}>
-                  <a href={"#" + this._getEditorId(item)} data-toggle="tab" onClick={this.handleTabClick.bind(this, item)}>
-                    {item.name}
-                  </a>
-                </li>
-              );
-            }.bind(this))
-          }
+          {tabs}
         </ul>
-        <div className="tab-content">
-          {
-            this.state.fileOpened.map(function(item, index) {
-              return (
-                <div key={item.path} id={this._getEditorId(item)}
-                  className={editorClassNames[index]}>
-                </div>
-              );
-            }.bind(this))
-          }
+        <div className="tab-content full-height">
+          {tabbedEditors}
         </div>
       </div>
     );

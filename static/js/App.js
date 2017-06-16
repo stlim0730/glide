@@ -41,7 +41,7 @@ class App extends React.Component {
       phase: 'clean_slate',
       project: null,
       projects: [],
-      fileOpened: [],
+      filesOpened: [],
       fileActive: null
     };
   }
@@ -49,7 +49,7 @@ class App extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if(prevState.project != this.state.project) {
       this.setState({
-        fileOpened: [],
+        filesOpened: [],
         fileActive: null
       });
     }
@@ -86,7 +86,7 @@ class App extends React.Component {
             {modals}
             <ProjectToolBar app={this} project={this.state.project} />
             <FileSideBar app={this} project={this.state.project} />
-            <EditorPane app={this} fileActive={this.state.fileActive} fileOpened={this.state.fileOpened} />
+            <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
           </div>
         );
