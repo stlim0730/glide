@@ -10,8 +10,8 @@ class FileNode extends React.Component {
     };
 
     this._slugify = this._slugify.bind(this);
+    this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
-    // this._openFile = this._openFile.bind(this);
   }
 
   componentDidMount() {
@@ -29,8 +29,6 @@ class FileNode extends React.Component {
   componentWillReceiveProps(nextProps) {
     // 
     // This event seems to affect the root node's behavior.
-    //   Compared to children nodes, the root node is static
-    //   so that the state is determined when it receives props.
     // 
     let orderedNodes = _.orderBy(nextProps.nodes, ['type','name'], ['desc', 'asc']);
     this.setState({
@@ -48,30 +46,54 @@ class FileNode extends React.Component {
       .trim();
   }
 
-  // _openFile() {
-  //   let fileSideBar = this.props.fileSideBar;
-  //   let file = fileSideBar.state.fileSelected;
-  //   if(fileSideBar.state.fileOpened.length > 0) {
-  //     console.info('openFile', file);
-  //     console.info('openFile', fileSideBar.state.fileOpened);
-  //   }
-  // }
+  _getEditorId(fileObj) {
+    let suffix = '_editor';
+    return fileObj.sha + suffix;
+  }
 
   handleFileClick(file, e) {
+    // Folders don't call this event handler
+
     let fileSideBar = this.props.fileSideBar;
     let app = this.props.app;
+    let filesOpened = fileSideBar.state.filesOpened;
+    let fileActive = fileSideBar.state.fileActive;
 
-    let fileOpened = fileSideBar.state.fileOpened;
-    fileOpened.push(file);
-    fileSideBar.setState({
-      fileOpened: fileOpened,
-      fileActive: file
-    }, function() {
-      app.setState({
-        fileOpened: fileOpened,
-        fileActive: file
-      });
-    });
+    if(_.includes(filesOpened, file)) {
+      // Already opened
+      // TODO: Change the tab
+    }
+    else {
+      if(file.content == null) {
+        // Initial loading: load remote resources
+        // GET file content
+        let url = file.downloadUrl;
+        $.ajax({
+          url: url,
+          method: 'GET',
+          // headers: { 'X-CSRFToken': window.glide.csrfToken },
+          success: function(response) {
+            file.content = response;
+            
+            fileActive = file;
+            filesOpened.push(file);
+
+            fileSideBar.setState({
+              filesOpened: filesOpened,
+              fileActive: fileActive
+            }, function() {
+              app.setState({
+                filesOpened: filesOpened,
+                fileActive: fileActive
+              });
+            });
+          }
+        });
+      }
+      else {
+        // TODO: Use local content
+      }
+    }
   }
 
   render () {
@@ -90,7 +112,7 @@ class FileNode extends React.Component {
                   </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="list-group collapse">
-                    <FileNode nodes={item.nodes} />
+                    <FileNode nodes={item.nodes} fileSideBar={this.props.fileSideBar} app={this.props.app}/>
                   </ul>
                 </div>
               );
@@ -99,7 +121,7 @@ class FileNode extends React.Component {
               // Render a file.
               return (
                 <button key={index} className="list-group-item file-node-file"
-                data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
+                  data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
                   {item.name}
                 </button>
               );

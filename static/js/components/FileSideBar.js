@@ -14,17 +14,28 @@ class FileSideBar extends React.Component {
       },
       groupBy: 'path',
       tree: {},
-      project: this.props.project,
-      fileOpened: [],
+      project: null,
+      filesOpened: [],
       fileActive: null
     };
 
     this._loadTree = this._loadTree.bind(this);
+    this._reset = this._reset.bind(this);
   }
 
-  _loadTree(projectSlug) {
+  _reset() {
+    this.setState({
+      groupBy: 'path',
+      tree: {},
+      project: null,
+      filesOpened: [],
+      fileActive: null
+    });
+  }
+
+  _loadTree(project) {
     // GET project file structure
-    let url = '/api/project/tree/' + projectSlug;
+    let url = '/api/project/tree/' + project.slug;
     let self = this;
     $.ajax({
       url: url,
@@ -37,7 +48,8 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            tree: response.tree
+            tree: response.tree,
+            project: project
           });
         }
       }
@@ -45,11 +57,19 @@ class FileSideBar extends React.Component {
   }
 
   componentDidMount() {
-    this._loadTree(this.state.project.slug);
+    this.setState({
+      project: this.props.project
+    }, function() {
+      this._loadTree(this.state.project);
+    });
   }
 
   componentWillReceiveProps(nextProps) {
-    this._loadTree(nextProps.project.slug);
+    if(this.state.project && this.state.project.slug != nextProps.project.slug) {
+      // Need to update tree
+      this._reset();
+      this._loadTree(nextProps.project);
+    }
   }
 
   render () {
@@ -67,7 +87,7 @@ class FileSideBar extends React.Component {
             )
             :
             (
-              <div className="auto-scroll full-height panel-body">
+              <div className="auto-scroll height-90 panel-body">
                 <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
               </div>
             )

@@ -16,6 +16,8 @@ class BrowseProjectsModalContent extends React.Component {
     // GET project tree
     let url = '/api/project/get';
     let self = this;
+    let app = self.props.app;
+
     $.ajax({
       url: url,
       method: 'GET',
@@ -28,9 +30,10 @@ class BrowseProjectsModalContent extends React.Component {
         else {
           self.setState({
             projects: response
-          });
-          self.props.app.setState({
-            projects: response
+          }, function() {
+            app.setState({
+              projects: response
+            });
           });
         }
       }
@@ -47,12 +50,11 @@ class BrowseProjectsModalContent extends React.Component {
     let app = this.props.app;
     app.setState({
       phase: app.state.constants.APP_PHASE_OPEN,
-      project: project//.slug
+      project: project
     });
   }
 
   render() {
-    console.info('BrowseProjectsModalContent', this.state);
     return (
       <div className="modal-content">
         <div className="modal-header">

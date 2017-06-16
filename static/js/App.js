@@ -41,23 +41,26 @@ class App extends React.Component {
       phase: 'clean_slate',
       project: null,
       projects: [],
-      fileOpened: [],
+      filesOpened: [],
       fileActive: null
     };
-
-    // this.clickHandler = this.clickHandler.bind(this);
   }
 
-  // componentDidUpdate(prevProps, prevState) {
-    
-  // }
-
-  // clickHandler() {
-  //   this.setState({phase: APP_PHASE_OPEN});
-  // }
+  componentDidUpdate(prevProps, prevState) {
+    if(prevState.project != this.state.project) {
+      this.setState({
+        filesOpened: [],
+        fileActive: null
+      });
+    }
+    else if(prevState.fileActive != this.state.fileActive) {
+      
+    }
+  }
 
   render() {
     console.info('App', this.state);
+
     let modals = (
       <div>
         <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />
@@ -83,7 +86,7 @@ class App extends React.Component {
             {modals}
             <ProjectToolBar app={this} project={this.state.project} />
             <FileSideBar app={this} project={this.state.project} />
-            <EditorPane app={this} fileActive={this.state.fileActive} fileOpened={this.state.fileOpened} />
+            <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
           </div>
         );
@@ -101,8 +104,6 @@ class App extends React.Component {
           <div>WHERE ARE YOU GOING?</div>
         );
     }
-
-    // return <div onClick={this.clickHandler}>{this.state.phase}</div>;
   }
 }
 
