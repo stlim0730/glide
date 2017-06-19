@@ -54,14 +54,19 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if(prevState.project != this.state.project) {
+      // If another project is opened, the substructures should reset
       this.setState({
         filesOpened: [],
-        fileActive: null
+        fileActive: null,
+        branches: [],
+        branch: null,
+        commits: [],
+        commit: null
       });
     }
-    else if(prevState.fileActive != this.state.fileActive) {
+    // else if(prevState.fileActive != this.state.fileActive) {
       
-    }
+    // }
   }
 
   render() {
@@ -113,7 +118,11 @@ class App extends React.Component {
               branch={this.state.branch}
               commits={this.state.commits}
               commit={this.state.commit} />
-            <FileSideBar app={this} project={this.state.project} branch={this.state.branch} />
+            <FileSideBar
+              app={this}
+              project={this.state.project}
+              branch={this.state.branch}
+              commit={this.state.commit} />
             <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
           </div>

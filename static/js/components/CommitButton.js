@@ -56,7 +56,7 @@ class CommitButton extends React.Component {
                 return (
                   <li key={item.sha}>
                     <a href="#" onClick={this.handleCommitClick.bind(this, item)}>
-                      "{item.commit.message}" by {item.commit.committer.name} on {item.commit.committer.date}
+                      "{item.commit.message}" by {item.commit.committer.name} ({item.sha.substring(0, 7)})
                     </a>
                   </li>
                 );

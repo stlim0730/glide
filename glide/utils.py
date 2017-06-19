@@ -12,4 +12,7 @@ def getAuthUrl(url):
   return authUrl
 
 def getBase64Bytes(content):
-  return base64.b64encode(content.encode('utf-8'))
+  if type(content) == type('bytes'.encode('utf-8')):
+    return base64.b64encode(content)
+  else:# elif type(content) == type('str'):
+    return base64.b64encode(content.encode('utf-8'))

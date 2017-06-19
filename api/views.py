@@ -93,14 +93,19 @@ def _getLatestSha(accessToken, repoUsername, projectSlug):
   return latestCommit['sha']
 
 
-def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
+def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit=None):
   """
   Returns the latest tree structure of a repository.
   The branch can be specified. Otherwise, it assumes master.
+  The commit SHA can be specified. Otherwise, it assumes latest commit.
   """
-  latestSha = _getLatestSha(accessToken, repoUsername, projectSlug)
+  sha = ''
+  if not commit:
+    sha = _getLatestSha(accessToken, repoUsername, projectSlug)
+  else:
+    sha = commit
   repoTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees/{}?recursive=1?access_token={}'
-  repoTreeUrl = repoTreeUrl.format(repoUsername, projectSlug, latestSha, accessToken)
+  repoTreeUrl = repoTreeUrl.format(repoUsername, projectSlug, sha, accessToken)
   repoTreeUrl = getAuthUrl(repoTreeUrl)
   with urlopen(repoTreeUrl) as repoTreeRes:
     # TODO: This API request sometimes gives 409 conflicts response. # Why?
@@ -199,23 +204,27 @@ def createProject(request):
           )
           projects = Project.objects.all()
           # 
-          # TODO: Load theme files and make a commit to start from
+          # Load theme files and make a commit to start from
           # 
-          readmeContent = '# This folder is where your theme lives!'
-          readme = {
-            'name': 'README.md',
-            'content': getBase64Bytes(readmeContent),
-            'path': 'theme/README.md'
-          }
-          createReadme = _createFile(accessToken, repoUsername, slug, readme)
-          # themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
-          return Response({'project': ProjectSerializer(project, many=False).data, 'projects': ProjectSerializer(projects, many=True).data})
+          themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
+          for file in themeTree['tree']:
+            if file['type'] == 'tree' or not file['downloadUrl']:
+              continue
+            newFile = {}
+            newFile['path'] = 'theme/' + file['path']
+            with urlopen(file['downloadUrl']) as fileContentRes:
+              newFile['content'] = getBase64Bytes(fileContentRes.read())#.decode('utf-8')
+              _createFile(accessToken, repoUsername, slug, newFile)
+          return Response({
+            'project': ProjectSerializer(project, many=False).data,
+            'projects': ProjectSerializer(projects, many=True).data
+          })
     # Error! The project title is being used.
     return Response({'error': 'The project title is being used. Try with a different title.'})
 
 
 @api_view(['GET'])
-def projectTree(request, projectSlug, branch):
+def tree(request, projectSlug, branch, commit):
   """
   Returns tree structure of a project.
   The HTTP parameter specifies the project ID (slug).
@@ -232,13 +241,11 @@ def projectTree(request, projectSlug, branch):
   project = projects.filter(slug=projectSlug) # Leave it as a queryset: querysets are innately serializable as a response!
   theme = themes.filter(slug=project[0].theme.slug)[0]
   # GET the tree structure of the project repository
-  repoTree = _getRepoTree(accessToken, repoUsername, project[0].slug, branch)
-  # GET the tree structure of the theme repository
-  themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
+  repoTree = _getRepoTree(accessToken, repoUsername, project[0].slug, branch, commit)
   # Resolve path strings:
   #   Trees from GitHub have meta data on path.
-  #   Build file structrue using the meta data.
-  paths = list(set([file['path'] for file in repoTree['tree'] if file['type']=='tree'] + [file['path'] for file in themeTree['tree'] if file['type']=='tree']))
+  #   Build recursive file structrue using the meta data.
+  paths = list(set([file['path'] for file in repoTree['tree'] if file['type']=='tree']))
   # paths must have path strings in descending order: deepest first!
   paths = sorted(paths, key=lambda x:len(x.split('/')), reverse=True)
   
@@ -316,15 +323,10 @@ def projectTree(request, projectSlug, branch):
     pathDicts.append(pathDict)
   for pathDict in pathDicts:
     fs = mergeDicts(fs, pathDict)
-  # Remove file name duplicates from repo and theme
-  themePaths = set([file['path'] for file in themeTree['tree']])
-  repoPaths = set([file['path'] for file in repoTree['tree']])
-  duplicates = list(themePaths & repoPaths)
-  files = [file for file in themeTree['tree'] if not file['path'] in duplicates] + repoTree['tree']
   # Fill out the file structure with files.
-  traversFs(fs, [], files)
+  traversFs(fs, [], repoTree['tree'])
   # Add files from root
-  rootFiles = [file for file in themeTree['tree'] if not file['path'] in duplicates and file['path'] == file['name'] and file['type'] != 'tree'] + [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
+  rootFiles = [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
   for file in rootFiles:
     name = file['name']
     file['content'] = None
