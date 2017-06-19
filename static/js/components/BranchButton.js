@@ -41,10 +41,35 @@ class BranchButton extends React.Component {
     let app = this.props.app;
     this.setState({
       branch: branch
-    }, app.setState({
-      branch: branch,
-      phase: app.state.constants.APP_PHASE_BRANCH_OPEN
-    }));
+    }, function() {
+      let self = this;
+      app.setState({
+        branch: branch,
+        phase: app.state.constants.APP_PHASE_BRANCH_OPEN
+      }, function() {
+        // GET project branches
+        let url = '/api/project/commits/' + this.state.project.slug + '/' + branch.name;
+        // let self = this;
+        let app = self.props.app;
+
+        $.ajax({
+          url: url,
+          method: 'GET',
+          // headers: { 'X-CSRFToken': window.glide.csrfToken },
+          success: function(response) {
+            console.info('BranchButton AJAX', response);
+            if('error' in response) {
+              // TODO
+            }
+            else {
+              app.setState({
+                commits: response
+              });
+            }
+          }
+        });
+      });
+    });
   }
 
   render () {

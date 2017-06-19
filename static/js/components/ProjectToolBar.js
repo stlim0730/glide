@@ -1,4 +1,5 @@
 import BranchButton from './BranchButton.js';
+import CommitButton from './CommitButton.js';
 
 // 
 // ProjectToolBar component
@@ -10,11 +11,13 @@ class ProjectToolBar extends React.Component {
     this.state = {
       project: this.props.project,
       branches: [],
-      branch: null
+      branch: null,
+      commits: [],
+      commit: null
     };
 
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
-    this.handleMouseLeave = this.handleMouseLeave.bind(this);
+    // this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    // this.handleMouseLeave = this.handleMouseLeave.bind(this);
   }
 
   componentDidMount() {
@@ -48,21 +51,23 @@ class ProjectToolBar extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       project: nextProps.project,
+      // Don't update branches: it comes from the server, not from App component
       branch: nextProps.branch,
-      // Don't update branches: it comes from the server
+      commits: nextProps.commits,
+      commit: nextProps.commit
     });
   }
 
-  handleMouseEnter(e) {
+  // handleMouseEnter(e) {
     // this.refs.configIcon.className = "glyphicon glyphicon-cog";
     // let commands = e.target.getElementsByClassName('project-level-commands');
-    $(e.target).children('small').removeClass('hidden');
-  }
+    // $(e.target).children('small').removeClass('hidden');
+  // }
 
-  handleMouseLeave(e) {
+  // handleMouseLeave(e) {
     // this.refs.configIcon.className = "glyphicon glyphicon-cog hidden";
-    $(e.target).children('small').addClass('hidden');
-  }
+    // $(e.target).children('small').addClass('hidden');
+  // }
 
   render () {
     console.info('ProjectToolBar', this.state);
@@ -70,6 +75,7 @@ class ProjectToolBar extends React.Component {
       <div className="overflow-hidden" onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
         <label className="h5">&emsp;{this.state.project.title}&emsp;</label>
         <BranchButton app={this.props.app} branches={this.state.branches} branch={this.state.branch} />
+        <CommitButton app={this.props.app} commits={this.state.commits} commit={this.state.commit} />
       </div>
     );
   }

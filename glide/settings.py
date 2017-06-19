@@ -207,7 +207,6 @@ GITHUB_SCOPE = 'user,repo'
 GITHUB_AUTH_URL = 'https://github.com/login/oauth/authorize?client_id={}&redirect_uri={}&scope={}'
 GITHUB_ACCESS_TOKEN_URL = 'https://github.com/login/oauth/access_token'
 
-
 # To override local settings from default settings,
 #   local_settings.py must not exist on the production server or in shared repository.
 #   This should be at the end of settings.py to override default settings.

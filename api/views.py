@@ -1,11 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from rest_framework.renderers import JSONRenderer
-from .serializers import ThemeSerializer, ProjectSerializer, BranchSerializer
+from .serializers import *
 import json
 from urllib.request import urlopen
 from django.contrib.auth.models import User
 from workspace.models import Project, Theme
+from glide import getAuthUrl
 
 
 @api_view(['GET'])
@@ -24,7 +25,7 @@ def theme(request, slug):
 @api_view(['GET'])
 def project(request, slug):
   """
-  Responds with a project specified
+  Responds with a project object specified
   """
   projects = Project.objects.all()
   if slug:
@@ -36,11 +37,14 @@ def project(request, slug):
 @api_view(['GET'])
 def branches(request, projectSlug):
   """
+  Responds with a list of branches in the specified project
   """
   username = request.session['username']
   accessToken = request.session['accessToken']
   repoUsername = username.split('@')[0]
-  getBranchesUrl = 'https://api.github.com/repos/{}/{}/branches?access_token={}'.format(repoUsername, projectSlug, accessToken)
+  getBranchesUrl = 'https://api.github.com/repos/{}/{}/branches?access_token={}'
+  getBranchesUrl = getBranchesUrl.format(repoUsername, projectSlug, accessToken)
+  getBranchesUrl = getAuthUrl(getBranchesUrl)
   with urlopen(getBranchesUrl) as branchesRes:
     resStr = branchesRes.read().decode('utf-8')
     branches = json.loads(resStr)
@@ -48,60 +52,22 @@ def branches(request, projectSlug):
     return Response(serializer.data)
 
 
-@api_view(['POST'])
-def createProject(request):
+@api_view(['GET'])
+def commits(request, projectSlug, branch):
   """
-  Create a new instance of project.
-  GETs existing repositories on GitHub to check potential name duplicates.
-  POSTs a new repository on GitHub and create a project instance on Glide server.
+  Responds with a list of commits on the specified branch in the specified project
   """
   username = request.session['username']
-  user = User.objects.filter(username=username)[0]
   accessToken = request.session['accessToken']
-  # Starting from Django 1.5,
-  #   request.POST object does not contain non-form data anymore (e.g., AJAX).
-  #   It is now in request.body object.
-  # Also, consider using
-  #   'application/x-www-form-urlencoded'
-  #   for contentType of AJAX data (on client side)
-  #   rather than 'application/json; charset=utf-8',
-  #   if something goes wrong.
-  title = request.data['title']
-  slug = request.data['slug']
-  description = request.data['description']
-  repoUrl = request.data['repoUrl']
-  theme = request.data['theme']
-  getAllReposUrl = 'https://api.github.com/user/repos?access_token={}'.format(accessToken)
-  with urlopen(getAllReposUrl) as allReposRes:
-    resStr = allReposRes.read().decode('utf-8')
-    allReposJson = json.loads(resStr)
-    repoNames = [repo['name'] for repo in allReposJson]
-    # Check if the repo exists on repoProvider
-    if not slug in repoNames:
-      # Check if the project exists on Glide server
-      if not Project.objects.filter(owner=username, slug=slug):
-        # You may create a new repo on repoProvider
-        createRepoUrl = 'https://api.github.com/user/repos?access_token={}'.format(accessToken)
-        createRepoData = {'name': slug, 'description': description, 'auto_init': True}
-        createRepoData = json.dumps(createRepoData).encode('utf-8')
-        with urlopen(createRepoUrl, createRepoData) as createRepoRes:
-          resStr = createRepoRes.read().decode('utf-8')
-          # (optional) TODO: Match the model structure with repo data structure?
-          theme = Theme.objects.get(slug=theme)
-          project = Project.objects.create(
-            owner=user,
-            title=title,
-            slug=slug,
-            description=description,
-            repoUrl=repoUrl,
-            theme=theme
-          )
-          projects = Project.objects.all()
-          # serializer = ProjectSerializer(projects, many=True)
-          return Response({'project': ProjectSerializer(project, many=False).data, 'projects': ProjectSerializer(projects, many=True).data})
-    # Error! The project title is being used.
-    return Response({'error': 'The project title is being used. Try with a different title.'})
-
+  repoUsername = username.split('@')[0]
+  getCommitsUrl = 'https://api.github.com/repos/{}/{}/commits?access_token={}'
+  getCommitsUrl = getCommitsUrl.format(repoUsername, projectSlug, accessToken)
+  getCommitsUrl = getAuthUrl(getCommitsUrl)
+  with urlopen(getCommitsUrl) as commitsRes:
+    resStr = commitsRes.read().decode('utf-8')
+    commits = json.loads(resStr)
+    serializer = CommitSerializer(commits, many=True)
+    return Response(serializer.data)
 
 def _getLatestCommit(accessToken, repoUsername, projectSlug):
   """
@@ -109,6 +75,7 @@ def _getLatestCommit(accessToken, repoUsername, projectSlug):
   """
   commitsUrl = 'https://api.github.com/repos/{}/{}/commits?access_token={}'
   commitsUrl = commitsUrl.format(repoUsername, projectSlug, accessToken)
+  commitsUrl = getAuthUrl(commitsUrl)
   with urlopen(commitsUrl) as commitsRes:
     res = commitsRes.read().decode('utf-8')
     commits = json.loads(res)
@@ -133,6 +100,7 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
   latestSha = _getLatestSha(accessToken, repoUsername, projectSlug)
   repoTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees/{}?recursive=1?access_token={}'
   repoTreeUrl = repoTreeUrl.format(repoUsername, projectSlug, latestSha, accessToken)
+  repoTreeUrl = getAuthUrl(repoTreeUrl)
   with urlopen(repoTreeUrl) as repoTreeRes:
     # TODO: This API request sometimes gives 409 conflicts response. # Why?
     res = repoTreeRes.read().decode('utf-8')
@@ -155,6 +123,66 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
       file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, branch, file['path'], accessToken)
     # repoTree['tree'] = [file for file in repoTree['tree'] if file['type'] != 'tree']
     return repoTree
+
+
+@api_view(['POST'])
+def createProject(request):
+  """
+  Create a new instance of project.
+  GETs existing repositories on GitHub to check potential name duplicates.
+  POSTs a new repository on GitHub and create a project instance on Glide server.
+  """
+  username = request.session['username']
+  user = User.objects.filter(username=username)[0]
+  accessToken = request.session['accessToken']
+  # Starting from Django 1.5,
+  #   request.POST object does not contain non-form data anymore (e.g., AJAX).
+  #   It is now in request.data object if using DRF.
+  # Also, consider using
+  #   'application/x-www-form-urlencoded'
+  #   for contentType of AJAX data (on client side)
+  #   rather than 'application/json; charset=utf-8',
+  #   if something goes wrong.
+  title = request.data['title']
+  slug = request.data['slug']
+  description = request.data['description']
+  repoUrl = request.data['repoUrl']
+  theme = request.data['theme']
+  getAllReposUrl = 'https://api.github.com/user/repos?access_token={}'.format(accessToken)
+  getAllReposUrl = getAuthUrl(getAllReposUrl)
+  with urlopen(getAllReposUrl) as allReposRes:
+    resStr = allReposRes.read().decode('utf-8')
+    allReposJson = json.loads(resStr)
+    repoNames = [repo['name'] for repo in allReposJson]
+    # Check if the repo exists on repoProvider
+    if not slug in repoNames:
+      # Check if the project exists on Glide server
+      if not Project.objects.filter(owner=username, slug=slug):
+        # You may create a new repo on repoProvider
+        createRepoUrl = 'https://api.github.com/user/repos?access_token={}'.format(accessToken)
+        createRepoData = {'name': slug, 'description': description, 'auto_init': True}
+        createRepoData = json.dumps(createRepoData).encode('utf-8')
+        createRepoUrl = getAuthUrl(createRepoUrl)
+        with urlopen(createRepoUrl, createRepoData) as createRepoRes:
+          resStr = createRepoRes.read().decode('utf-8')
+          # (optional) TODO: Match the model structure with repo data structure?
+          theme = Theme.objects.get(slug=theme)
+          project = Project.objects.create(
+            owner=user,
+            title=title,
+            slug=slug,
+            description=description,
+            repoUrl=repoUrl,
+            theme=theme
+          )
+          projects = Project.objects.all()
+          # 
+          # TODO: Load theme files and make a commit to start from
+          # 
+          themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
+          return Response({'project': ProjectSerializer(project, many=False).data, 'projects': ProjectSerializer(projects, many=True).data})
+    # Error! The project title is being used.
+    return Response({'error': 'The project title is being used. Try with a different title.'})
 
 
 @api_view(['GET'])
@@ -275,3 +303,15 @@ def projectTree(request, projectSlug, branch):
   # Transform fs for React-friendly form
   tree = transformFs(fs, {}, '')
   return Response({'tree': tree})
+
+
+# @api_view(['POST'])
+# def createBranch(request):
+#   """
+#   Returns tree structure of a project.
+#   The HTTP parameter specifies the project ID (slug).
+#   GETs the latest commit hash value (sha) of the repository.
+#   GETs the tree (file structure in GitHub repo) data for the commit.
+#   Actual content requests and delivery will be on client side (AJAX).
+#   """
+#   pass

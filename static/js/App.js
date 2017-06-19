@@ -36,6 +36,7 @@ class App extends React.Component {
         APP_PHASE_CLEAN_SLATE: 'clean_slate',
         APP_PHASE_PROJECT_OPEN: 'project_open',
         APP_PHASE_BRANCH_OPEN: 'branch_open',
+        APP_PHASE_COMMIT_OPEN: 'commit_open',
         APP_PHASE_LOADING: 'loading'
       },
 
@@ -44,6 +45,8 @@ class App extends React.Component {
       project: null,
       branches: [],
       branch: null,
+      commits: [],
+      commit: null,
       filesOpened: [],
       fileActive: null
     };
@@ -83,20 +86,33 @@ class App extends React.Component {
         );
 
       case this.state.constants.APP_PHASE_PROJECT_OPEN:
-        return (
-          <div className="row full-height">
-            <NavBar />
-            {modals}
-            <ProjectToolBar app={this} project={this.state.project} branches={this.state.branches} branch={this.state.branch} />
-          </div>
-        );
-
       case this.state.constants.APP_PHASE_BRANCH_OPEN:
         return (
           <div className="row full-height">
             <NavBar />
             {modals}
-            <ProjectToolBar app={this} project={this.state.project} branches={this.state.branches} branch={this.state.branch} />
+            <ProjectToolBar
+              app={this}
+              project={this.state.project}
+              branches={this.state.branches}
+              branch={this.state.branch}
+              commits={this.state.commits}
+              commit={this.state.commit} />
+          </div>
+        );
+
+      case this.state.constants.APP_PHASE_COMMIT_OPEN:
+        return (
+          <div className="row full-height">
+            <NavBar />
+            {modals}
+            <ProjectToolBar
+              app={this}
+              project={this.state.project}
+              branches={this.state.branches}
+              branch={this.state.branch}
+              commits={this.state.commits}
+              commit={this.state.commit} />
             <FileSideBar app={this} project={this.state.project} branch={this.state.branch} />
             <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
