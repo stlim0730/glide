@@ -3,10 +3,11 @@ from rest_framework.response import Response
 # from rest_framework.renderers import JSONRenderer
 from .serializers import *
 import json
-from urllib.request import urlopen
+from urllib.parse import urlencode
+from urllib.request import urlopen, Request
 from django.contrib.auth.models import User
 from workspace.models import Project, Theme
-from glide import getAuthUrl
+from glide import *
 
 
 @api_view(['GET'])
@@ -125,6 +126,26 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master'):
     return repoTree
 
 
+def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master', message=None):
+  createFileUrl = 'https://api.github.com/repos/{}/{}/contents/{}?access_token={}'
+  # fileObj.path should be like 'foo/bar'
+  createFileUrl = createFileUrl.format(repoUsername, projectSlug, fileObj['path'], accessToken)
+  createFileUrl = getAuthUrl(createFileUrl)
+  if not message:
+    message = 'added {}'.format(fileObj['path'])
+  createFileData = {
+    'message': message,
+    'content': fileObj['content'].decode('utf-8'),
+    'branch': branch
+  }
+  req = Request(
+    url=createFileUrl, headers={'Content-Type': 'application/json'},
+    data=json.dumps(createFileData).encode('utf-8'), method='PUT')
+  with urlopen(req) as createFileRes:
+    resStr = createFileRes.read().decode('utf-8')
+    return json.loads(resStr)
+
+
 @api_view(['POST'])
 def createProject(request):
   """
@@ -133,6 +154,7 @@ def createProject(request):
   POSTs a new repository on GitHub and create a project instance on Glide server.
   """
   username = request.session['username']
+  repoUsername = username.split('@')[0]
   user = User.objects.filter(username=username)[0]
   accessToken = request.session['accessToken']
   # Starting from Django 1.5,
@@ -179,7 +201,14 @@ def createProject(request):
           # 
           # TODO: Load theme files and make a commit to start from
           # 
-          themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
+          readmeContent = '# This folder is where your theme lives!'
+          readme = {
+            'name': 'README.md',
+            'content': getBase64Bytes(readmeContent),
+            'path': 'theme/README.md'
+          }
+          createReadme = _createFile(accessToken, repoUsername, slug, readme)
+          # themeTree = _getRepoTree(accessToken, theme.author, theme.slug)
           return Response({'project': ProjectSerializer(project, many=False).data, 'projects': ProjectSerializer(projects, many=True).data})
     # Error! The project title is being used.
     return Response({'error': 'The project title is being used. Try with a different title.'})
