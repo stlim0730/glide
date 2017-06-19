@@ -49,7 +49,7 @@ class BrowseProjectsModalContent extends React.Component {
   handleProjectClick(project, e) {
     let app = this.props.app;
     app.setState({
-      phase: app.state.constants.APP_PHASE_OPEN,
+      phase: app.state.constants.APP_PHASE_PROJECT_OPEN,
       project: project
     });
   }

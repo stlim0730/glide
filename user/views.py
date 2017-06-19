@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as loginUser
@@ -7,7 +8,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.conf import settings
+from glide import getAuthUrl
 
 
 def login(request, repoProvider):
@@ -59,6 +60,7 @@ def loggingIn(request, repoProvider):
     ]
     data = urlencode(data).encode('utf-8')
     githubUrl = settings.GITHUB_ACCESS_TOKEN_URL
+    githubUrl = getAuthUrl(githubUrl)
     with urlopen(githubUrl, data) as githubAuthRes:
       res = parse_qs(githubAuthRes.read().decode('utf-8'))
       accessToken = res['access_token'][0]
@@ -72,6 +74,7 @@ def loggingIn(request, repoProvider):
         # Start local authentication using GitHub reponse with credentials.
         githubUserQuery = 'https://api.github.com/user?access_token={}'
         githubUserQuery = githubUserQuery.format(accessToken)
+        githubUserQuery = getAuthUrl(githubUserQuery)
         with urlopen(githubUserQuery) as githubUserRes:
           githubUser = json.loads(githubUserRes.read().decode('utf-8'))
           repoUsername = githubUser['login']

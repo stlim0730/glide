@@ -32,8 +32,7 @@ class EditorPane extends React.Component {
   }
 
   render () {
-    console.info('EditorPane', this.state);
-    
+    // console.info('EditorPane', this.state);
     return (
       <div className="col-lg-5 col-md-5 full-height">
         <div className="panel panel-default full-height">

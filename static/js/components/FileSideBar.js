@@ -8,13 +8,10 @@ class FileSideBar extends React.Component {
     super(props);
 
     this.state = {
-      constants: {
-        TYPE_VIEW: 'type',
-        FOLDER_VIEW: 'path'
-      },
-      groupBy: 'path',
       tree: {},
       project: null,
+      branch: null,
+      commit: null,
       filesOpened: [],
       fileActive: null
     };
@@ -23,19 +20,22 @@ class FileSideBar extends React.Component {
     this._reset = this._reset.bind(this);
   }
 
-  _reset() {
+  _reset(callback) {
     this.setState({
-      groupBy: 'path',
       tree: {},
       project: null,
+      branch: null,
+      commit: null,
       filesOpened: [],
       fileActive: null
+    }, function() {
+      callback();
     });
   }
 
-  _loadTree(project) {
+  _loadTree(project, branch, commit) {
     // GET project file structure
-    let url = '/api/project/tree/' + project.slug;
+    let url = '/api/project/tree/' + project.slug + '/' + branch.name + '/' + commit.sha;
     let self = this;
     $.ajax({
       url: url,
@@ -58,17 +58,27 @@ class FileSideBar extends React.Component {
 
   componentDidMount() {
     this.setState({
-      project: this.props.project
+      project: this.props.project,
+      branch: this.props.branch,
+      commit: this.props.commit
     }, function() {
-      this._loadTree(this.state.project);
+      this._loadTree(this.state.project, this.state.branch, this.state.commit);
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.state.project && this.state.project.slug != nextProps.project.slug) {
-      // Need to update tree
-      this._reset();
-      this._loadTree(nextProps.project);
+    if(this.state.project && this.state.project.slug != nextProps.project.slug
+      || this.state.branch && this.state.branch.name != nextProps.branch.name
+      || this.state.commit && this.state.commit.sha != nextProps.commit.sha) {
+      // Need to reset the component and update tree:
+      //   when another project is selected
+      //   when another branch is selected
+      //   when another commit is selected
+      // let self = this;
+      // this._reset(function() {
+      //   self._loadTree(nextProps.project, nextProps.branch, nextProps.commit);
+      // });
+      this._loadTree(nextProps.project, nextProps.branch, nextProps.commit);
     }
   }
 
@@ -79,18 +89,9 @@ class FileSideBar extends React.Component {
           <div className="panel-heading">Files</div>
 
           {
-            this.state.groupBy == 'type'
-            ?
-            (
-              <div className="auto-scroll full-height">
-              </div>
-            )
-            :
-            (
-              <div className="auto-scroll height-90 panel-body">
-                <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
-              </div>
-            )
+            <div className="auto-scroll height-90 panel-body">
+              <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
+            </div>
           }
         </div>
       </div>

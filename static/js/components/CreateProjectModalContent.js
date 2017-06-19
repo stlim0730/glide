@@ -106,7 +106,7 @@ class CreateProjectModalContent extends React.Component {
           let projects = response.projects;
           let app = self.props.app;
           app.setState({
-            phase: app.state.constants.APP_PHASE_OPEN,
+            phase: app.state.constants.APP_PHASE_PROJECT_OPEN,
             project: project,
             projects: projects
           });

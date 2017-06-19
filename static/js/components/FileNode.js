@@ -100,7 +100,7 @@ class FileNode extends React.Component {
     return (
       <div>
         {
-          this.state.nodes && this.state.nodes.map(function(item, index) {
+          this.state.nodes.map(function(item, index) {
             if(item.type == 'tree') {
               // Render a folder
               return (
