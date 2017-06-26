@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # TODO: How to configure Django Admin password from code?
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True# False
+DEBUG = True# False # Temporarily!
 
 CSRF_USE_SESSIONS = True
 
