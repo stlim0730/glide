@@ -6,5 +6,3 @@ daphne
 jinja2
 django-webpack-loader
 djangorestframework
-PyGithub
-whitenoise
