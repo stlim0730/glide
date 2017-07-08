@@ -1,7 +1,7 @@
 // 
-// CommitButton component
+// CommitDropdown component
 // 
-class CommitButton extends React.Component {
+class CommitDropdown extends React.Component {
   constructor(props) {
     super(props);
 
@@ -69,4 +69,4 @@ class CommitButton extends React.Component {
   }
 }
 
-export default CommitButton
+export default CommitDropdown

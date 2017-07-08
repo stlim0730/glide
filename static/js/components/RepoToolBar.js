@@ -1,15 +1,16 @@
-import BranchButton from './BranchButton.js';
-import CommitButton from './CommitButton.js';
+import BranchDropdown from './BranchDropdown.js';
+import CommitDropdown from './CommitDropdown.js';
 
 // 
-// ProjectToolBar component
+// RepoToolBar component
 // 
-class ProjectToolBar extends React.Component {
+class RepoToolBar extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      project: this.props.project,
+      // project: this.props.project,
+      repository: this.props.repository,
       branches: [],
       branch: null,
       commits: [],
@@ -22,7 +23,7 @@ class ProjectToolBar extends React.Component {
 
   componentDidMount() {
     // GET project branches
-    let url = '/api/project/branches/' + this.state.project.slug;
+    let url = '/api/project/branches/' + this.state.repository.full_name;
     let self = this;
     let app = self.props.app;
 
@@ -31,16 +32,17 @@ class ProjectToolBar extends React.Component {
       method: 'GET',
       // headers: { 'X-CSRFToken': window.glide.csrfToken },
       success: function(response) {
-        // console.info('ProjectToolBar AJAX', response);
+        // console.info('RepoToolBar AJAX', response);
+        let branches = JSON.parse(response.branches);
         if('error' in response) {
           // TODO
         }
         else {
           self.setState({
-            branches: response
+            branches: branches
           }, function() {
             app.setState({
-              branches: response
+              branches: branches
             });
           });
         }
@@ -50,7 +52,8 @@ class ProjectToolBar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      project: nextProps.project,
+      // project: nextProps.project,
+      repository: nextProps.repository,
       // Don't update branches: it comes from the server, not from App component
       branch: nextProps.branch,
       commits: nextProps.commits,
@@ -70,18 +73,26 @@ class ProjectToolBar extends React.Component {
   // }
 
   render () {
-    console.info('ProjectToolBar', this.state);
+    console.info('RepoToolBar', this.state);
     return (
-      <div className="overflow-hidden" onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave}>
-        <label className="h5">&emsp;{this.state.project.title}&emsp;</label>
-        <BranchButton app={this.props.app} branches={this.state.branches} branch={this.state.branch} />
-        <CommitButton app={this.props.app} commits={this.state.commits} commit={this.state.commit} />
+      <div className="overflow-hidden">
+        <label className="h5">
+          &emsp;{this.state.repository.name}&emsp;
+        </label>
+        <BranchDropdown
+          app={this.props.app}
+          branches={this.state.branches}
+          branch={this.state.branch} />
+        <CommitDropdown
+          app={this.props.app}
+          commits={this.state.commits}
+          commit={this.state.commit} />
       </div>
     );
   }
 }
 
-export default ProjectToolBar
+export default RepoToolBar
 
 
 // <small className="hidden">

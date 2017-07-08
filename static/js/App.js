@@ -15,9 +15,10 @@ import './lib/bootstrap/bootstrap.min.js';
 // 
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
-import CreateProjectModalContent from './components/CreateProjectModalContent.js';
-import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
-import ProjectToolBar from './components/ProjectToolBar.js';
+import CloneRepoModalContent from './components/CloneRepoModalContent.js';
+// import CreateProjectModalContent from './components/CreateProjectModalContent.js';
+// import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
+import RepoToolBar from './components/RepoToolBar.js';
 import FileSideBar from './components/FileSideBar.js';
 import EditorPane from './components/EditorPane.js';
 import RuntimePane from './components/RuntimePane.js';
@@ -34,15 +35,16 @@ class App extends React.Component {
     this.state = {
       constants: {
         APP_PHASE_CLEAN_SLATE: 'clean_slate',
-        APP_PHASE_PROJECT_OPEN: 'project_open',
+        APP_PHASE_REPOSITORY_OPEN: 'repository_open',
         APP_PHASE_BRANCH_OPEN: 'branch_open',
         APP_PHASE_COMMIT_OPEN: 'commit_open',
         APP_PHASE_LOADING: 'loading'
       },
 
       phase: 'clean_slate',
-      projects: [],
-      project: null,
+      // projects: [],
+      // project: null,
+      repository: null,
       branches: [],
       branch: null,
       commits: [],
@@ -74,8 +76,13 @@ class App extends React.Component {
 
     let modals = (
       <div>
-        <Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />
-        <Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />
+        <Modal id="clone-repository-modal"
+          modalContent={
+            <CloneRepoModalContent app={this} />
+          }
+          large={false} />
+        {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
+        {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>
     );
 
@@ -90,15 +97,15 @@ class App extends React.Component {
           // <StartPanel />
         );
 
-      case this.state.constants.APP_PHASE_PROJECT_OPEN:
+      case this.state.constants.APP_PHASE_REPOSITORY_OPEN:
       case this.state.constants.APP_PHASE_BRANCH_OPEN:
         return (
           <div className="row full-height">
             <NavBar />
             {modals}
-            <ProjectToolBar
+            <RepoToolBar
               app={this}
-              project={this.state.project}
+              repository={this.state.repository}
               branches={this.state.branches}
               branch={this.state.branch}
               commits={this.state.commits}
@@ -111,16 +118,16 @@ class App extends React.Component {
           <div className="row full-height">
             <NavBar />
             {modals}
-            <ProjectToolBar
+            <RepoToolBar
               app={this}
-              project={this.state.project}
+              repository={this.state.repository}
               branches={this.state.branches}
               branch={this.state.branch}
               commits={this.state.commits}
               commit={this.state.commit} />
             <FileSideBar
               app={this}
-              project={this.state.project}
+              repository={this.state.repository}
               branch={this.state.branch}
               commit={this.state.commit} />
             <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />

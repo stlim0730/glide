@@ -9,7 +9,7 @@ class FileSideBar extends React.Component {
 
     this.state = {
       tree: {},
-      project: null,
+      repository: null,
       branch: null,
       commit: null,
       filesOpened: [],
@@ -23,7 +23,7 @@ class FileSideBar extends React.Component {
   _reset(callback) {
     this.setState({
       tree: {},
-      project: null,
+      repository: null,
       branch: null,
       commit: null,
       filesOpened: [],
@@ -33,9 +33,9 @@ class FileSideBar extends React.Component {
     });
   }
 
-  _loadTree(project, branch, commit) {
+  _loadTree(repository, branch, commit) {
     // GET project file structure
-    let url = '/api/project/tree/' + project.slug + '/' + branch.name + '/' + commit.sha;
+    let url = '/api/project/tree/' + repository.full_name + '/' + branch.name + '/' + commit.sha;
     let self = this;
     $.ajax({
       url: url,
@@ -48,8 +48,8 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            tree: response.tree,
-            project: project
+            tree: response.tree//,
+            // repository: repository
           });
         }
       }
@@ -58,27 +58,28 @@ class FileSideBar extends React.Component {
 
   componentDidMount() {
     this.setState({
-      project: this.props.project,
+      // project: this.props.project,
+      repository: this.props.repository,
       branch: this.props.branch,
       commit: this.props.commit
     }, function() {
-      this._loadTree(this.state.project, this.state.branch, this.state.commit);
+      this._loadTree(this.state.repository, this.state.branch, this.state.commit);
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.state.project && this.state.project.slug != nextProps.project.slug
+    if(this.state.repository && this.state.repository.full_name != nextProps.repository.full_name
       || this.state.branch && this.state.branch.name != nextProps.branch.name
       || this.state.commit && this.state.commit.sha != nextProps.commit.sha) {
       // Need to reset the component and update tree:
-      //   when another project is selected
+      //   when another repository is selected
       //   when another branch is selected
       //   when another commit is selected
       // let self = this;
       // this._reset(function() {
-      //   self._loadTree(nextProps.project, nextProps.branch, nextProps.commit);
+      //   self._loadTree(nextProps.repository, nextProps.branch, nextProps.commit);
       // });
-      this._loadTree(nextProps.project, nextProps.branch, nextProps.commit);
+      this._loadTree(nextProps.repository, nextProps.branch, nextProps.commit);
     }
   }
 

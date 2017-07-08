@@ -1,7 +1,7 @@
 // 
-// BranchButton component
+// BranchDropdown component
 // 
-class BranchButton extends React.Component {
+class BranchDropdown extends React.Component {
   constructor(props) {
     super(props);
 
@@ -48,7 +48,7 @@ class BranchButton extends React.Component {
         phase: app.state.constants.APP_PHASE_BRANCH_OPEN
       }, function() {
         // GET project branches
-        let url = '/api/project/commits/' + this.state.project.slug + '/' + branch.name;
+        let url = '/api/project/commits/' + this.state.repository.full_name + '/' + branch.name;
         // let self = this;
         let app = self.props.app;
 
@@ -57,13 +57,14 @@ class BranchButton extends React.Component {
           method: 'GET',
           // headers: { 'X-CSRFToken': window.glide.csrfToken },
           success: function(response) {
-            console.info('BranchButton AJAX', response);
+            // console.info('BranchDropdown AJAX', response);
+            let commits = JSON.parse(response.commits);
             if('error' in response) {
               // TODO
             }
             else {
               app.setState({
-                commits: response
+                commits: commits
               });
             }
           }
@@ -99,4 +100,4 @@ class BranchButton extends React.Component {
   }
 }
 
-export default BranchButton
+export default BranchDropdown
