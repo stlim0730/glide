@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
   # url(r'^theme/?(?P<slug>.*)$', views.theme, name='theme'),
   url(r'^project/clone$', views.clone, name='clone'),
+  url(r'^project/branch$', views.branch, name='branch'),
   # url(r'^project/create$', views.createProject, name='createProject'),
   # url(r'^project/get/(?P<slug>.*)$', views.project, name='project'),
   url(r'^project/branches/(?P<repositoryFullName>.+)$', views.branches, name='branches'),

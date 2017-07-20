@@ -6,35 +6,75 @@ class BranchDropdown extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
       branches: [],
-      branch: null
+      branch: null,
+      commits: [],
+      commit: null
     };
 
+    this._ajaxBranches = this._ajaxBranches.bind(this);
     this.handleBranchClick = this.handleBranchClick.bind(this);
+  }
+
+  _ajaxBranches(repository) {
+    // GET project branches
+    let url = '/api/project/branches/' + repository.full_name;
+    let self = this;
+    let app = self.props.app;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          let branches = JSON.parse(response.branches);
+          self.setState({
+            branches: branches
+          }, function() {
+            app.setState({
+              branches: branches
+            });
+          });
+        }
+      }
+    });
   }
 
   componentDidMount() {
     this.setState({
-      branches: this.props.branches,
-      branch: this.props.branch
+      repository: this.props.repository,
+      // Don't update branches:
+      //   get branches via ajax
+      branch: this.props.branch,
+      commits: this.props.commits,
+      commit: this.props.commit
+    }, function() {
+      this._ajaxBranches(this.state.repository);
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({
-      branches: nextProps.branches,
-      branch: nextProps.branch
-    });
-  }
+    // This happens in selecting a commit
+    //   or creating a new branch.
+    let prevBranch = this.state.branch;
 
-  _slugify(str) {
-    return str.toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-      .replace(/\-\-+/g, '-') // Replace multiple - with single -
-      .replace(/^-+/, '') // Trim - from start of text
-      .replace(/-+$/, '') // Trim - from end of text
-      .trim();
+    this.setState({
+      repository: nextProps.repository,
+      // Don't update branches:
+      //   get branches via ajax
+      branch: nextProps.branch,
+      commits: nextProps.commits,
+      commit: nextProps.commit
+    }, function() {
+      if(!_.isEqual(prevBranch, nextProps.branch)) {
+        // A new branch is created
+        this._ajaxBranches(this.state.repository);
+      }
+    });
   }
 
   handleBranchClick(branch, e) {
@@ -42,38 +82,21 @@ class BranchDropdown extends React.Component {
     this.setState({
       branch: branch
     }, function() {
-      let self = this;
       app.setState({
         branch: branch,
         phase: app.state.constants.APP_PHASE_BRANCH_OPEN
-      }, function() {
-        // GET project branches
-        let url = '/api/project/commits/' + this.state.repository.full_name + '/' + branch.name;
-        // let self = this;
-        let app = self.props.app;
-
-        $.ajax({
-          url: url,
-          method: 'GET',
-          // headers: { 'X-CSRFToken': window.glide.csrfToken },
-          success: function(response) {
-            // console.info('BranchDropdown AJAX', response);
-            let commits = JSON.parse(response.commits);
-            if('error' in response) {
-              // TODO
-            }
-            else {
-              app.setState({
-                commits: commits
-              });
-            }
-          }
-        });
       });
     });
   }
 
   render () {
+    let latestCommit = false;
+    let commit = this.state.commit;
+    let commits = this.state.commits;
+    if(this.state.commit != null && this.state.commits.length > 0) {
+      latestCommit = _.isEqual(commit, commits[0]);
+    }
+
     return (
       <div className="btn-group" style={{marginTop: -5}}>
         <a href="#" className="btn btn-default btn-xs">
@@ -92,8 +115,8 @@ class BranchDropdown extends React.Component {
               );
             }.bind(this))
           }
-          <li className="divider"></li>
-          <li><a href="#">Create a New Branch</a></li>
+          { latestCommit ? <li className="divider"></li> : null }
+          { latestCommit ? <li><a href="#" data-toggle="modal" data-target="#create-branch-modal">Create a New Branch</a></li> : null }
         </ul>
       </div>
     );

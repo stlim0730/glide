@@ -6,24 +6,61 @@ class CommitDropdown extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
       commits: [],
       commit: null
     };
 
+    this._ajaxCommits = this._ajaxCommits.bind(this);
     this.handleCommitClick = this.handleCommitClick.bind(this);
   }
 
-  componentDidMount() {
-    this.setState({
-      commits: this.props.commits,
-      commit: this.props.commit
+  _ajaxCommits(repository, branch) {
+    // GET commits on the branch
+    let url = '/api/project/commits/' + repository.full_name + '/' + branch.name;
+    let self = this;
+    let app = this.props.app;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          let commits = JSON.parse(response.commits);
+          self.setState({
+            commits: commits
+          }, function() {
+            app.setState({
+              commits: commits
+            });
+          });
+        }
+      }
     });
   }
 
+  componentDidMount() {
+    // This component mounts invisible
+    //   earlier than when it plays a role
+    // So, this callback stays empty
+  }
+
   componentWillReceiveProps(nextProps) {
+    let prevBranch = this.state.branch;
     this.setState({
-      commits: nextProps.commits,
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      // Don't update commits:
+      //   get commits via ajax
       commit: nextProps.commit
+    }, function() {
+      if(!_.isEqual(prevBranch, nextProps.branch)) {
+        this._ajaxCommits(this.state.repository, this.state.branch);
+      }
     });
   }
 

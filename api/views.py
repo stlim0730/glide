@@ -148,11 +148,10 @@ def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master'
 @api_view(['POST'])
 def clone(request):
   """
-  Import a project from specified GitHub url.
+  Clone a project from specified GitHub url.
   GETs existing repositories on GitHub to check potential name duplicates.
   POSTs a new repository on GitHub and create a project instance on Glide server.
   """
-  username = request.session['username']
   accessToken = request.session['accessToken']
   # Starting from Django 1.5,
   #   request.POST object does not contain non-form data anymore (e.g., AJAX).
@@ -165,6 +164,29 @@ def clone(request):
   with urlopen(getRepoUrl) as reposRes:
     resStr = reposRes.read().decode('utf-8')
     return Response({ 'repository': resStr })
+
+
+@api_view(['POST'])
+def branch(request):
+  """
+  Create a reference on GitHub repo as a new branch
+  """
+  accessToken = request.session['accessToken']
+  newBranch = request.data['newBranch']
+  branchFrom = request.data['branchFrom']
+  owner = request.data['owner']
+  repo = request.data['repo']
+  createRefUrl = 'https://api.github.com/repos/{}/{}/git/refs?access_token={}'.format(owner, repo, accessToken)
+  createRefUrl = getAuthUrl(createRefUrl)
+  createRefData = {
+    'ref': 'refs/heads/' + newBranch,
+    'sha': branchFrom
+  }
+  createRefData = json.dumps(createRefData).encode('utf-8')
+  with urlopen(createRefUrl, createRefData) as createRefRes:
+    resStr = createRefRes.read().decode('utf-8')
+    return Response({
+      'createRefRes': json.loads(resStr), 'code': createRefRes.getcode() })
 
 
 # @api_view(['POST'])

@@ -9,7 +9,6 @@ class RepoToolBar extends React.Component {
     super(props);
 
     this.state = {
-      // project: this.props.project,
       repository: this.props.repository,
       branches: [],
       branch: null,
@@ -22,39 +21,13 @@ class RepoToolBar extends React.Component {
   }
 
   componentDidMount() {
-    // GET project branches
-    let url = '/api/project/branches/' + this.state.repository.full_name;
-    let self = this;
-    let app = self.props.app;
-
-    $.ajax({
-      url: url,
-      method: 'GET',
-      // headers: { 'X-CSRFToken': window.glide.csrfToken },
-      success: function(response) {
-        // console.info('RepoToolBar AJAX', response);
-        let branches = JSON.parse(response.branches);
-        if('error' in response) {
-          // TODO
-        }
-        else {
-          self.setState({
-            branches: branches
-          }, function() {
-            app.setState({
-              branches: branches
-            });
-          });
-        }
-      }
-    });
+    
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      // project: nextProps.project,
       repository: nextProps.repository,
-      // Don't update branches: it comes from the server, not from App component
+      branches: nextProps.branches,
       branch: nextProps.branch,
       commits: nextProps.commits,
       commit: nextProps.commit
@@ -81,10 +54,15 @@ class RepoToolBar extends React.Component {
         </label>
         <BranchDropdown
           app={this.props.app}
+          repository={this.state.repository}
           branches={this.state.branches}
-          branch={this.state.branch} />
+          branch={this.state.branch}
+          commits={this.state.commits}
+          commit={this.state.commit} />
         <CommitDropdown
           app={this.props.app}
+          repository={this.state.repository}
+          branch={this.state.branch}
           commits={this.state.commits}
           commit={this.state.commit} />
       </div>
@@ -93,7 +71,6 @@ class RepoToolBar extends React.Component {
 }
 
 export default RepoToolBar
-
 
 // <small className="hidden">
 //   <span className="glyphicon glyphicon-cog" aria-hidden="true"></span> Configure project...&emsp;

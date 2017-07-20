@@ -16,7 +16,7 @@ class FileSideBar extends React.Component {
       fileActive: null
     };
 
-    this._loadTree = this._loadTree.bind(this);
+    this._ajaxTree = this._ajaxTree.bind(this);
     this._reset = this._reset.bind(this);
   }
 
@@ -33,7 +33,7 @@ class FileSideBar extends React.Component {
     });
   }
 
-  _loadTree(repository, branch, commit) {
+  _ajaxTree(repository, branch, commit) {
     // GET project file structure
     let url = '/api/project/tree/' + repository.full_name + '/' + branch.name + '/' + commit.sha;
     let self = this;
@@ -42,7 +42,7 @@ class FileSideBar extends React.Component {
       method: 'GET',
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       success: function(response) {
-        console.info('_loadTree AJAX success', response);
+        console.info('_ajaxTree AJAX success', response);
         if('error' in response) {
           // TODO
         }
@@ -58,12 +58,11 @@ class FileSideBar extends React.Component {
 
   componentDidMount() {
     this.setState({
-      // project: this.props.project,
       repository: this.props.repository,
       branch: this.props.branch,
       commit: this.props.commit
     }, function() {
-      this._loadTree(this.state.repository, this.state.branch, this.state.commit);
+      this._ajaxTree(this.state.repository, this.state.branch, this.state.commit);
     });
   }
 
@@ -77,9 +76,9 @@ class FileSideBar extends React.Component {
       //   when another commit is selected
       // let self = this;
       // this._reset(function() {
-      //   self._loadTree(nextProps.repository, nextProps.branch, nextProps.commit);
+      //   self._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
       // });
-      this._loadTree(nextProps.repository, nextProps.branch, nextProps.commit);
+      this._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
     }
   }
 

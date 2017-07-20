@@ -16,6 +16,7 @@ import './lib/bootstrap/bootstrap.min.js';
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
 import CloneRepoModalContent from './components/CloneRepoModalContent.js';
+import CreateBranchModalContent from './components/CreateBranchModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepoToolBar from './components/RepoToolBar.js';
@@ -42,8 +43,6 @@ class App extends React.Component {
       },
 
       phase: 'clean_slate',
-      // projects: [],
-      // project: null,
       repository: null,
       branches: [],
       branch: null,
@@ -55,8 +54,9 @@ class App extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if(prevState.project != this.state.project) {
-      // If another project is opened, the substructures should reset
+    if(prevState.repository != this.state.repository) {
+      // When a new repository is opened,
+      //   the substructures should reset
       this.setState({
         filesOpened: [],
         fileActive: null,
@@ -66,9 +66,24 @@ class App extends React.Component {
         commit: null
       });
     }
-    // else if(prevState.fileActive != this.state.fileActive) {
-      
-    // }
+    else if(prevState.branch != this.state.branch) {
+      // When shifted to another branch,
+      //   the substructures should reset
+      this.setState({
+        filesOpened: [],
+        fileActive: null,
+        commits: [],
+        commit: null
+      });
+    }
+    else if(prevState.commit != this.state.commit) {
+      // When checked out another commit,
+      //   the substructures should reset
+      this.setState({
+        filesOpened: [],
+        fileActive: null
+      });
+    }
   }
 
   render() {
@@ -79,6 +94,13 @@ class App extends React.Component {
         <Modal id="clone-repository-modal"
           modalContent={
             <CloneRepoModalContent app={this} />
+          }
+          large={false} />
+        <Modal id="create-branch-modal"
+          modalContent={
+            <CreateBranchModalContent
+              app={this}
+              commit={this.state.commit} />
           }
           large={false} />
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
@@ -130,7 +152,10 @@ class App extends React.Component {
               repository={this.state.repository}
               branch={this.state.branch}
               commit={this.state.commit} />
-            <EditorPane app={this} fileActive={this.state.fileActive} filesOpened={this.state.filesOpened} />
+            <EditorPane
+              app={this}
+              fileActive={this.state.fileActive}
+              filesOpened={this.state.filesOpened} />
             <RuntimePane app={this} />
           </div>
         );
