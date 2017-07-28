@@ -8,6 +8,7 @@ class FileSideBar extends React.Component {
     super(props);
 
     this.state = {
+      viewFriendlyTree: {},
       tree: {},
       repository: null,
       branch: null,
@@ -17,21 +18,22 @@ class FileSideBar extends React.Component {
     };
 
     this._ajaxTree = this._ajaxTree.bind(this);
-    this._reset = this._reset.bind(this);
+    // this._reset = this._reset.bind(this);
   }
 
-  _reset(callback) {
-    this.setState({
-      tree: {},
-      repository: null,
-      branch: null,
-      commit: null,
-      filesOpened: [],
-      fileActive: null
-    }, function() {
-      callback();
-    });
-  }
+  // _reset(callback) {
+  //   this.setState({
+  //     viewFriendlyTree: {},
+  //     tree: {},
+  //     repository: null,
+  //     branch: null,
+  //     commit: null,
+  //     filesOpened: [],
+  //     fileActive: null
+  //   }, function() {
+  //     // callback();
+  //   });
+  // }
 
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
@@ -40,7 +42,7 @@ class FileSideBar extends React.Component {
     $.ajax({
       url: url,
       method: 'GET',
-      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      // headers: { 'X-CSRFToken': window.glide.csrfToken },
       success: function(response) {
         console.info('_ajaxTree AJAX success', response);
         if('error' in response) {
@@ -48,49 +50,71 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            tree: response.tree//,
-            // repository: repository
+            viewFriendlyTree: response.viewFriendlyTree,
+            tree: response.tree
           });
         }
       }
     });
   }
-
+  
   componentDidMount() {
+    // console.info('FileSideBar CDM', this.state);
+    // let self = this;
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
       commit: this.props.commit
-    }, function() {
-      this._ajaxTree(this.state.repository, this.state.branch, this.state.commit);
-    });
+    }/*, function() {
+      self._ajaxTree(
+        self.state.repository,
+        self.state.branch,
+        self.state.commit
+      );
+    }*/);
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.state.repository && this.state.repository.full_name != nextProps.repository.full_name
-      || this.state.branch && this.state.branch.name != nextProps.branch.name
-      || this.state.commit && this.state.commit.sha != nextProps.commit.sha) {
-      // Need to reset the component and update tree:
-      //   when another repository is selected
-      //   when another branch is selected
-      //   when another commit is selected
-      // let self = this;
-      // this._reset(function() {
-      //   self._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
-      // });
-      this._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
-    }
+    console.info('FileSideBar CWRP', this.state);
+    let self = this;
+    this.setState({
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      commit: nextProps.commit
+    }, function() {
+      self._ajaxTree(
+        self.state.repository,
+        self.state.branch,
+        self.state.commit
+      );
+    });
+    // if(this.state.repository && this.state.repository.full_name != nextProps.repository.full_name
+    //   || this.state.branch && this.state.branch.name != nextProps.branch.name
+    //   || this.state.commit && this.state.commit.sha != nextProps.commit.sha) {
+    //   // Need to reset the component and update viewFriendlyTree:
+    //   //   when another repository is selected
+    //   //   when another branch is selected
+    //   //   when another commit is selected
+    //   // let self = this;
+    //   // this._reset(function() {
+    //   //   self._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
+    //   // });
+    //   this._ajaxTree(nextProps.repository, nextProps.branch, nextProps.commit);
+    // }
   }
 
   render () {
+    console.info('FileSideBar', this.state);
     return (
       <div className="col-lg-2 col-md-2 full-height">
         <div className="panel panel-default full-height">
           <div className="panel-heading">Files</div>
-
           {
             <div className="auto-scroll height-90 panel-body">
-              <FileNode nodes={this.state.tree.nodes} fileSideBar={this} app={this.props.app}/>
+              <FileNode
+                nodes={this.state.viewFriendlyTree.nodes}
+                fileSideBar={this}
+                app={this.props.app} />
             </div>
           }
         </div>

@@ -46,7 +46,6 @@ class RepoToolBar extends React.Component {
   // }
 
   render () {
-    console.info('RepoToolBar', this.state);
     return (
       <div className="overflow-hidden">
         <label className="h5">

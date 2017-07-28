@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen, Request
 from django.contrib.auth.models import User
 from workspace.models import Project, Theme
+from copy import deepcopy
 from glide import *
 
 
@@ -119,6 +120,7 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit
       elif file['ext'] in ['css']:
         file['editor'] = 'css'
       file['name'] = file['path'].split('/')[-1]
+      # TODO: Use GitHub Blobs API rather than custom string operations
       downloadUrl = 'https://raw.githubusercontent.com/{}/{}/{}/{}?access_token={}'
       file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, branch, file['path'], accessToken)
     # repoTree['tree'] = [file for file in repoTree['tree'] if file['type'] != 'tree']
@@ -186,7 +188,9 @@ def branch(request):
   with urlopen(createRefUrl, createRefData) as createRefRes:
     resStr = createRefRes.read().decode('utf-8')
     return Response({
-      'createRefRes': json.loads(resStr), 'code': createRefRes.getcode() })
+      'createRefRes': json.loads(resStr),
+      'code': createRefRes.getcode()
+    })
 
 
 # @api_view(['POST'])
@@ -273,6 +277,9 @@ def tree(request, owner, repo, branch, commit):
   accessToken = request.session['accessToken']
   # GET the tree structure of the project repository
   repoTree = _getRepoTree(accessToken, owner, repo, branch, commit)
+  # Set aside a raw tree
+  #   for part of response to return
+  tree = deepcopy(repoTree)
   # 
   # Resolve path strings:
   #   Trees from GitHub have meta data on path.
@@ -364,19 +371,43 @@ def tree(request, owner, repo, branch, commit):
     name = file['name']
     file['content'] = None
     fs[file['name']] = file
-  # Transform fs for React-friendly form
-  tree = transformFs(fs, {}, '')
-  return Response({ 'tree': tree })
+  # Transform fs for view-friendly form with recursive structure
+  viewFriendlyTree = transformFs(fs, {}, '')
+  return Response({ 'viewFriendlyTree': viewFriendlyTree, 'tree': tree })
 
 
-# @api_view(['POST'])
-# def createBranch(request):
-#   """
-#   Returns tree structure of a project.
-#   The HTTP parameter specifies the project ID (slug).
-#   GETs the latest commit hash value (sha) of the repository.
-#   GETs the tree (file structure in GitHub repo) data for the commit.
-#   Actual content requests and delivery will be on client side (AJAX).
-#   """
-#   pass
-
+@api_view(['GET', 'POST'])
+def blob(request, owner, repo, sha):
+  """
+  GET a blob specified and return it
+  POST a blob to create it on GitHub
+  """
+  accessToken = request.session['accessToken']
+  if request.method == 'GET':
+    # Get a blob
+    if sha:
+      getBlobUrl = 'https://api.github.com/repos/{}/{}/git/blobs/{}?access_token={}'
+      getBlobUrl = getBlobUrl.format(owner, repo, sha, accessToken)
+      getBlobUrl = getAuthUrl(getBlobUrl)
+      with urlopen(getBlobUrl) as blobRes:
+        resStr = blobRes.read().decode('utf-8')
+        return Response({ 'blob': json.loads(resStr) })
+    else:
+      return Response({ 'error': 'sha should be specified' })
+  elif request.method == 'POST':
+    # TODO: Create a blob
+    content = request.data['content']
+    encoding = 'utf-8'
+    if 'encoding' in request.data:
+      encoding = request.data['encoding']
+    createBlobUrl = 'https://api.github.com/repos/{}/{}/git/blobs?access_token={}'
+    createBlobUrl = createBlobUrl.format(owner, repo, accessToken)
+    createBlobUrl = getAuthUrl(createBlobUrl)
+    createBlobData = { 'content': content, 'encoding': encoding }
+    createBlobData = json.dumps(createBlobData).encode('utf-8')
+    with urlopen(createBlobUrl, createBlobData) as createBlobRes:
+      resStr = createBlobRes.read().decode('utf-8')
+      return Response({
+        'createBlobRes': json.loads(resStr),
+        'code': createBlobRes.getcode()
+      })

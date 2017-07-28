@@ -9,28 +9,14 @@ class FileNode extends React.Component {
       nodes: []
     };
 
+    this._orderNodes = this._orderNodes.bind(this);
     this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
   }
 
-  componentDidMount() {
-    // 
-    // This event seems to affect children nodes' behavior.
-    //   Maybe, that's because recursively generated nodes are dynamic
-    //   so that the state should update after being mounted.
-    // 
-    let orderedNodes = _.orderBy(this.props.nodes, ['type','name'], ['desc', 'asc']);
-    this.setState({
-      nodes: orderedNodes
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // 
-    // This event seems to affect the root node's behavior.
-    // 
-    let orderedNodes = _.orderBy(nextProps.nodes, ['type','name'], ['desc', 'asc']);
+  _orderNodes(nodes) {
+    let orderedNodes = _.orderBy(nodes, ['type','name'], ['desc', 'asc']);
     this.setState({
       nodes: orderedNodes
     });
@@ -51,11 +37,26 @@ class FileNode extends React.Component {
     return fileObj.sha + suffix;
   }
 
+  componentDidMount() {
+    // 
+    // This event seems to affect children nodes' behavior.
+    //   Maybe, that's because recursively generated nodes are dynamic
+    //   so that the state should update after being mounted.
+    // 
+    this._orderNodes(this.props.nodes);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // 
+    // This event seems to affect the root node's behavior.
+    // 
+    this._orderNodes(nextProps.nodes);
+  }
+
   handleFileClick(file, e) {
     // Folders don't call this event handler
-
-    let fileSideBar = this.props.fileSideBar;
     let app = this.props.app;
+    let fileSideBar = this.props.fileSideBar;
     let filesOpened = fileSideBar.state.filesOpened;
     let fileActive = fileSideBar.state.fileActive;
 
@@ -65,28 +66,34 @@ class FileNode extends React.Component {
     }
     else {
       if(file.content == null) {
-        // Initial loading: load remote resources
-        // GET file content
-        let url = file.downloadUrl;
+        // Initial loading:
+        //   request server to load remote resources
+        let url = '/api/project/blob/' + fileSideBar.state.repository.full_name + '/' + file.sha;
+        let app = this.props.app;
+
         $.ajax({
           url: url,
           method: 'GET',
-          // headers: { 'X-CSRFToken': window.glide.csrfToken },
           success: function(response) {
-            file.content = response;
-            
-            fileActive = file;
-            filesOpened.push(file);
-
-            fileSideBar.setState({
-              filesOpened: filesOpened,
-              fileActive: fileActive
-            }, function() {
-              app.setState({
+            console.info(response);
+            if('error' in response) {
+              // TODO
+            }
+            else {
+              file.content = atob(response.blob.content);
+              
+              fileActive = file;
+              filesOpened.push(file);
+              fileSideBar.setState({
                 filesOpened: filesOpened,
                 fileActive: fileActive
+              }, function() {
+                app.setState({
+                  filesOpened: filesOpened,
+                  fileActive: fileActive
+                });
               });
-            });
+            }
           }
         });
       }
@@ -112,7 +119,10 @@ class FileNode extends React.Component {
                   </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="list-group collapse">
-                    <FileNode nodes={item.nodes} fileSideBar={this.props.fileSideBar} app={this.props.app}/>
+                    <FileNode
+                      nodes={item.nodes}
+                      fileSideBar={this.props.fileSideBar}
+                      app={this.props.app} />
                   </ul>
                 </div>
               );
@@ -120,8 +130,11 @@ class FileNode extends React.Component {
             else {
               // Render a file.
               return (
-                <button key={index} className="list-group-item file-node-file"
-                  data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
+                <button
+                  key={index}
+                  className="list-group-item file-node-file"
+                  data-download-url={item.downloadUrl}
+                  onClick={this.handleFileClick.bind(this, item)}>
                   {item.name}
                 </button>
               );
