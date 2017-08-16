@@ -49,7 +49,8 @@ class App extends React.Component {
       commits: [],
       commit: null,
       filesOpened: [],
-      fileActive: null
+      fileActive: null,
+      stagedFiles: []
     };
   }
 
@@ -57,28 +58,33 @@ class App extends React.Component {
     if(prevState.repository != this.state.repository) {
       // When a new repository is opened,
       //   the substructures should reset
+      // TODO: Check if the stagedFiles is empty
       this.setState({
-        filesOpened: [],
-        fileActive: null,
         branches: [],
         branch: null,
         commits: [],
-        commit: null
+        commit: null,
+        filesOpened: [],
+        fileActive: null,
+        stagedFiles: []
       });
     }
     else if(prevState.branch != this.state.branch) {
       // When shifted to another branch,
       //   the substructures should reset
+      // TODO: Check if the stagedFiles is empty
       this.setState({
+        commits: [],
+        commit: null,
         filesOpened: [],
         fileActive: null,
-        commits: [],
-        commit: null
+        stagedFiles: []
       });
     }
     else if(prevState.commit != this.state.commit) {
       // When checked out another commit,
       //   the substructures should reset
+      // TODO: Check if the stagedFiles is empty
       this.setState({
         filesOpened: [],
         fileActive: null

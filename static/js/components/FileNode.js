@@ -60,12 +60,13 @@ class FileNode extends React.Component {
     let filesOpened = fileSideBar.state.filesOpened;
     let fileActive = fileSideBar.state.fileActive;
 
-    if(_.includes(filesOpened, file)) {
+    if(_.find(filesOpened, {'path': file.path})) {
+      alert('file alreay opened');
       // Already opened
       // TODO: Change the tab
     }
     else {
-      if(file.content == null) {
+      if(file.originalContent == null) {
         // Initial loading:
         //   request server to load remote resources
         let url = '/api/project/blob/' + fileSideBar.state.repository.full_name + '/' + file.sha;
@@ -80,7 +81,7 @@ class FileNode extends React.Component {
               // TODO
             }
             else {
-              file.content = atob(response.blob.content);
+              file.originalContent = atob(response.blob.content);
               
               fileActive = file;
               filesOpened.push(file);
@@ -112,11 +113,13 @@ class FileNode extends React.Component {
               // Render a folder
               return (
                 <div key={index}>
-                  <button href="#" className="btn btn-link file-node-folder" data-toggle="collapse"
+                  <button
+                    href="#"
+                    className="btn btn-link file-node-folder"
+                    data-toggle="collapse"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
-                    {item.name}&emsp;
-                    <span className="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-                  </button>
+                    {item.name}
+                  </button>&nbsp;<span className="glyphicon glyphicon-menu-down"></span>
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="list-group collapse">
                     <FileNode
@@ -133,9 +136,9 @@ class FileNode extends React.Component {
                 <button
                   key={index}
                   className="list-group-item file-node-file"
-                  data-download-url={item.downloadUrl}
                   onClick={this.handleFileClick.bind(this, item)}>
-                  {item.name}
+                  {item.name} {item.modified && !item.added && <span className="glyphicon glyphicon-asterisk
+                  "></span>}
                 </button>
               );
             }
@@ -147,3 +150,5 @@ class FileNode extends React.Component {
 }
 
 export default FileNode
+
+// data-download-url={item.downloadUrl}

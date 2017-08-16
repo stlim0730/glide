@@ -98,26 +98,29 @@ class BranchDropdown extends React.Component {
     }
 
     return (
-      <div className="btn-group" style={{marginTop: -5}}>
-        <a href="#" className="btn btn-default btn-xs">
-          {
-            this.state.branch ? this.state.branch.name : 'Select a branch'
-          }
-        </a>
-        <a href="#" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
-        <ul className="dropdown-menu">
-          {
-            this.state.branches.map(function(item, index) {
-              return (
-                <li key={item.name}>
-                  <a href="#" onClick={this.handleBranchClick.bind(this, item)}>{item.name}</a>
-                </li>
-              );
-            }.bind(this))
-          }
-          { latestCommit ? <li className="divider"></li> : null }
-          { latestCommit ? <li><a href="#" data-toggle="modal" data-target="#create-branch-modal">Create a New Branch</a></li> : null }
-        </ul>
+      <div className="inline-block" style={{marginRight: 30}}>
+        <label className="control-label">Branch</label><br />
+        <div className="btn-group" style={{marginTop: -5}}>
+          <a href="#" className="btn btn-default btn-xs">
+            {
+              this.state.branch ? this.state.branch.name : 'Select a branch'
+            }
+          </a>
+          <a href="#" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
+          <ul className="dropdown-menu">
+            {
+              this.state.branches.map(function(item, index) {
+                return (
+                  <li key={item.name}>
+                    <a href="#" onClick={this.handleBranchClick.bind(this, item)}>{item.name}</a>
+                  </li>
+                );
+              }.bind(this))
+            }
+            { latestCommit ? <li className="divider"></li> : null }
+            { latestCommit ? <li><a href="#" data-toggle="modal" data-target="#create-branch-modal">Create a New Branch</a></li> : null }
+          </ul>
+        </div>
       </div>
     );
   }

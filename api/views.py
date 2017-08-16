@@ -111,7 +111,7 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit
       if file['path'] == file['ext']:
         # It's a folder
         file['ext'] = None
-        file['downloadUrl'] = None
+        # file['downloadUrl'] = None
       file['editor'] = ''
       if file['ext'] in ['glide', 'md', 'yml', 'yaml']:
         file['editor'] = 'data'
@@ -121,30 +121,30 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit
         file['editor'] = 'css'
       file['name'] = file['path'].split('/')[-1]
       # TODO: Use GitHub Blobs API rather than custom string operations
-      downloadUrl = 'https://raw.githubusercontent.com/{}/{}/{}/{}?access_token={}'
-      file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, branch, file['path'], accessToken)
+      # downloadUrl = 'https://raw.githubusercontent.com/{}/{}/{}/{}?access_token={}'
+      # file['downloadUrl'] = downloadUrl.format(repoUsername, projectSlug, branch, file['path'], accessToken)
     # repoTree['tree'] = [file for file in repoTree['tree'] if file['type'] != 'tree']
     return repoTree
 
 
-def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master', message=None):
-  createFileUrl = 'https://api.github.com/repos/{}/{}/contents/{}?access_token={}'
-  # fileObj.path should be like 'foo/bar'
-  createFileUrl = createFileUrl.format(repoUsername, projectSlug, fileObj['path'], accessToken)
-  createFileUrl = getAuthUrl(createFileUrl)
-  if not message:
-    message = 'added {}'.format(fileObj['path'])
-  createFileData = {
-    'message': message,
-    'content': fileObj['content'].decode('utf-8'),
-    'branch': branch
-  }
-  req = Request(
-    url=createFileUrl, headers={'Content-Type': 'application/json'},
-    data=json.dumps(createFileData).encode('utf-8'), method='PUT')
-  with urlopen(req) as createFileRes:
-    resStr = createFileRes.read().decode('utf-8')
-    return json.loads(resStr)
+# def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master', message=None):
+#   createFileUrl = 'https://api.github.com/repos/{}/{}/contents/{}?access_token={}'
+#   # fileObj.path should be like 'foo/bar'
+#   createFileUrl = createFileUrl.format(repoUsername, projectSlug, fileObj['path'], accessToken)
+#   createFileUrl = getAuthUrl(createFileUrl)
+#   if not message:
+#     message = 'added {}'.format(fileObj['path'])
+#   createFileData = {
+#     'message': message,
+#     'originalContent': fileObj['originalContent'].decode('utf-8'),
+#     'branch': branch
+#   }
+#   req = Request(
+#     url=createFileUrl, headers={'Content-Type': 'application/json'},
+#     data=json.dumps(createFileData).encode('utf-8'), method='PUT')
+#   with urlopen(req) as createFileRes:
+#     resStr = createFileRes.read().decode('utf-8')
+#     return json.loads(resStr)
 
 
 @api_view(['POST'])
@@ -255,7 +255,7 @@ def branch(request):
 #             newFile = {}
 #             newFile['path'] = 'theme/' + file['path']
 #             with urlopen(file['downloadUrl']) as fileContentRes:
-#               newFile['content'] = getBase64Bytes(fileContentRes.read())#.decode('utf-8')
+#               newFile['originalContent'] = getBase64Bytes(fileContentRes.read())#.decode('utf-8')
 #               _createFile(accessToken, repoUsername, slug, newFile)
 #           return Response({
 #             'project': ProjectSerializer(project, many=False).data,
@@ -334,14 +334,16 @@ def tree(request, owner, repo, branch, commit):
       # print('{}: {}'.format('/'.join(stack), filesInFolder))
       for file in filesInFolder:
         name = file['name']
-        file['content'] = None
+        file['originalContent'] = None
+        file['modified'] = False
+        file['added'] = False
         fsDict[folder][name] = file
         f.remove(file)
       stack.pop()
 
   def transformFs(fsDict, res, parentPath):
     def _isFolder(x):
-      if not 'content' in x:
+      if not 'originalContent' in x:
         return True
       else:
         return False
@@ -369,7 +371,9 @@ def tree(request, owner, repo, branch, commit):
   rootFiles = [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
   for file in rootFiles:
     name = file['name']
-    file['content'] = None
+    file['originalContent'] = None
+    file['modified'] = False
+    file['added'] = False
     fs[file['name']] = file
   # Transform fs for view-friendly form with recursive structure
   viewFriendlyTree = transformFs(fs, {}, '')
@@ -396,7 +400,7 @@ def blob(request, owner, repo, sha):
       return Response({ 'error': 'sha should be specified' })
   elif request.method == 'POST':
     # TODO: Create a blob
-    content = request.data['content']
+    content = request.data['originalContent']
     encoding = 'utf-8'
     if 'encoding' in request.data:
       encoding = request.data['encoding']

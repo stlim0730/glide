@@ -87,8 +87,6 @@ class CloneRepoModalContent extends React.Component {
   }
 
   render() {
-    // console.info('CloneRepoModalContent', this.state);
-
     return (
       <div className="modal-content">
         <div className="modal-header">
@@ -98,20 +96,22 @@ class CloneRepoModalContent extends React.Component {
         
         <div className="modal-body">
           <div className="row">
-            <fieldset>
-              <div className="form-group">
-                <label className="col-md-2 col-md-offset-1 control-label">
-                  Git URL
-                </label>
-                <div className="col-md-7">
-                  <input
-                    type="text" ref={(c) => this.urlInput = c}
-                    onChange={this.handleUrlChange}
-                    className="form-control" maxLength="100"
-                    placeholder="https://github.com/" />
+            <form className="form-horizontal">
+              <fieldset>
+                <div className="form-group">
+                  <label className="col-md-2 col-md-offset-1 control-label">
+                    Git URL
+                  </label>
+                  <div className="col-md-7">
+                    <input
+                      type="text" ref={(c) => this.urlInput = c}
+                      onChange={this.handleUrlChange}
+                      className="form-control" maxLength="100"
+                      placeholder="https://github.com/" />
+                  </div>
                 </div>
-              </div>
-            </fieldset>
+              </fieldset>
+            </form>
           </div>
         </div>
         

@@ -18,6 +18,7 @@ class TabbedEditors extends React.Component {
     // this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.handleEditorChange = this.handleEditorChange.bind(this);
   }
 
   // _slugify(str) {
@@ -44,6 +45,18 @@ class TabbedEditors extends React.Component {
         fileActive: file
       });
     });
+  }
+
+  handleEditorChange(file, newVal) {
+    file.newContent = newVal;
+    if(file.originalContent != file.newContent) {
+      // file.modified = true;
+      let app = this.props.app;
+      if(!_.find(app.state.stagedFiles, { path: file.path })) {
+        app.state.stagedFiles.push(file);
+      }
+      console.info(_.find(app.state.stagedFiles, { path: file.path }));
+    }
   }
 
   componentDidMount() {
@@ -93,7 +106,10 @@ class TabbedEditors extends React.Component {
       let tabClassName = (item == this.state.fileActive ? "active" : "");
       tabs.push(
         <li key={item.path} className={tabClassName}>
-          <a href={"#" + this._getEditorId(item)} data-toggle="tab" onClick={this.handleTabClick.bind(this, item)}>
+          <a
+            href={"#" + this._getEditorId(item)}
+            data-toggle="tab"
+            onClick={this.handleTabClick.bind(this, item)}>
             {item.name}
           </a>
         </li>
@@ -123,20 +139,21 @@ class TabbedEditors extends React.Component {
         <CodeMirror
           key={item.path}
           file={item}
-          value={item.content}
+          value={item.originalContent}
           className={editorClassName}
           autoFocus={true}
-          options={options} />
+          options={options}
+          onChange={this.handleEditorChange.bind(this, item)}/>
       );
 
     }.bind(this))
 
     return (
-      <div className="full-height">
+      <div className="height-95">
         <ul className="nav nav-tabs">
           {tabs}
         </ul>
-        <div className="tab-content full-height">
+        <div className="tab-content height-95">
           {tabbedEditors}
         </div>
       </div>

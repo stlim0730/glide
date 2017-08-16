@@ -9,7 +9,11 @@ class NavMenuListItem extends React.Component {
   render () {
     return (
       <li>
-        <a href="#" disabled={this.props.disabled} data-toggle="modal" data-target={this.props.dataTarget}>
+        <a
+          href="#"
+          disabled={this.props.disabled}
+          data-toggle="modal"
+          data-target={this.props.dataTarget}>
           {this.props.label}
         </a>
       </li>

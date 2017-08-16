@@ -47,10 +47,15 @@ class RepoToolBar extends React.Component {
 
   render () {
     return (
-      <div className="overflow-hidden">
-        <label className="h5">
-          &emsp;{this.state.repository.name}&emsp;
-        </label>
+      <div className="overflow-hidden" style={{marginBottom: 10}}>
+        <div className="inline-block" style={{marginLeft: 15, marginRight: 30}}>
+          <label className="control-label">
+            Repository
+          </label><br />
+          <div className="btn-group" style={{marginTop: -5}}>
+            <span className="h3 text-muted">{this.state.repository.owner.login}/</span><span className="h3">{this.state.repository.name}</span>
+          </div>
+        </div>
         <BranchDropdown
           app={this.props.app}
           repository={this.state.repository}
