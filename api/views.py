@@ -57,8 +57,8 @@ def commits(request, owner, repo, branch):
     in the specified repository
   """
   accessToken = request.session['accessToken']
-  getCommitsUrl = 'https://api.github.com/repos/{}/{}/commits?access_token={}'
-  getCommitsUrl = getCommitsUrl.format(owner, repo, accessToken)
+  getCommitsUrl = 'https://api.github.com/repos/{}/{}/commits?sha={}&access_token={}'
+  getCommitsUrl = getCommitsUrl.format(owner, repo, branch, accessToken)
   getCommitsUrl = getAuthUrl(getCommitsUrl)
   with urlopen(getCommitsUrl) as commitsRes:
     resStr = commitsRes.read().decode('utf-8')
@@ -376,8 +376,8 @@ def tree(request, owner, repo, branch, commit):
     file['added'] = False
     fs[file['name']] = file
   # Transform fs for view-friendly form with recursive structure
-  viewFriendlyTree = transformFs(fs, {}, '')
-  return Response({ 'viewFriendlyTree': viewFriendlyTree, 'tree': tree })
+  recursiveTree = transformFs(fs, {}, '')
+  return Response({ 'recursiveTree': recursiveTree, 'tree': tree })
 
 
 @api_view(['GET', 'POST'])

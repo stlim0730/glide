@@ -8,8 +8,8 @@ class FileSideBar extends React.Component {
     super(props);
 
     this.state = {
-      viewFriendlyTree: {},
-      tree: {},
+      recursiveTree: null,//{},
+      tree: null,//{},
       repository: null,
       branch: null,
       commit: null,
@@ -23,7 +23,7 @@ class FileSideBar extends React.Component {
 
   // _reset(callback) {
   //   this.setState({
-  //     viewFriendlyTree: {},
+  //     recursiveTree: {},
   //     tree: {},
   //     repository: null,
   //     branch: null,
@@ -37,12 +37,14 @@ class FileSideBar extends React.Component {
 
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
+    console.info('FileSideBar _ajaxTree', this.state);
     let url = '/api/project/tree/' + repository.full_name + '/' + branch.name + '/' + commit.sha;
     let self = this;
+    let app = this.props.app;
+
     $.ajax({
       url: url,
       method: 'GET',
-      // headers: { 'X-CSRFToken': window.glide.csrfToken },
       success: function(response) {
         console.info('_ajaxTree AJAX success', response);
         if('error' in response) {
@@ -50,8 +52,12 @@ class FileSideBar extends React.Component {
         }
         else {
           self.setState({
-            viewFriendlyTree: response.viewFriendlyTree,
+            recursiveTree: response.recursiveTree,
             tree: response.tree
+          }, function() {
+            app.setState({
+              tree: response.tree
+            });
           });
         }
       }
@@ -76,8 +82,16 @@ class FileSideBar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     console.info('FileSideBar CWRP', this.state);
+    if(this.state.repository == nextProps.repository
+      && this.state.branch == nextProps.branch
+      && this.state.commit == nextProps.commit) {
+      // No need to update
+      return;
+    }
+
     let self = this;
     this.setState({
+      // app: nextProps.app,
       repository: nextProps.repository,
       branch: nextProps.branch,
       commit: nextProps.commit
@@ -88,10 +102,14 @@ class FileSideBar extends React.Component {
         self.state.commit
       );
     });
+
+    // 
+    // I don't understand why I wrote these lines below...
+    // 
     // if(this.state.repository && this.state.repository.full_name != nextProps.repository.full_name
     //   || this.state.branch && this.state.branch.name != nextProps.branch.name
     //   || this.state.commit && this.state.commit.sha != nextProps.commit.sha) {
-    //   // Need to reset the component and update viewFriendlyTree:
+    //   // Need to reset the component and update recursiveTree:
     //   //   when another repository is selected
     //   //   when another branch is selected
     //   //   when another commit is selected
@@ -110,9 +128,10 @@ class FileSideBar extends React.Component {
         <div className="panel panel-default full-height">
           <div className="panel-heading">Files</div>
           {
+            this.state.recursiveTree &&
             <div className="auto-scroll height-90 panel-body">
               <FileNode
-                nodes={this.state.viewFriendlyTree.nodes}
+                nodes={this.state.recursiveTree.nodes}
                 fileSideBar={this}
                 app={this.props.app} />
             </div>

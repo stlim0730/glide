@@ -100,13 +100,13 @@ class BranchDropdown extends React.Component {
     return (
       <div className="inline-block" style={{marginRight: 30}}>
         <label className="control-label">Branch</label><br />
-        <div className="btn-group" style={{marginTop: -5}}>
-          <a href="#" className="btn btn-default btn-xs">
+        <div className="btn-group">
+          <a href="#" className="btn btn-default btn-sm">
             {
               this.state.branch ? this.state.branch.name : 'Select a branch'
             }
           </a>
-          <a href="#" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
+          <a href="#" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
           <ul className="dropdown-menu">
             {
               this.state.branches.map(function(item, index) {

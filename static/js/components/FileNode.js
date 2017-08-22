@@ -61,7 +61,6 @@ class FileNode extends React.Component {
     let fileActive = fileSideBar.state.fileActive;
 
     if(_.find(filesOpened, {'path': file.path})) {
-      alert('file alreay opened');
       // Already opened
       // TODO: Change the tab
     }

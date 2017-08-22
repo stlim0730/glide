@@ -34,9 +34,9 @@ class CommitDropdown extends React.Component {
           self.setState({
             commits: commits
           }, function() {
-            app.setState({
-              commits: commits
-            });
+            // app.setState({
+            //   commits: commits
+            // });
           });
         }
       }
@@ -51,6 +51,7 @@ class CommitDropdown extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     let prevBranch = this.state.branch;
+    let self = this;
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
@@ -58,7 +59,12 @@ class CommitDropdown extends React.Component {
       //   get commits via ajax
       commit: nextProps.commit
     }, function() {
-      if(!_.isEqual(prevBranch, nextProps.branch)) {
+      if(!nextProps.branch) {
+        self.setState({
+          commits: []
+        });
+      }
+      else/* if(!_.isEqual(prevBranch, nextProps.branch)) */ {
         this._ajaxCommits(this.state.repository, this.state.branch);
       }
     });
@@ -82,13 +88,13 @@ class CommitDropdown extends React.Component {
       return (
         <div className="inline-block" style={{marginRight: 30}}>
           <label className="control-label">Commit</label><br />
-          <div className="btn-group" style={{marginTop: -5}}>
-            <a href="#" className="btn btn-default btn-xs">
+          <div className="btn-group">
+            <a href="#" className="btn btn-default btn-sm">
               {
                 this.state.commit ? this.state.commit.commit.message : 'Select a commit'
               }
             </a>
-            <a href="#" className="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
+            <a href="#" className="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown"><span className="caret"></span></a>
             <ul className="dropdown-menu">
               {
                 this.state.commits.map(function(item, index) {

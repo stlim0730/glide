@@ -17,6 +17,7 @@ import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
 import CloneRepoModalContent from './components/CloneRepoModalContent.js';
 import CreateBranchModalContent from './components/CreateBranchModalContent.js';
+import GitStatusModalContent from './components/GitStatusModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepoToolBar from './components/RepoToolBar.js';
@@ -48,6 +49,7 @@ class App extends React.Component {
       branch: null,
       commits: [],
       commit: null,
+      tree: null,
       filesOpened: [],
       fileActive: null,
       stagedFiles: []
@@ -107,6 +109,11 @@ class App extends React.Component {
             <CreateBranchModalContent
               app={this}
               commit={this.state.commit} />
+          }
+          large={false} />
+        <Modal id="git-status-modal"
+          modalContent={
+            <GitStatusModalContent app={this} />
           }
           large={false} />
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}

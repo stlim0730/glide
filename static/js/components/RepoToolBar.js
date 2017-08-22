@@ -1,5 +1,6 @@
 import BranchDropdown from './BranchDropdown.js';
 import CommitDropdown from './CommitDropdown.js';
+import RepoControls from './RepoControls.js';
 
 // 
 // RepoToolBar component
@@ -25,12 +26,27 @@ class RepoToolBar extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    let nextBranch = nextProps.branch;
+    let nextCommits = nextProps.commits;
+    let nextCommit = nextProps.commit;
+
+    if(this.state.repository != nextProps.repository) {
+      nextBranch = null;
+      nextCommits = [];
+      nextCommit = null;
+    }
+
+    if(this.state.branch != nextProps.branch) {
+      nextCommits = [];
+      nextCommit = null;
+    }
+
     this.setState({
       repository: nextProps.repository,
       branches: nextProps.branches,
-      branch: nextProps.branch,
-      commits: nextProps.commits,
-      commit: nextProps.commit
+      branch: nextBranch,
+      commits: nextCommits,
+      commit: nextCommit
     });
   }
 
@@ -64,6 +80,12 @@ class RepoToolBar extends React.Component {
           commits={this.state.commits}
           commit={this.state.commit} />
         <CommitDropdown
+          app={this.props.app}
+          repository={this.state.repository}
+          branch={this.state.branch}
+          commits={this.state.commits}
+          commit={this.state.commit} />
+        <RepoControls
           app={this.props.app}
           repository={this.state.repository}
           branch={this.state.branch}

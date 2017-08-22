@@ -73,13 +73,15 @@ class CloneRepoModalContent extends React.Component {
         }
         else {
           self._reset();
-          // let project = response.project;
           let repository = JSON.parse(response.repository);
           let app = self.props.app;
           app.setState({
             phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
-            // project: project,
-            repository: repository
+            repository: repository,
+            branches: [],
+            branch: null,
+            commits: [],
+            commit: null
           });
         }
       }
@@ -116,7 +118,13 @@ class CloneRepoModalContent extends React.Component {
         </div>
         
         <div className="modal-footer">
-          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this._reset}>Close</button>
+          <button
+            type="button"
+            className="btn btn-default"
+            data-dismiss="modal"
+            onClick={this._reset}>
+            Close
+          </button>
           <button
             className="btn btn-primary" onClick={this.handleSubmit}
             data-dismiss="modal" ref={(c) => this.submitButton = c}
