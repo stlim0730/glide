@@ -52,7 +52,7 @@ class App extends React.Component {
       tree: null,
       filesOpened: [],
       fileActive: null,
-      stagedFiles: []
+      changedFiles: []
     };
   }
 
@@ -60,7 +60,7 @@ class App extends React.Component {
     if(prevState.repository != this.state.repository) {
       // When a new repository is opened,
       //   the substructures should reset
-      // TODO: Check if the stagedFiles is empty
+      // TODO: Check if the changedFiles is empty
       this.setState({
         branches: [],
         branch: null,
@@ -68,25 +68,25 @@ class App extends React.Component {
         commit: null,
         filesOpened: [],
         fileActive: null,
-        stagedFiles: []
+        changedFiles: []
       });
     }
     else if(prevState.branch != this.state.branch) {
       // When shifted to another branch,
       //   the substructures should reset
-      // TODO: Check if the stagedFiles is empty
+      // TODO: Check if the changedFiles is empty
       this.setState({
         commits: [],
         commit: null,
         filesOpened: [],
         fileActive: null,
-        stagedFiles: []
+        changedFiles: []
       });
     }
     else if(prevState.commit != this.state.commit) {
       // When checked out another commit,
       //   the substructures should reset
-      // TODO: Check if the stagedFiles is empty
+      // TODO: Check if the changedFiles is empty
       this.setState({
         filesOpened: [],
         fileActive: null
@@ -113,9 +113,12 @@ class App extends React.Component {
           large={false} />
         <Modal id="git-status-modal"
           modalContent={
-            <GitStatusModalContent app={this} />
+            <GitStatusModalContent
+              app={this}
+              branch={this.state.branch}
+              changedFiles={this.state.changedFiles} />
           }
-          large={false} />
+          large={true} />
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
         {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>

@@ -49,13 +49,29 @@ class TabbedEditors extends React.Component {
 
   handleEditorChange(file, newVal) {
     file.newContent = newVal;
+    let app = this.props.app;
     if(file.originalContent != file.newContent) {
-      // file.modified = true;
-      let app = this.props.app;
-      if(!_.find(app.state.stagedFiles, { path: file.path })) {
-        app.state.stagedFiles.push(file);
+      // This file has been modified.
+      //   NOT USED file.modified = true;
+      if(!_.find(app.state.changedFiles, { path: file.path })) {
+        let changedFiles = app.state.changedFiles;
+        changedFiles.push(file);
+        app.setState({
+          changedFiles: changedFiles
+        });
       }
-      console.info(_.find(app.state.stagedFiles, { path: file.path }));
+    }
+    else {
+      // This file hasn't been modified:
+      //   Take out this file from staged area
+      
+      // Returns a new array with non-target elements
+      let changedFiles = _.remove(app.state.changedFiles, function(item) {
+        return item.path != file.path;
+      });
+      app.setState({
+        changedFiles: changedFiles
+      });
     }
   }
 
