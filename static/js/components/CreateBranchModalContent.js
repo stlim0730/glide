@@ -174,12 +174,17 @@ class CreateBranchModalContent extends React.Component {
         </div>
         
         <div className="modal-footer">
-          <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this._reset}>Close</button>
           <button
-            className="btn btn-primary" onClick={this.handleSubmit}
-            data-dismiss="modal" ref={(c) => this.submitButton = c}
-            disabled={this.state.newBranch==''}
-            type="submit">
+            type="button"
+            className="btn btn-default"
+            data-dismiss="modal"
+            onClick={this._reset}>Close</button>
+          <button
+            className="btn btn-primary"
+            onClick={this.handleSubmit}
+            data-dismiss="modal"
+            type="submit"
+            disabled={this.state.newBranch==''}>
             Submit
           </button>
         </div>

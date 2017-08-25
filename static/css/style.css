@@ -37,11 +37,11 @@ div.panel + div.panel {
   min-height: 70px;
   text-align: center;
 }
-button.file-node-folder + span.glyphicon-menu-down + ul .file-node-folder,
-button.file-node-folder + span.glyphicon-menu-down + ul .file-node-file {
-  position: relative;
-  left: 15px;
+ul.subtree {
+  padding-left: 15px;
 }
+.file-node-file { color: #222222 !important; }
+.new-file-button { color: #3fb618 !important; }
 .repo-file-link.opened {
   font-weight: bold;
 }

@@ -22,9 +22,10 @@ class GitStatusModalContent extends React.Component {
   // }
 
   handleChangedFileClick(file) {
-    this.setState({
-      diffFile: file
-    });
+    // TODO: Currently not using diff tool on Glide
+    // this.setState({
+    //   diffFile: file
+    // });
   }
 
   componentDidMount() {

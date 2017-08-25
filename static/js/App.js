@@ -18,6 +18,7 @@ import Modal from './components/Modal.js';
 import CloneRepoModalContent from './components/CloneRepoModalContent.js';
 import CreateBranchModalContent from './components/CreateBranchModalContent.js';
 import GitStatusModalContent from './components/GitStatusModalContent.js';
+import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepoToolBar from './components/RepoToolBar.js';
@@ -54,6 +55,25 @@ class App extends React.Component {
       fileActive: null,
       changedFiles: []
     };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    // let s0 = _.cloneDeep(this.state);
+    // let s1 = _.cloneDeep(nextState);
+    // let commits0 = _.cloneDeep(s0.commits);
+    // let commits1 = _.cloneDeep(s1.commits);
+    // delete s0.commits;
+    // delete s1.commits;
+    // console.info(commits0, commits1);
+
+    if(_.isEqual(this.state, nextState)) {
+      // If the only difference
+      //   between current and next states is commits,
+      //   don't update App.
+      return false;
+    }
+
+    return true;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -101,7 +121,8 @@ class App extends React.Component {
       <div>
         <Modal id="clone-repository-modal"
           modalContent={
-            <CloneRepoModalContent app={this} />
+            <CloneRepoModalContent
+              app={this} />
           }
           large={false} />
         <Modal id="create-branch-modal"
@@ -111,6 +132,12 @@ class App extends React.Component {
               commit={this.state.commit} />
           }
           large={false} />
+        <Modal id="create-new-file-modal"
+          modalContent={
+            <CreateNewFileModalContent
+              app={this} />
+          }
+          large={false} />
         <Modal id="git-status-modal"
           modalContent={
             <GitStatusModalContent
@@ -118,7 +145,7 @@ class App extends React.Component {
               branch={this.state.branch}
               changedFiles={this.state.changedFiles} />
           }
-          large={true} />
+          large={false} />
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
         {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>

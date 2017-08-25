@@ -34,9 +34,9 @@ class CommitDropdown extends React.Component {
           self.setState({
             commits: commits
           }, function() {
-            // app.setState({
-            //   commits: commits
-            // });
+            app.setState({
+              commits: commits
+            });
           });
         }
       }

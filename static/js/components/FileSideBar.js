@@ -66,18 +66,23 @@ class FileSideBar extends React.Component {
   
   componentDidMount() {
     // console.info('FileSideBar CDM', this.state);
-    // let self = this;
+    let self = this;
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
       commit: this.props.commit
-    }/*, function() {
-      self._ajaxTree(
-        self.state.repository,
-        self.state.branch,
-        self.state.commit
-      );
-    }*/);
+    }, function() {
+      let repository = self.state.repository;
+      let branch = self.state.branch;
+      let commit = self.state.commit;
+      if(repository && branch && commit) {
+        self._ajaxTree(
+          self.state.repository,
+          self.state.branch,
+          self.state.commit
+        );
+      }
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -91,7 +96,6 @@ class FileSideBar extends React.Component {
 
     let self = this;
     this.setState({
-      // app: nextProps.app,
       repository: nextProps.repository,
       branch: nextProps.branch,
       commit: nextProps.commit
@@ -131,6 +135,7 @@ class FileSideBar extends React.Component {
             this.state.recursiveTree &&
             <div className="auto-scroll height-90 panel-body">
               <FileNode
+                currentPath=''
                 nodes={this.state.recursiveTree.nodes}
                 fileSideBar={this}
                 app={this.props.app} />

@@ -93,7 +93,7 @@ class BranchDropdown extends React.Component {
     let latestCommit = false;
     let commit = this.state.commit;
     let commits = this.state.commits;
-    if(this.state.commit != null && this.state.commits.length > 0) {
+    if(commit != null && commits.length > 0) {
       latestCommit = _.isEqual(commit, commits[0]);
     }
 

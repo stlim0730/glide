@@ -6,6 +6,7 @@ class FileNode extends React.Component {
     super(props);
 
     this.state = {
+      currentPath: '',
       nodes: []
     };
 
@@ -13,6 +14,7 @@ class FileNode extends React.Component {
     this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
+    this.handleCreateNewFileClick = this.handleCreateNewFileClick.bind(this);
   }
 
   _orderNodes(nodes) {
@@ -35,22 +37,6 @@ class FileNode extends React.Component {
   _getEditorId(fileObj) {
     let suffix = '_editor';
     return fileObj.sha + suffix;
-  }
-
-  componentDidMount() {
-    // 
-    // This event seems to affect children nodes' behavior.
-    //   Maybe, that's because recursively generated nodes are dynamic
-    //   so that the state should update after being mounted.
-    // 
-    this._orderNodes(this.props.nodes);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // 
-    // This event seems to affect the root node's behavior.
-    // 
-    this._orderNodes(nextProps.nodes);
   }
 
   handleFileClick(file, e) {
@@ -103,6 +89,35 @@ class FileNode extends React.Component {
     }
   }
 
+  handleCreateNewFileClick() {
+    // TODO: set state of the modal with path parameter
+    let path = this.state.currentPath + '/';
+    console.info($('#create-new-file-modal input.pathInput'));
+    $('#create-new-file-modal input.pathInput').val(path);
+  }
+
+  componentDidMount() {
+    // 
+    // This event seems to affect children nodes' behavior.
+    //   Maybe, that's because recursively generated nodes are dynamic
+    //   so that the state should update after being mounted.
+    // 
+    this.setState({
+      currentPath: this.props.currentPath
+    });
+    this._orderNodes(this.props.nodes);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // 
+    // This event seems to affect the root node's behavior.
+    // 
+    this.setState({
+      currentPath: nextProps.currentPath
+    });
+    this._orderNodes(nextProps.nodes);
+  }
+
   render () {
     return (
       <div>
@@ -118,10 +133,11 @@ class FileNode extends React.Component {
                     data-toggle="collapse"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
                     {item.name}
-                  </button>&nbsp;<span className="glyphicon glyphicon-menu-down"></span>
+                  </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
-                    className="list-group collapse">
+                    className="collapse subtree">
                     <FileNode
+                      currentPath={item.path}
                       nodes={item.nodes}
                       fileSideBar={this.props.fileSideBar}
                       app={this.props.app} />
@@ -134,7 +150,7 @@ class FileNode extends React.Component {
               return (
                 <button
                   key={index}
-                  className="list-group-item file-node-file"
+                  className="btn btn-link file-node-file"
                   onClick={this.handleFileClick.bind(this, item)}>
                   {item.name} {item.modified && !item.added && <span className="glyphicon glyphicon-asterisk
                   "></span>}
@@ -143,6 +159,13 @@ class FileNode extends React.Component {
             }
           }.bind(this))
         }
+        <button
+          className="btn btn-link new-file-button"
+          onClick={this.handleCreateNewFileClick.bind(this)}
+          data-toggle="modal"
+          data-target="#create-new-file-modal">
+          <span className="glyphicon glyphicon-plus"></span> Create New...
+        </button>
       </div>
     );
   }
