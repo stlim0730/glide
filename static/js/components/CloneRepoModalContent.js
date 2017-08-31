@@ -10,6 +10,7 @@ class CloneRepoModalContent extends React.Component {
     };
 
     this.handleUrlChange = this.handleUrlChange.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this._reset = this._reset.bind(this);
     this._validateGitUrl = this._validateGitUrl.bind(this);
@@ -30,6 +31,14 @@ class CloneRepoModalContent extends React.Component {
 
   componentDidMount() {
     // 
+  }
+
+  handleKeyUp(e) {
+    e.preventDefault();
+    let keyCode = e.keyCode;
+    if(keyCode == 13) {
+      this.submitButton.click();
+    }
   }
 
   handleUrlChange(e) {
@@ -109,7 +118,8 @@ class CloneRepoModalContent extends React.Component {
                       type="text" ref={(c) => this.urlInput = c}
                       onChange={this.handleUrlChange}
                       className="form-control" maxLength="100"
-                      placeholder="https://github.com/" />
+                      placeholder="https://github.com/"
+                      onKeyUp={this.handleKeyUp} />
                   </div>
                 </div>
               </fieldset>

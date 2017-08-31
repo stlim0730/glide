@@ -64,7 +64,8 @@ class CommitDropdown extends React.Component {
           commits: []
         });
       }
-      else/* if(!_.isEqual(prevBranch, nextProps.branch)) */ {
+      else if(!_.isEqual(prevBranch, nextProps.branch)) {
+        // Make an Ajax req only when a branch has changed
         this._ajaxCommits(this.state.repository, this.state.branch);
       }
     });

@@ -19,9 +19,10 @@ div.panel + div.panel {
 .navbar button.btn-sm {
   margin-top: 10px;
 }
-.inline-block {
-  display: inline-block;
-}
+.block { display: block; }
+.inline-block { display: inline-block; }
+.margin-top-15 { margin-top: 15px; }
+.margin-bottom-15 { margin-bottom: 15px; }
 .page-thumbnail-wrapper {
   margin-bottom: 10px;
 }
@@ -42,9 +43,9 @@ ul.subtree {
 }
 .file-node-file { color: #222222 !important; }
 .new-file-button { color: #3fb618 !important; }
-.repo-file-link.opened {
+/*.repo-file-link.opened {
   font-weight: bold;
-}
+}*/
 .v-middle {
   position: relative;
   top: 50%;

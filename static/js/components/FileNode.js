@@ -40,7 +40,8 @@ class FileNode extends React.Component {
   }
 
   handleFileClick(file, e) {
-    // Folders don't call this event handler
+    // console.info(file);
+    // Folders don't call this event handler: yay
     let app = this.props.app;
     let fileSideBar = this.props.fileSideBar;
     let filesOpened = fileSideBar.state.filesOpened;
@@ -52,8 +53,8 @@ class FileNode extends React.Component {
     }
     else {
       if(file.originalContent == null) {
-        // Initial loading:
-        //   request server to load remote resources
+        // Initial loading of an existing file in the repository:
+        //   Request server to load remote resources
         let url = '/api/project/blob/' + fileSideBar.state.repository.full_name + '/' + file.sha;
         let app = this.props.app;
 
@@ -84,15 +85,29 @@ class FileNode extends React.Component {
         });
       }
       else {
-        // TODO: Use local content
+        // Use local content
+        if(file.added) {
+          // Newly added file by the user:
+          //   There is no remote resources to load
+          fileActive = file;
+          filesOpened.push(file);
+          fileSideBar.setState({
+            filesOpened: filesOpened,
+            fileActive: fileActive
+          }, function() {
+            app.setState({
+              filesOpened: filesOpened,
+              fileActive: fileActive
+            });
+          });
+        }
       }
     }
   }
 
   handleCreateNewFileClick() {
-    // TODO: set state of the modal with path parameter
+    // Show the path of the new file
     let path = this.state.currentPath + '/';
-    console.info($('#create-new-file-modal input.pathInput'));
     $('#create-new-file-modal input.pathInput').val(path);
   }
 
@@ -129,7 +144,7 @@ class FileNode extends React.Component {
                 <div key={index}>
                   <button
                     href="#"
-                    className="btn btn-link file-node-folder"
+                    className="btn btn-link file-node-folder block"
                     data-toggle="collapse"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
                     {item.name}
@@ -150,7 +165,7 @@ class FileNode extends React.Component {
               return (
                 <button
                   key={index}
-                  className="btn btn-link file-node-file"
+                  className="btn btn-link file-node-file block"
                   onClick={this.handleFileClick.bind(this, item)}>
                   {item.name} {item.modified && !item.added && <span className="glyphicon glyphicon-asterisk
                   "></span>}
@@ -160,7 +175,7 @@ class FileNode extends React.Component {
           }.bind(this))
         }
         <button
-          className="btn btn-link new-file-button"
+          className="btn btn-link new-file-button block"
           onClick={this.handleCreateNewFileClick.bind(this)}
           data-toggle="modal"
           data-target="#create-new-file-modal">
@@ -172,5 +187,3 @@ class FileNode extends React.Component {
 }
 
 export default FileNode
-
-// data-download-url={item.downloadUrl}

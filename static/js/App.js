@@ -51,29 +51,12 @@ class App extends React.Component {
       commits: [],
       commit: null,
       tree: null,
+      recursiveTree: null,
       filesOpened: [],
       fileActive: null,
-      changedFiles: []
+      changedFiles: [],
+      addedFiles: []
     };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    // let s0 = _.cloneDeep(this.state);
-    // let s1 = _.cloneDeep(nextState);
-    // let commits0 = _.cloneDeep(s0.commits);
-    // let commits1 = _.cloneDeep(s1.commits);
-    // delete s0.commits;
-    // delete s1.commits;
-    // console.info(commits0, commits1);
-
-    if(_.isEqual(this.state, nextState)) {
-      // If the only difference
-      //   between current and next states is commits,
-      //   don't update App.
-      return false;
-    }
-
-    return true;
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -81,6 +64,7 @@ class App extends React.Component {
       // When a new repository is opened,
       //   the substructures should reset
       // TODO: Check if the changedFiles is empty
+      // TODO: Check if the addedFiles is empty
       this.setState({
         branches: [],
         branch: null,
@@ -88,28 +72,34 @@ class App extends React.Component {
         commit: null,
         filesOpened: [],
         fileActive: null,
-        changedFiles: []
+        changedFiles: [],
+        addedFiles: []
       });
     }
     else if(prevState.branch != this.state.branch) {
       // When shifted to another branch,
       //   the substructures should reset
       // TODO: Check if the changedFiles is empty
+      // TODO: Check if the addedFiles is empty
       this.setState({
         commits: [],
         commit: null,
         filesOpened: [],
         fileActive: null,
-        changedFiles: []
+        changedFiles: [],
+        addedFiles: []
       });
     }
     else if(prevState.commit != this.state.commit) {
       // When checked out another commit,
       //   the substructures should reset
       // TODO: Check if the changedFiles is empty
+      // TODO: Check if the addedFiles is empty
       this.setState({
         filesOpened: [],
-        fileActive: null
+        fileActive: null,
+        changedFiles: [],
+        addedFiles: []
       });
     }
   }
@@ -135,7 +125,9 @@ class App extends React.Component {
         <Modal id="create-new-file-modal"
           modalContent={
             <CreateNewFileModalContent
-              app={this} />
+              app={this}
+              tree={this.state.tree}
+              recursiveTree={this.state.recursiveTree} />
           }
           large={false} />
         <Modal id="git-status-modal"
@@ -143,7 +135,8 @@ class App extends React.Component {
             <GitStatusModalContent
               app={this}
               branch={this.state.branch}
-              changedFiles={this.state.changedFiles} />
+              changedFiles={this.state.changedFiles}
+              addedFiles={this.state.addedFiles} />
           }
           large={false} />
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
@@ -194,7 +187,8 @@ class App extends React.Component {
               app={this}
               repository={this.state.repository}
               branch={this.state.branch}
-              commit={this.state.commit} />
+              commit={this.state.commit}
+              recursiveTree={this.state.recursiveTree} />
             <EditorPane
               app={this}
               fileActive={this.state.fileActive}

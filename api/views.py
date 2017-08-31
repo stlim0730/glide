@@ -107,18 +107,25 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit
     res = repoTreeRes.read().decode('utf-8')
     repoTree = json.loads(res)
     for file in repoTree['tree']:
-      file['ext'] = file['path'].split('.')[-1]
-      if file['path'] == file['ext']:
-        # It's a folder
-        file['ext'] = None
-        # file['downloadUrl'] = None
-      file['editor'] = ''
-      if file['ext'] in ['glide', 'md', 'yml', 'yaml']:
-        file['editor'] = 'data'
-      elif file['ext'] in ['html', 'htm']:
-        file['editor'] = 'html'
-      elif file['ext'] in ['css']:
-        file['editor'] = 'css'
+      # 
+      # TODO: File extension?
+      # 
+      # file['ext'] = file['path'].split('.')[-1]
+      # if file['path'] == file['ext']:
+      #   # It's a folder
+      #   file['ext'] = None
+      #   # file['downloadUrl'] = None
+      # 
+      # TODO: Editor type?
+      # 
+      # file['editor'] = ''
+      # if file['ext'] in ['glide', 'md', 'yml', 'yaml']:
+      #   file['editor'] = 'data'
+      # elif file['ext'] in ['html', 'htm']:
+      #   file['editor'] = 'html'
+      # elif file['ext'] in ['css']:
+      #   file['editor'] = 'css'
+      # 
       file['name'] = file['path'].split('/')[-1]
       # TODO: Use GitHub Blobs API rather than custom string operations
       # downloadUrl = 'https://raw.githubusercontent.com/{}/{}/{}/{}?access_token={}'

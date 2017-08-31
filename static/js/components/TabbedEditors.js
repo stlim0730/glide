@@ -155,11 +155,11 @@ class TabbedEditors extends React.Component {
         <CodeMirror
           key={item.path}
           file={item}
-          value={item.originalContent}
+          value={item.newContent ? item.newContent : item.originalContent}
           className={editorClassName}
           autoFocus={true}
           options={options}
-          onChange={this.handleEditorChange.bind(this, item)}/>
+          onChange={this.handleEditorChange.bind(this, item)} />
       );
 
     }.bind(this))

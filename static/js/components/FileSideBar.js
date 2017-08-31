@@ -8,8 +8,8 @@ class FileSideBar extends React.Component {
     super(props);
 
     this.state = {
-      recursiveTree: null,//{},
-      tree: null,//{},
+      recursiveTree: null,
+      tree: null,
       repository: null,
       branch: null,
       commit: null,
@@ -56,6 +56,7 @@ class FileSideBar extends React.Component {
             tree: response.tree
           }, function() {
             app.setState({
+              recursiveTree: response.recursiveTree,
               tree: response.tree
             });
           });
@@ -90,15 +91,27 @@ class FileSideBar extends React.Component {
     if(this.state.repository == nextProps.repository
       && this.state.branch == nextProps.branch
       && this.state.commit == nextProps.commit) {
-      // No need to update
+      // To avoid unnecessary _ajaxTree call
       return;
     }
+
+    // if(this.state.recursiveTree != nextProps.recursiveTree) {
+    //   // No need to make _ajaxTree call:
+    //   //   This should happen
+    //   //   when the recursiveTree structure has changed
+    //   //   outside this component (e.g., CreateNewFileModalContent).
+    //   console.info('rec tree received');
+    //   this.setState({
+    //     recursiveTree: nextProps.recursiveTree
+    //   });
+    //   return;
+    // }
 
     let self = this;
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
-      commit: nextProps.commit
+      commit: nextProps.commit,
     }, function() {
       self._ajaxTree(
         self.state.repository,
