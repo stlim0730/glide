@@ -14,15 +14,13 @@ class RepoToolBar extends React.Component {
       branches: [],
       branch: null,
       commits: [],
-      commit: null
+      commit: null,
+      changedFiles: [],
+      addedFiles: []
     };
 
     // this.handleMouseEnter = this.handleMouseEnter.bind(this);
     // this.handleMouseLeave = this.handleMouseLeave.bind(this);
-  }
-
-  componentDidMount() {
-    
   }
 
   componentWillReceiveProps(nextProps) {
@@ -46,7 +44,9 @@ class RepoToolBar extends React.Component {
       branches: nextProps.branches,
       branch: nextBranch,
       commits: nextCommits,
-      commit: nextCommit
+      commit: nextCommit,
+      changedFiles: nextProps.changedFiles,
+      addedFiles: nextProps.addedFiles
     });
   }
 
@@ -90,7 +90,9 @@ class RepoToolBar extends React.Component {
           repository={this.state.repository}
           branch={this.state.branch}
           commits={this.state.commits}
-          commit={this.state.commit} />
+          commit={this.state.commit}
+          changedFiles={this.state.changedFiles}
+          addedFiles={this.state.addedFiles} />
       </div>
     );
   }

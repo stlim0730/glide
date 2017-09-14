@@ -11,6 +11,7 @@ class CreateBranchModalContent extends React.Component {
     };
 
     this.handleBranchNameChange = this.handleBranchNameChange.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this._reset = this._reset.bind(this);
     this._validateBranchName = this._validateBranchName.bind(this);
@@ -82,6 +83,13 @@ class CreateBranchModalContent extends React.Component {
     }
   }
 
+  handleKeyUp(e) {
+    let keyCode = e.keyCode;
+    if(keyCode == 13) {
+      this.submitButton.click();
+    }
+  }
+
   handleSubmit(e) {
     // POST branch name to create
     let url = '/api/project/branch';
@@ -150,7 +158,8 @@ class CreateBranchModalContent extends React.Component {
                     type="text" ref={(c) => this.branchNameInput = c}
                     onChange={this.handleBranchNameChange}
                     className="form-control" maxLength="255"
-                    placeholder="Be concise and descriptive"/>
+                    placeholder="Be concise and descriptive"
+                    onKeyUp={this.handleKeyUp} />
                 </div>
               </div>
               <div className="form-group">
@@ -181,6 +190,7 @@ class CreateBranchModalContent extends React.Component {
             onClick={this._reset}>Close</button>
           <button
             className="btn btn-primary"
+            ref={(c) => this.submitButton = c}
             onClick={this.handleSubmit}
             data-dismiss="modal"
             type="submit"

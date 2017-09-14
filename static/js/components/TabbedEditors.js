@@ -50,9 +50,10 @@ class TabbedEditors extends React.Component {
   handleEditorChange(file, newVal) {
     file.newContent = newVal;
     let app = this.props.app;
+    console.info('editorChanged', app.state.changedFiles);
     if(file.originalContent != file.newContent) {
       // This file has been modified.
-      //   NOT USED file.modified = true;
+      //   CURRENTLY NOT USING file.modified = true;
       if(!_.find(app.state.changedFiles, { path: file.path })) {
         let changedFiles = app.state.changedFiles;
         changedFiles.push(file);
@@ -83,12 +84,27 @@ class TabbedEditors extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+
+    // let currentFilesOpened = this.state.filesOpened;
+    // let nextFilesOpened = nextProps.filesOpened;
+    // _.forEach()
+
+
     this.setState({
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
-      let file = this.state.fileActive;
-      if(file) {
+
+      if(this.state.filesOpened == [] && this.state.fileActive == null) {
+        $('#tabbed-editors-tabs').empty();
+        $('#tabbed-editors-editors').empty();
+      }
+      // $('.CodeMirror').each(function(i, el){
+      //   el.CodeMirror.refresh();
+      //   console.info(el);
+      // });
+      // let file = this.state.fileActive;
+      // if(file) {
         // let editorId = this._getEditorId(file);
         // let editor = ace.edit(editorId);
         // let editors = this.state.editors;
@@ -110,7 +126,7 @@ class TabbedEditors extends React.Component {
           // editor.focus();
           // console.info(this.state.editors);
         // });
-      }
+      // }
     });
   }
 
@@ -166,10 +182,10 @@ class TabbedEditors extends React.Component {
 
     return (
       <div className="height-95">
-        <ul className="nav nav-tabs">
+        <ul className="nav nav-tabs" id="tabbed-editors-tabs">
           {tabs}
         </ul>
-        <div className="tab-content height-95">
+        <div className="tab-content height-95" id="tabbed-editors-editors">
           {tabbedEditors}
         </div>
       </div>

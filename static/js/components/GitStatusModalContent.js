@@ -1,4 +1,4 @@
-import GitDiffPane from './GitDiffPane.js';
+// import GitDiffPane from './GitDiffPane.js';
 
 // 
 // GitStatusModalContent component
@@ -110,16 +110,11 @@ class GitStatusModalContent extends React.Component {
             }
           </div>
 
-          <GitDiffPane
-            diffFile={this.state.diffFile}
-            gitStatusModalContent={this} />
-
         </div>
         
         <div className="modal-footer">
           <button
-            type="button"
-            className="btn btn-default"
+            type="button" className="btn btn-default"
             data-dismiss="modal">Close</button>
         </div>
       </div>
@@ -128,3 +123,7 @@ class GitStatusModalContent extends React.Component {
 }
 
 export default GitStatusModalContent;
+
+// <GitDiffPane
+//   diffFile={this.state.diffFile}
+//   gitStatusModalContent={this} />

@@ -8,7 +8,9 @@ class RepoControls extends React.Component {
     this.state = {
       repository: null,
       branch: null,
-      commit: null
+      commit: null,
+      changedFiles: [],
+      addedFiles: []
     };
 
     // this._ajaxCommits = this._ajaxCommits.bind(this);
@@ -22,13 +24,16 @@ class RepoControls extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      repository: this.props.repository,
-      branch: this.props.branch,
-      commit: this.props.commit
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      commit: nextProps.commit,
+      changedFiles: nextProps.changedFiles,
+      addedFiles: nextProps.addedFiles
     });
   }
 
   render () {
+    // console.info(this.state.changedFiles, this.state.addedFiles);
     if(!this.state.commit) {
       return null;
     }
@@ -46,14 +51,28 @@ class RepoControls extends React.Component {
             </button>&nbsp;
             <button
               type="button"
-              className="btn btn-sm btn-success disabled">
+              className="btn btn-sm btn-success"
+              data-toggle="modal"
+              data-target="#git-commit-push-modal"
+              disabled={this.state.changedFiles.length==0 && this.state.addedFiles.length==0}>
               Commit &amp; Push
             </button>&nbsp;
             <button
               type="button"
-              className="btn btn-sm btn-danger disabled">
-              Reset
+              className="btn btn-sm btn-success"
+              data-toggle="modal"
+              data-target="#git-pull-request-modal"
+              disabled={!this.state.commit.pushed}>
+              Make a Pull Request
             </button>&nbsp;
+            <button
+              type="button"
+              className="btn btn-sm btn-danger"
+              data-toggle="modal"
+              data-target="#git-reset-modal"
+              disabled={this.state.commit.pushed || (this.state.changedFiles.length==0 && this.state.addedFiles.length==0)}>
+              Reset
+            </button>
           </div>
         </div>
       );

@@ -32,7 +32,7 @@ class NavBar extends React.Component {
               disabled: false
             },
             {
-              slug: 'closeRepository',
+              // slug: 'closeRepository',
               label: 'Close',
               disabled: true
             }

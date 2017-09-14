@@ -14,7 +14,7 @@ class CloneRepoModalContent extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this._reset = this._reset.bind(this);
     this._validateGitUrl = this._validateGitUrl.bind(this);
-  } 
+  }
 
   _validateGitUrl(url) {
     let repoUrlRegex = /https:\/\/github.com\/\S+\/\S+\.git/;
@@ -34,7 +34,6 @@ class CloneRepoModalContent extends React.Component {
   }
 
   handleKeyUp(e) {
-    e.preventDefault();
     let keyCode = e.keyCode;
     if(keyCode == 13) {
       this.submitButton.click();
@@ -129,17 +128,14 @@ class CloneRepoModalContent extends React.Component {
         
         <div className="modal-footer">
           <button
-            type="button"
-            className="btn btn-default"
-            data-dismiss="modal"
-            onClick={this._reset}>
+            type="button" className="btn btn-default"
+            data-dismiss="modal" onClick={this._reset}>
             Close
           </button>
           <button
             className="btn btn-primary" onClick={this.handleSubmit}
             data-dismiss="modal" ref={(c) => this.submitButton = c}
-            disabled={this.state.repoUrl==''}
-            type="submit">
+            disabled={this.state.repoUrl==''} type="submit">
             Submit
           </button>
         </div>

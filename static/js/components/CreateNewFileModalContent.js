@@ -17,6 +17,7 @@ class CreateNewFileModalContent extends React.Component {
     this.__addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -58,6 +59,13 @@ class CreateNewFileModalContent extends React.Component {
       this.setState({
         fileName: ''
       });
+    }
+  }
+
+  handleKeyUp(e) {
+    let keyCode = e.keyCode;
+    if(keyCode == 13) {
+      this.submitButton.click();
     }
   }
 
@@ -226,6 +234,7 @@ class CreateNewFileModalContent extends React.Component {
                   <input
                     type="text"
                     onChange={this.handleFileNameChange}
+                    onKeyUp={this.handleKeyUp}
                     ref={(c) => this.fileNameInput = c}
                     className="form-control"
                     maxLength="255" />
@@ -243,6 +252,7 @@ class CreateNewFileModalContent extends React.Component {
             onClick={this._reset}>Close</button>
           <button
             type="button"
+            ref={(c) => this.submitButton = c}
             className="btn btn-primary"
             onClick={this.handleSubmit}
             data-dismiss="modal"

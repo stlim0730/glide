@@ -134,6 +134,50 @@ def _getRepoTree(accessToken, repoUsername, projectSlug, branch='master', commit
     return repoTree
 
 
+def _createReference(accessToken, owner, repo, ref, refTo):
+  # 
+  # In case of creating a new branch,
+  #   ref is the new branch name
+  #   and refTo is sha of a commit you branch from.
+  # 
+  createRefUrl = 'https://api.github.com/repos/{}/{}/git/refs?access_token={}'.format(owner, repo, accessToken)
+  createRefUrl = getAuthUrl(createRefUrl)
+  createRefData = {
+    'ref': 'refs/heads/' + ref,
+    'sha': refTo
+  }
+  createRefData = json.dumps(createRefData).encode('utf-8')
+  with urlopen(createRefUrl, createRefData) as createRefRes:
+    resStr = createRefRes.read().decode('utf-8')
+    return json.loads(resStr)
+
+
+def _updateReference(accessToken, owner, repo, ref, refTo):
+  updateRefUrl = 'https://api.github.com/repos/{}/{}/git/refs/{}?access_token={}'
+  updateRefUrl = updateRefUrl.format(owner, repo, ref, accessToken)
+  updateRefUrl = getAuthUrl(updateRefUrl)
+  updateRefData = {
+    'sha': refTo
+  }
+  updateRefData = json.dumps(updateRefData).encode('utf-8')
+  req = Request(
+    url=updateRefUrl, headers={'Content-Type': 'application/json'},
+    data=updateRefData, method='PATCH')
+  with urlopen(req) as createFileRes:
+    resStr = updateRefRes.read().decode('utf-8')
+    return json.loads(resStr)
+  # updateRefUrl = 'https://api.github.com/repos/{}/{}/git/refs/{}?access_token={}'
+  # updateRefUrl = updateRefUrl.format(owner, repo, ref, accessToken)
+  # updateRefUrl = getAuthUrl(updateRefUrl)
+  # updateRefData = {
+  #   'sha': refTo
+  # }
+  # updateRefData = json.dumps(updateRefData).encode('utf-8')
+  # with urlopen(updateRefUrl, updateRefData) as updateRefRes:
+  #   resStr = updateRefRes.read().decode('utf-8')
+  #   return json.loads(resStr)
+
+
 # def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master', message=None):
 #   createFileUrl = 'https://api.github.com/repos/{}/{}/contents/{}?access_token={}'
 #   # fileObj.path should be like 'foo/bar'
@@ -181,23 +225,68 @@ def branch(request):
   Create a reference on GitHub repo as a new branch
   """
   accessToken = request.session['accessToken']
-  newBranch = request.data['newBranch']
-  branchFrom = request.data['branchFrom']
+  newBranchName = request.data['newBranch']
+  shaBranchFrom = request.data['branchFrom']
   owner = request.data['owner']
   repo = request.data['repo']
-  createRefUrl = 'https://api.github.com/repos/{}/{}/git/refs?access_token={}'.format(owner, repo, accessToken)
-  createRefUrl = getAuthUrl(createRefUrl)
-  createRefData = {
-    'ref': 'refs/heads/' + newBranch,
-    'sha': branchFrom
+  createRefRes = _createReference(accessToken, owner, repo, newBranchName, shaBranchFrom)
+  return Response({
+    'createRefRes': createRefRes
+    # 'code': createRefRes.getcode()
+  })
+
+
+@api_view(['POST'])
+def commit(request, owner, repo):
+  accessToken = request.session['accessToken']
+  tree = request.data['tree']
+  branch = 'heads/{}'.format(request.data['branch'])
+  commit = request.data['commit']
+  message = request.data['message']
+  # POST the tree from the client
+  createTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees?access_token={}'
+  createTreeUrl = createTreeUrl.format(owner, repo, accessToken)
+  createTreeUrl = getAuthUrl(createTreeUrl)
+  createTreeData = {
+    'tree': tree
   }
-  createRefData = json.dumps(createRefData).encode('utf-8')
-  with urlopen(createRefUrl, createRefData) as createRefRes:
-    resStr = createRefRes.read().decode('utf-8')
-    return Response({
-      'createRefRes': json.loads(resStr),
-      'code': createRefRes.getcode()
-    })
+  createTreeData = json.dumps(createTreeData).encode('utf-8')
+  with urlopen(createTreeUrl, createTreeData) as createTreeRes:
+    resStr = createTreeRes.read().decode('utf-8')
+    res = json.loads(resStr)
+    shaTree = res['sha']
+    # Create a commit that points the tree
+    createCommitUrl = 'https://api.github.com/repos/{}/{}/git/commits?access_token={}'
+    createCommitUrl = createCommitUrl.format(owner, repo, accessToken)
+    createCommitUrl = getAuthUrl(createCommitUrl)
+    createCommitData = {
+      'message': message,
+      'tree': shaTree,
+      'parents': [commit]
+    }
+    createCommitData = json.dumps(createCommitData).encode('utf-8')
+    with urlopen(createCommitUrl, createCommitData) as createCommitRes:
+      resStr = createCommitRes.read().decode('utf-8')
+      newCommit = json.loads(resStr)
+      shaNewCommit = newCommit['sha']
+      updateRefUrl = 'https://api.github.com/repos/{}/{}/git/refs/{}?access_token={}'
+      updateRefUrl = updateRefUrl.format(owner, repo, branch, accessToken)
+      updateRefUrl = getAuthUrl(updateRefUrl)
+      updateRefData = {
+        'sha': shaNewCommit
+      }
+      updateRefData = json.dumps(updateRefData).encode('utf-8')
+      req = Request(
+        url=updateRefUrl, headers={'Content-Type': 'application/json'},
+        data=updateRefData, method='PATCH')
+      with urlopen(req) as updateRefRes:
+        resStr = updateRefRes.read().decode('utf-8')
+        res = json.loads(resStr)
+        return Response({
+          'createTreeRes': shaTree,
+          'createCommitRes': newCommit,
+          'updateRefRes': res
+        })
 
 
 # @api_view(['POST'])
@@ -272,7 +361,7 @@ def branch(request):
 #     return Response({'error': 'The project title is being used. Try with a different title.'})
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def tree(request, owner, repo, branch, commit):
   """
   Returns tree structure of a project.
@@ -282,109 +371,146 @@ def tree(request, owner, repo, branch, commit):
   Actual content requests and delivery will be on client side (AJAX).
   """
   accessToken = request.session['accessToken']
-  # GET the tree structure of the project repository
-  repoTree = _getRepoTree(accessToken, owner, repo, branch, commit)
-  # Set aside a raw tree
-  #   for part of response to return
-  tree = deepcopy(repoTree)
-  # 
-  # Resolve path strings:
-  #   Trees from GitHub have meta data on path.
-  #   Build recursive file structrue using the meta data.
-  # 
-  paths = list(set([file['path'] for file in repoTree['tree'] if file['type']=='tree']))
-  # paths must have path strings in descending order: deepest first!
-  paths = sorted(paths, key=lambda x:len(x.split('/')), reverse=True)
-  
-  def pathToDict(pathString):
-    """
-    Convert a sigle path string into a nested dictionary.
-    """
-    pathList = pathString.split('/')
-    pathList.reverse()
-    stack = [{}]
-    for path in pathList:
-      stack.append({path: stack.pop()})
-    return stack[0]
+  if request.method == 'POST':
+    pass
+    # tree = request.data['tree']
+    # # commit = request.data['commit']
+    # message = request.data['message']
+    # # POST the tree from the client
+    # createTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees?access_token={}'
+    # createTreeUrl = createTreeUrl.format(owner, repo, accessToken)
+    # createTreeUrl = getAuthUrl(createTreeUrl)
+    # createTreeData = {
+    #   'tree': tree
+    # }
+    # createTreeData = json.dumps(createTreeData).encode('utf-8')
+    # with urlopen(createTreeUrl, createTreeData) as createTreeRes:
+    #   resStr = createTreeRes.read().decode('utf-8')
+    #   shaTree = json.loads(resStr)['sha']
+    #   # Create a commit that points the tree
+    #   createCommitUrl = 'https://api.github.com/repos/{}/{}/git/commits?access_token={}'
+    #   createCommitUrl = createCommitUrl.format(owner, repo, accessToken)
+    #   createCommitUrl = getAuthUrl(createCommitUrl)
+    #   createCommitData = {
+    #     'message': message,
+    #     'tree': shaTree,
+    #     'parents': [commit]
+    #   }
+    #   createCommitData = json.dumps(createCommitData).encode('utf-8')
+    #   with urlopen(createCommitUrl, createCommitData) as createCommitRes:
+    #     resStr = createCommitRes.read().decode('utf-8')
+    #     createCommitRes = json.loads(resStr)
+    #     newCommit = createCommitRes['sha']
+    #     updateRefRes = _updateReference(accessToken, owner, repo, branch, newCommit)
+    #     return Response({
+    #       'updateRefRes': updateRefRes,
+    #       # 'branch': branch,
+    #       'newCommit': newCommit
+    #     })
+  elif request.method == 'GET':
+    # GET the tree structure of the project repository
+    repoTree = _getRepoTree(accessToken, owner, repo, branch, commit)
+    # Set aside a raw tree
+    #   for part of response to return
+    tree = deepcopy(repoTree)
+    # 
+    # Resolve path strings:
+    #   Trees from GitHub have meta data on path.
+    #   Build recursive file structrue using the meta data.
+    # 
+    paths = list(set([file['path'] for file in repoTree['tree'] if file['type']=='tree']))
+    # paths must have path strings in descending order: deepest first!
+    paths = sorted(paths, key=lambda x:len(x.split('/')), reverse=True)
+    
+    def pathToDict(pathString):
+      """
+      Convert a sigle path string into a nested dictionary.
+      """
+      pathList = pathString.split('/')
+      pathList.reverse()
+      stack = [{}]
+      for path in pathList:
+        stack.append({path: stack.pop()})
+      return stack[0]
 
-  def mergeDicts(d1, d2):
-    """
-    Merge two nested dictionaries into one.
-    """
-    if d1 == {}:
-      return d2
-    if d2 == {}:
-      return d1
-    res = {}
-    commonKeys = list(set(d1.keys()) & set(d2.keys()))
-    for commonKey in commonKeys:
-      res[commonKey] = mergeDicts(d1[commonKey], d2[commonKey])
-    for key in list(d1.keys()):
-      if not key in commonKeys:
-        res[key] = d1[key]
-    for key in list(d2.keys()):
-      if not key in commonKeys:
-        res[key] = d2[key]
-    return res
+    def mergeDicts(d1, d2):
+      """
+      Merge two nested dictionaries into one.
+      """
+      if d1 == {}:
+        return d2
+      if d2 == {}:
+        return d1
+      res = {}
+      commonKeys = list(set(d1.keys()) & set(d2.keys()))
+      for commonKey in commonKeys:
+        res[commonKey] = mergeDicts(d1[commonKey], d2[commonKey])
+      for key in list(d1.keys()):
+        if not key in commonKeys:
+          res[key] = d1[key]
+      for key in list(d2.keys()):
+        if not key in commonKeys:
+          res[key] = d2[key]
+      return res
 
-  def traversFs(fsDict, stack, f):
-    """
-    Traverses fsDict to return:
-    {
-      "file-or-folder-name": {"content": "...", "file": {...}}
-    }
-    """
-    for folder in list(fsDict.keys()):
-      stack.append(folder)
-      traversFs(fsDict[folder], stack, f)
-      filesInFolder = [file for file in f if file['type'] != 'tree' and file['path'].startswith('/'.join(stack))]
-      # print('{}: {}'.format('/'.join(stack), filesInFolder))
-      for file in filesInFolder:
-        name = file['name']
-        file['originalContent'] = None
-        file['modified'] = False
-        file['added'] = False
-        fsDict[folder][name] = file
-        f.remove(file)
-      stack.pop()
+    def traversFs(fsDict, stack, f):
+      """
+      Traverses fsDict to return:
+      {
+        "file-or-folder-name": {"content": "...", "file": {...}}
+      }
+      """
+      for folder in list(fsDict.keys()):
+        stack.append(folder)
+        traversFs(fsDict[folder], stack, f)
+        filesInFolder = [file for file in f if file['type'] != 'tree' and file['path'].startswith('/'.join(stack))]
+        # print('{}: {}'.format('/'.join(stack), filesInFolder))
+        for file in filesInFolder:
+          name = file['name']
+          file['originalContent'] = None
+          file['modified'] = False
+          file['added'] = False
+          fsDict[folder][name] = file
+          f.remove(file)
+        stack.pop()
 
-  def transformFs(fsDict, res, parentPath):
-    def _isFolder(x):
-      if not 'originalContent' in x:
-        return True
-      else:
-        return False
-    res['nodes'] = []
-    for key in fsDict:
-      if _isFolder(fsDict[key]):
-        path = '/'.join([parentPath, key])
-        thisFolder = {'name': key, 'path': path, 'type': 'tree'}
-        res['nodes'].append(transformFs(fsDict[key], thisFolder, path))
-      else:
-        fsDict[key]['nodes'] = []
-        res['nodes'].append(fsDict[key])
-    return res
+    def transformFs(fsDict, res, parentPath):
+      def _isFolder(x):
+        if not 'originalContent' in x:
+          return True
+        else:
+          return False
+      res['nodes'] = []
+      for key in fsDict:
+        if _isFolder(fsDict[key]):
+          path = '/'.join([parentPath, key])
+          thisFolder = {'name': key, 'path': path, 'type': 'tree'}
+          res['nodes'].append(transformFs(fsDict[key], thisFolder, path))
+        else:
+          fsDict[key]['nodes'] = []
+          res['nodes'].append(fsDict[key])
+      return res
 
-  pathDicts = []
-  fs = {}
-  for path in paths:
-    pathDict = pathToDict(path)
-    pathDicts.append(pathDict)
-  for pathDict in pathDicts:
-    fs = mergeDicts(fs, pathDict)
-  # Fill out the file structure with files.
-  traversFs(fs, [], repoTree['tree'])
-  # Add files from root
-  rootFiles = [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
-  for file in rootFiles:
-    name = file['name']
-    file['originalContent'] = None
-    file['modified'] = False
-    file['added'] = False
-    fs[file['name']] = file
-  # Transform fs for view-friendly form with recursive structure
-  recursiveTree = transformFs(fs, {}, '')
-  return Response({ 'recursiveTree': recursiveTree, 'tree': tree })
+    pathDicts = []
+    fs = {}
+    for path in paths:
+      pathDict = pathToDict(path)
+      pathDicts.append(pathDict)
+    for pathDict in pathDicts:
+      fs = mergeDicts(fs, pathDict)
+    # Fill out the file structure with files.
+    traversFs(fs, [], repoTree['tree'])
+    # Add files from root
+    rootFiles = [file for file in repoTree['tree'] if file['path'] == file['name'] and file['type'] != 'tree']
+    for file in rootFiles:
+      name = file['name']
+      file['originalContent'] = None
+      file['modified'] = False
+      file['added'] = False
+      fs[file['name']] = file
+    # Transform fs for view-friendly form with recursive structure
+    recursiveTree = transformFs(fs, {}, '')
+    return Response({ 'recursiveTree': recursiveTree, 'tree': tree })
 
 
 @api_view(['GET', 'POST'])
@@ -422,3 +548,31 @@ def blob(request, owner, repo, sha):
         'createBlobRes': json.loads(resStr),
         'code': createBlobRes.getcode()
       })
+
+
+@api_view(['POST'])
+def pull(request, owner, repo):
+  accessToken = request.session['accessToken']
+  title = request.data['title']
+  head = request.data['head']
+  base = request.data['base']
+  body = ''
+  if 'pullReqBody' in request.data:
+    body = request.data['pullReqBody']
+  # POST the pull request
+  createPullReqUrl = 'https://api.github.com/repos/{}/{}/pulls?access_token={}'
+  createPullReqUrl = createPullReqUrl.format(owner, repo, accessToken)
+  createPullReqUrl = getAuthUrl(createPullReqUrl)
+  createPullReqData = {
+    'title': title,
+    'head': head,
+    'base': base,
+    'body': body
+  }
+  createPullReqData = json.dumps(createPullReqData).encode('utf-8')
+  with urlopen(createPullReqUrl, createPullReqData) as createPullReqRes:
+    resStr = createPullReqRes.read().decode('utf-8')
+    return Response({
+      'createPullReqRes': json.loads(resStr),
+      'code': createPullReqRes.getcode()
+    })

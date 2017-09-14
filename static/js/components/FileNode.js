@@ -101,6 +101,10 @@ class FileNode extends React.Component {
             });
           });
         }
+        else {
+          // TODO: existing file to use local content,
+          //   which means files changed and closed
+        }
       }
     }
   }

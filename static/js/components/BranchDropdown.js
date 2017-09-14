@@ -91,6 +91,7 @@ class BranchDropdown extends React.Component {
 
   render () {
     let latestCommit = false;
+    let branch = this.state.branch;
     let commit = this.state.commit;
     let commits = this.state.commits;
     if(commit != null && commits.length > 0) {
@@ -117,8 +118,8 @@ class BranchDropdown extends React.Component {
                 );
               }.bind(this))
             }
-            { latestCommit ? <li className="divider"></li> : null }
-            { latestCommit ? <li><a href="#" data-toggle="modal" data-target="#create-branch-modal">Create a New Branch</a></li> : null }
+            { branch && branch.name == 'master' && latestCommit ? <li className="divider"></li> : null }
+            { branch && branch.name == 'master' && latestCommit ? <li><a href="#" data-toggle="modal" data-target="#create-branch-modal">Create a New Branch</a></li> : null }
           </ul>
         </div>
       </div>

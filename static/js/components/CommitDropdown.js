@@ -51,6 +51,7 @@ class CommitDropdown extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     let prevBranch = this.state.branch;
+    let prevCommits = this.state.commits;
     let self = this;
     this.setState({
       repository: nextProps.repository,
@@ -66,7 +67,10 @@ class CommitDropdown extends React.Component {
       }
       else if(!_.isEqual(prevBranch, nextProps.branch)) {
         // Make an Ajax req only when a branch has changed
-        this._ajaxCommits(this.state.repository, this.state.branch);
+        self._ajaxCommits(self.state.repository, self.state.branch);
+      }
+      else if(!_.isEqual(prevCommits, nextProps.commits)) {
+        self._ajaxCommits(self.state.repository, self.state.branch);
       }
     });
   }

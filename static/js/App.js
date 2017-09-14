@@ -18,6 +18,9 @@ import Modal from './components/Modal.js';
 import CloneRepoModalContent from './components/CloneRepoModalContent.js';
 import CreateBranchModalContent from './components/CreateBranchModalContent.js';
 import GitStatusModalContent from './components/GitStatusModalContent.js';
+import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
+import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
+import GitResetModalContent from './components/GitResetModalContent.js';
 import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
@@ -90,9 +93,11 @@ class App extends React.Component {
         addedFiles: []
       });
     }
-    else if(prevState.commit != this.state.commit) {
+    else if(this.state.commit && !this.state.commit.pushed && prevState.commit != this.state.commit) {
       // When checked out another commit,
       //   the substructures should reset
+      // Commit & Push that forces to switch to the new commit
+      //   shouldn't fall in this conditional block
       // TODO: Check if the changedFiles is empty
       // TODO: Check if the addedFiles is empty
       this.setState({
@@ -135,6 +140,38 @@ class App extends React.Component {
             <GitStatusModalContent
               app={this}
               branch={this.state.branch}
+              changedFiles={this.state.changedFiles}
+              addedFiles={this.state.addedFiles} />
+          }
+          large={false} />
+        <Modal id="git-commit-push-modal"
+          modalContent={
+            <GitCommitPushModalContent
+              app={this}
+              repository={this.state.repository}
+              branch={this.state.branch}
+              commits={this.state.commits}
+              commit={this.state.commit}
+              tree={this.state.tree}
+              recursiveTree={this.state.recursiveTree}
+              changedFiles={this.state.changedFiles}
+              addedFiles={this.state.addedFiles} />
+          }
+          large={false} />
+        <Modal id="git-pull-request-modal"
+          modalContent={
+            <GitPullRequestModalContent
+              app={this}
+              repository={this.state.repository}
+              branch={this.state.branch}
+              commit={this.state.commit} />
+          }
+          large={false} />
+        <Modal id="git-reset-modal"
+          modalContent={
+            <GitResetModalContent
+              app={this}
+              commit={this.state.commit}
               changedFiles={this.state.changedFiles}
               addedFiles={this.state.addedFiles} />
           }
@@ -182,7 +219,9 @@ class App extends React.Component {
               branches={this.state.branches}
               branch={this.state.branch}
               commits={this.state.commits}
-              commit={this.state.commit} />
+              commit={this.state.commit}
+              changedFiles={this.state.changedFiles}
+              addedFiles={this.state.addedFiles} />
             <FileSideBar
               app={this}
               repository={this.state.repository}

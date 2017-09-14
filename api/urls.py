@@ -10,6 +10,8 @@ urlpatterns = [
   url(r'^project/branches/(?P<repositoryFullName>.+)$', views.branches, name='branches'),
   url(r'^project/commits/(?P<owner>.+)/(?P<repo>.+)/(?P<branch>.+)$', views.commits, name='commits'),
   url(r'^project/tree/(?P<owner>.+)/(?P<repo>.+)/(?P<branch>.+)/(?P<commit>.+)$', views.tree, name='tree'),
+  url(r'^project/commit/(?P<owner>.+)/(?P<repo>.+)$', views.commit, name='commit'),
   url(r'^project/blob/(?P<owner>.+)/(?P<repo>.+)/(?P<sha>.{40})$', views.blob, name='blob'),
+  url(r'^project/pull/(?P<owner>.+)/(?P<repo>.+)$', views.pull, name='pull'),
   # url(r'^project/blob/(?P<owner>.+)/(?P<repo>.+)$', views.blob, name='blob'),
 ]
