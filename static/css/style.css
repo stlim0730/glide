@@ -5,7 +5,7 @@ body { padding-top: 70px; padding-bottom: 21px;}
   html,body{ height:100%; overflow: auto; }
   body { padding-top: 0px; }
 }
-.full-height { height: 98.8%; }
+.full-height { height: 98.3%; }
 .height-95 { height: 95%; }
 .height-90 { height: 90%; }
 .height-60 { height: 59%; }
@@ -19,6 +19,10 @@ div.panel + div.panel {
 .navbar button.btn-sm {
   margin-top: 10px;
 }
+.block { display: block; }
+.inline-block { display: inline-block; }
+.margin-top-15 { margin-top: 15px; }
+.margin-bottom-15 { margin-bottom: 15px; }
 .page-thumbnail-wrapper {
   margin-bottom: 10px;
 }
@@ -34,13 +38,14 @@ div.panel + div.panel {
   min-height: 70px;
   text-align: center;
 }
-button.file-node-folder + ul .file-node-folder,
-button.file-node-folder + ul .file-node-file {
-  margin-left: 10px;
+ul.subtree {
+  padding-left: 15px;
 }
-.repo-file-link.opened {
+.file-node-file { color: #222222 !important; }
+.new-file-button { color: #3fb618 !important; }
+/*.repo-file-link.opened {
   font-weight: bold;
-}
+}*/
 .v-middle {
   position: relative;
   top: 50%;

@@ -18,6 +18,7 @@ class TabbedEditors extends React.Component {
     // this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.handleEditorChange = this.handleEditorChange.bind(this);
   }
 
   // _slugify(str) {
@@ -46,6 +47,35 @@ class TabbedEditors extends React.Component {
     });
   }
 
+  handleEditorChange(file, newVal) {
+    file.newContent = newVal;
+    let app = this.props.app;
+    console.info('editorChanged', app.state.changedFiles);
+    if(file.originalContent != file.newContent) {
+      // This file has been modified.
+      //   CURRENTLY NOT USING file.modified = true;
+      if(!_.find(app.state.changedFiles, { path: file.path })) {
+        let changedFiles = app.state.changedFiles;
+        changedFiles.push(file);
+        app.setState({
+          changedFiles: changedFiles
+        });
+      }
+    }
+    else {
+      // This file hasn't been modified:
+      //   Take out this file from staged area
+      
+      // Returns a new array with non-target elements
+      let changedFiles = _.remove(app.state.changedFiles, function(item) {
+        return item.path != file.path;
+      });
+      app.setState({
+        changedFiles: changedFiles
+      });
+    }
+  }
+
   componentDidMount() {
     this.setState({
       filesOpened: this.props.filesOpened,
@@ -54,12 +84,27 @@ class TabbedEditors extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+
+    // let currentFilesOpened = this.state.filesOpened;
+    // let nextFilesOpened = nextProps.filesOpened;
+    // _.forEach()
+
+
     this.setState({
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
-      let file = this.state.fileActive;
-      if(file) {
+
+      if(this.state.filesOpened == [] && this.state.fileActive == null) {
+        $('#tabbed-editors-tabs').empty();
+        $('#tabbed-editors-editors').empty();
+      }
+      // $('.CodeMirror').each(function(i, el){
+      //   el.CodeMirror.refresh();
+      //   console.info(el);
+      // });
+      // let file = this.state.fileActive;
+      // if(file) {
         // let editorId = this._getEditorId(file);
         // let editor = ace.edit(editorId);
         // let editors = this.state.editors;
@@ -81,7 +126,7 @@ class TabbedEditors extends React.Component {
           // editor.focus();
           // console.info(this.state.editors);
         // });
-      }
+      // }
     });
   }
 
@@ -93,7 +138,10 @@ class TabbedEditors extends React.Component {
       let tabClassName = (item == this.state.fileActive ? "active" : "");
       tabs.push(
         <li key={item.path} className={tabClassName}>
-          <a href={"#" + this._getEditorId(item)} data-toggle="tab" onClick={this.handleTabClick.bind(this, item)}>
+          <a
+            href={"#" + this._getEditorId(item)}
+            data-toggle="tab"
+            onClick={this.handleTabClick.bind(this, item)}>
             {item.name}
           </a>
         </li>
@@ -123,20 +171,21 @@ class TabbedEditors extends React.Component {
         <CodeMirror
           key={item.path}
           file={item}
-          value={item.content}
+          value={item.newContent ? item.newContent : item.originalContent}
           className={editorClassName}
           autoFocus={true}
-          options={options} />
+          options={options}
+          onChange={this.handleEditorChange.bind(this, item)} />
       );
 
     }.bind(this))
 
     return (
-      <div className="full-height">
-        <ul className="nav nav-tabs">
+      <div className="height-95">
+        <ul className="nav nav-tabs" id="tabbed-editors-tabs">
           {tabs}
         </ul>
-        <div className="tab-content full-height">
+        <div className="tab-content height-95" id="tabbed-editors-editors">
           {tabbedEditors}
         </div>
       </div>

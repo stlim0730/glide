@@ -10,8 +10,8 @@ class NavMenuList extends React.Component {
   }
 
   render () {
-    let children = this.props.children.map(function(menuListItem, index){
-      return <NavMenuListItem key={'menuListItem_' + index} label={menuListItem.label} slug={menuListItem.slug} dataTarget={menuListItem.targetModal} disabled={menuListItem.disabled} />;
+    let children = this.props.children.map(function(menuListItem, index) {
+      return <NavMenuListItem key={'menuListItem_' + index} label={menuListItem.label} dataTarget={menuListItem.targetModal} disabled={menuListItem.disabled} />;
     });
 
     return (

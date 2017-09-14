@@ -6,31 +6,19 @@ class FileNode extends React.Component {
     super(props);
 
     this.state = {
+      currentPath: '',
       nodes: []
     };
 
+    this._orderNodes = this._orderNodes.bind(this);
     this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
+    this.handleCreateNewFileClick = this.handleCreateNewFileClick.bind(this);
   }
 
-  componentDidMount() {
-    // 
-    // This event seems to affect children nodes' behavior.
-    //   Maybe, that's because recursively generated nodes are dynamic
-    //   so that the state should update after being mounted.
-    // 
-    let orderedNodes = _.orderBy(this.props.nodes, ['type','name'], ['desc', 'asc']);
-    this.setState({
-      nodes: orderedNodes
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    // 
-    // This event seems to affect the root node's behavior.
-    // 
-    let orderedNodes = _.orderBy(nextProps.nodes, ['type','name'], ['desc', 'asc']);
+  _orderNodes(nodes) {
+    let orderedNodes = _.orderBy(nodes, ['type','name'], ['desc', 'asc']);
     this.setState({
       nodes: orderedNodes
     });
@@ -52,48 +40,101 @@ class FileNode extends React.Component {
   }
 
   handleFileClick(file, e) {
-    // Folders don't call this event handler
-
-    let fileSideBar = this.props.fileSideBar;
+    // console.info(file);
+    // Folders don't call this event handler: yay
     let app = this.props.app;
+    let fileSideBar = this.props.fileSideBar;
     let filesOpened = fileSideBar.state.filesOpened;
     let fileActive = fileSideBar.state.fileActive;
 
-    if(_.includes(filesOpened, file)) {
+    if(_.find(filesOpened, {'path': file.path})) {
       // Already opened
       // TODO: Change the tab
     }
     else {
-      if(file.content == null) {
-        // Initial loading: load remote resources
-        // GET file content
-        let url = file.downloadUrl;
+      if(file.originalContent == null) {
+        // Initial loading of an existing file in the repository:
+        //   Request server to load remote resources
+        let url = '/api/project/blob/' + fileSideBar.state.repository.full_name + '/' + file.sha;
+        let app = this.props.app;
+
         $.ajax({
           url: url,
           method: 'GET',
-          // headers: { 'X-CSRFToken': window.glide.csrfToken },
           success: function(response) {
-            file.content = response;
-            
-            fileActive = file;
-            filesOpened.push(file);
-
-            fileSideBar.setState({
-              filesOpened: filesOpened,
-              fileActive: fileActive
-            }, function() {
-              app.setState({
+            console.info(response);
+            if('error' in response) {
+              // TODO
+            }
+            else {
+              file.originalContent = atob(response.blob.content);
+              
+              fileActive = file;
+              filesOpened.push(file);
+              fileSideBar.setState({
                 filesOpened: filesOpened,
                 fileActive: fileActive
+              }, function() {
+                app.setState({
+                  filesOpened: filesOpened,
+                  fileActive: fileActive
+                });
               });
-            });
+            }
           }
         });
       }
       else {
-        // TODO: Use local content
+        // Use local content
+        if(file.added) {
+          // Newly added file by the user:
+          //   There is no remote resources to load
+          fileActive = file;
+          filesOpened.push(file);
+          fileSideBar.setState({
+            filesOpened: filesOpened,
+            fileActive: fileActive
+          }, function() {
+            app.setState({
+              filesOpened: filesOpened,
+              fileActive: fileActive
+            });
+          });
+        }
+        else {
+          // TODO: existing file to use local content,
+          //   which means files changed and closed
+        }
       }
     }
+  }
+
+  handleCreateNewFileClick() {
+    // Show the path of the new file
+    let path = this.state.currentPath + '/';
+    $('#create-new-file-modal input.pathInput').val(path);
+  }
+
+  componentDidMount() {
+    // 
+    // This event seems to affect children nodes' behavior.
+    //   Maybe, that's because recursively generated nodes are dynamic
+    //   so that the state should update after being mounted.
+    // 
+    this.setState({
+      currentPath: this.props.currentPath
+    });
+    this._orderNodes(this.props.nodes);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // 
+    // This event seems to affect the root node's behavior.
+    // 
+    this.setState({
+      currentPath: nextProps.currentPath
+    });
+    this._orderNodes(nextProps.nodes);
   }
 
   render () {
@@ -105,14 +146,20 @@ class FileNode extends React.Component {
               // Render a folder
               return (
                 <div key={index}>
-                  <button href="#" className="btn btn-link file-node-folder" data-toggle="collapse"
+                  <button
+                    href="#"
+                    className="btn btn-link file-node-folder block"
+                    data-toggle="collapse"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
-                    {item.name}&emsp;
-                    <span className="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                    {item.name}
                   </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
-                    className="list-group collapse">
-                    <FileNode nodes={item.nodes} fileSideBar={this.props.fileSideBar} app={this.props.app}/>
+                    className="collapse subtree">
+                    <FileNode
+                      currentPath={item.path}
+                      nodes={item.nodes}
+                      fileSideBar={this.props.fileSideBar}
+                      app={this.props.app} />
                   </ul>
                 </div>
               );
@@ -120,14 +167,24 @@ class FileNode extends React.Component {
             else {
               // Render a file.
               return (
-                <button key={index} className="list-group-item file-node-file"
-                  data-download-url={item.downloadUrl} onClick={this.handleFileClick.bind(this, item)}>
-                  {item.name}
+                <button
+                  key={index}
+                  className="btn btn-link file-node-file block"
+                  onClick={this.handleFileClick.bind(this, item)}>
+                  {item.name} {item.modified && !item.added && <span className="glyphicon glyphicon-asterisk
+                  "></span>}
                 </button>
               );
             }
           }.bind(this))
         }
+        <button
+          className="btn btn-link new-file-button block"
+          onClick={this.handleCreateNewFileClick.bind(this)}
+          data-toggle="modal"
+          data-target="#create-new-file-modal">
+          <span className="glyphicon glyphicon-plus"></span> Create New...
+        </button>
       </div>
     );
   }

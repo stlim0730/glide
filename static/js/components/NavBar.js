@@ -11,23 +11,28 @@ class NavBar extends React.Component {
       menu: [
         {
           // slug: 'projects',
-          label: 'Projects',
+          label: 'Repository',
           disabled: false,
           children: [
+            // {
+            //   slug: 'browseProjects',
+            //   label: 'Browse Projects...',
+            //   targetModal: '#browse-projects-modal',
+            //   disabled: false
+            // },
+            // {
+            //   slug: 'createProject',
+            //   label: 'Create New...',
+            //   targetModal: '#create-project-modal',
+            //   disabled: false
+            // },
             {
-              slug: 'browseProjects',
-              label: 'Browse Projects...',
-              targetModal: '#browse-projects-modal',
+              label: 'Clone Repository...',
+              targetModal: '#clone-repository-modal',
               disabled: false
             },
             {
-              slug: 'createProject',
-              label: 'Create New...',
-              targetModal: '#create-project-modal',
-              disabled: false
-            },
-            {
-              slug: 'closeProject',
+              // slug: 'closeRepository',
               label: 'Close',
               disabled: true
             }

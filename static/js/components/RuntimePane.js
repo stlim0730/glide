@@ -15,7 +15,7 @@ class RuntimePane extends React.Component {
 
   render () {
     return (
-      <div className="col-lg-5 col-md-5 full-height">
+      <div className="col-lg-4 col-md-4 full-height">
         <RendererPane />
         <DebuggerPane />
       </div>

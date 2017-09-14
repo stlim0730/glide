@@ -1,4 +1,4 @@
-// import EditorToolBar from './EditorToolBar.js';
+import EditorToolBar from './EditorToolBar.js';
 import TabbedEditors from './TabbedEditors.js';
 
 // 
@@ -32,13 +32,21 @@ class EditorPane extends React.Component {
   }
 
   render () {
-    // console.info('EditorPane', this.state);
     return (
-      <div className="col-lg-5 col-md-5 full-height">
+      <div className="col-lg-6 col-md-6 full-height">
         <div className="panel panel-default full-height">
           <div className="panel-heading">Editor</div>
-          <div className="height-90 panel-body no-padding">
-            <TabbedEditors app={this.props.app} filesOpened={this.state.filesOpened} fileActive={this.state.fileActive} />
+          <div className="height-95 panel-body no-padding">
+            {
+              // <EditorToolBar
+              //   app={this.props.app}
+              //   filesOpened={this.state.filesOpened}
+              //   fileActive={this.state.fileActive} />
+            }
+            <TabbedEditors
+              app={this.props.app}
+              filesOpened={this.state.filesOpened}
+              fileActive={this.state.fileActive} />
           </div>
         </div>
       </div>
@@ -47,5 +55,3 @@ class EditorPane extends React.Component {
 }
 
 export default EditorPane
-
-//<EditorToolBar />
