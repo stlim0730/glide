@@ -8,6 +8,7 @@ from urllib.request import urlopen, Request
 from django.contrib.auth.models import User
 from workspace.models import Project, Theme
 from copy import deepcopy
+import markdown
 from glide import *
 
 
@@ -576,3 +577,21 @@ def pull(request, owner, repo):
       'createPullReqRes': json.loads(resStr),
       'code': createPullReqRes.getcode()
     })
+
+@api_view(['POST'])
+def render(request):
+  data = request.data['data']
+  fileName = request.data['fileName']
+  extension = fileName.split('.')
+  res = {}
+  if len(extension) > 1:
+    extension = extension[-1]
+  else:
+    # No extension
+    extension = None
+  if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
+    # Markdown
+    res['html'] = markdown.markdown(data)
+  else:
+    pass
+  return Response(res)

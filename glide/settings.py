@@ -48,6 +48,7 @@ INSTALLED_APPS = [
   # Third-party apps
   'channels',
   'webpack_loader',
+  'markdown',
   
   # Local apps
   'workspace',
