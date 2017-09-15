@@ -9,14 +9,27 @@ class RuntimePane extends React.Component {
     super(props);
 
     this.state = {
-      //
+      liveHtml: null
     };
+  }
+
+  componentDidMount() {
+    this.setState({
+      liveHtml: this.props.liveHtml
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      liveHtml: nextProps.liveHtml
+    });
   }
 
   render () {
     return (
       <div className="col-lg-4 col-md-4 full-height">
-        <RendererPane />
+        <RendererPane
+          liveHtml={this.state.liveHtml} />
         <DebuggerPane />
       </div>
     );

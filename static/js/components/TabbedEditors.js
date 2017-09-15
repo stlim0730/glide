@@ -50,7 +50,7 @@ class TabbedEditors extends React.Component {
   handleEditorChange(file, newVal) {
     file.newContent = newVal;
     let app = this.props.app;
-    console.info('editorChanged', app.state.changedFiles);
+    
     if(file.originalContent != file.newContent) {
       // This file has been modified.
       //   CURRENTLY NOT USING file.modified = true;
@@ -74,6 +74,31 @@ class TabbedEditors extends React.Component {
         changedFiles: changedFiles
       });
     }
+
+    // Request rendering
+    let url = '/api/project/render';
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        data: file.newContent,
+        fileName: file.name
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          //
+        }
+        else {
+          app.setState({
+            liveHtml: response.html
+          });
+        }
+      }
+    });
   }
 
   componentDidMount() {

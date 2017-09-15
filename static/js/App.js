@@ -58,7 +58,8 @@ class App extends React.Component {
       filesOpened: [],
       fileActive: null,
       changedFiles: [],
-      addedFiles: []
+      addedFiles: [],
+      liveHtml: null
     };
   }
 
@@ -76,7 +77,8 @@ class App extends React.Component {
         filesOpened: [],
         fileActive: null,
         changedFiles: [],
-        addedFiles: []
+        addedFiles: [],
+        liveHtml: null
       });
     }
     else if(prevState.branch != this.state.branch) {
@@ -90,7 +92,8 @@ class App extends React.Component {
         filesOpened: [],
         fileActive: null,
         changedFiles: [],
-        addedFiles: []
+        addedFiles: [],
+        liveHtml: null
       });
     }
     else if(this.state.commit && !this.state.commit.pushed && prevState.commit != this.state.commit) {
@@ -104,7 +107,8 @@ class App extends React.Component {
         filesOpened: [],
         fileActive: null,
         changedFiles: [],
-        addedFiles: []
+        addedFiles: [],
+        liveHtml: null
       });
     }
   }
@@ -232,7 +236,9 @@ class App extends React.Component {
               app={this}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened} />
-            <RuntimePane app={this} />
+            <RuntimePane
+              app={this}
+              liveHtml={this.state.liveHtml} />
           </div>
         );
 
