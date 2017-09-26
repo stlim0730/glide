@@ -26,11 +26,11 @@ class NavBar extends React.Component {
             //   targetModal: '#create-project-modal',
             //   disabled: false
             // },
-            {
-              label: 'Clone Repository...',
-              targetModal: '#clone-repository-modal',
-              disabled: false
-            },
+            // {
+            //   label: 'Clone Repository...',
+            //   targetModal: '#clone-repository-modal',
+            //   disabled: false
+            // },
             {
               // slug: 'closeRepository',
               label: 'Close',
@@ -52,6 +52,15 @@ class NavBar extends React.Component {
         }
       ]
     };
+  }
+
+  componentDidMount() {
+    let app = this.props.app;
+    if(app.state.phase == app.state.constants.APP_PHASE_CLEAN_SLATE) {
+      app.setState({
+        phase: app.state.constants.APP_PHASE_REPOSITORY_SELECTION
+      });
+    }
   }
 
   render () {

@@ -15,25 +15,43 @@ class TabbedEditors extends React.Component {
       editors: {}
     };
 
-    // this._slugify = this._slugify.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
+    this._requestRender = this._requestRender.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
 
-  // _slugify(str) {
-  //   return str.toLowerCase()
-  //     .replace(/\s+/g, '-') // Replace spaces with -
-  //     .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-  //     .replace(/\-\-+/g, '-') // Replace multiple - with single -
-  //     .replace(/^-+/, '') // Trim - from start of text
-  //     .replace(/-+$/, '') // Trim - from end of text
-  //     .trim();
-  // }
-
   _getEditorId(fileObj) {
     let suffix = '_editor';
     return fileObj.sha + suffix;
+  }
+
+  _requestRender(data, fileName) {
+    // POST Request rendering
+    let url = '/api/project/render';
+    let app = this.props.app;
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        data: data,
+        fileName: fileName
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          //
+        }
+        else {
+          app.setState({
+            liveHtml: response.html
+          });
+        }
+      }
+    });
   }
 
   handleTabClick(file, e) {
@@ -75,30 +93,7 @@ class TabbedEditors extends React.Component {
       });
     }
 
-    // Request rendering
-    let url = '/api/project/render';
-    $.ajax({
-      url: url,
-      method: 'POST',
-      headers: { 'X-CSRFToken': window.glide.csrfToken },
-      dataType: 'json',
-      data: JSON.stringify({
-        data: file.newContent,
-        fileName: file.name
-      }),
-      contentType: 'application/json; charset=utf-8',
-      success: function(response) {
-        console.info(response);
-        if('error' in response) {
-          //
-        }
-        else {
-          app.setState({
-            liveHtml: response.html
-          });
-        }
-      }
-    });
+    this._requestRender(file.newContent, file.name);
   }
 
   componentDidMount() {

@@ -32,11 +32,16 @@ class BranchDropdown extends React.Component {
         }
         else {
           let branches = JSON.parse(response.branches);
+          let masterBranch = _.find(branches, function(branch) { return branch.name == 'master'; });
+
           self.setState({
-            branches: branches
+            branches: branches,
+            branch: masterBranch
           }, function() {
             app.setState({
-              branches: branches
+              branches: branches,
+              branch: masterBranch,
+              phase: app.state.constants.APP_PHASE_BRANCH_OPEN
             });
           });
         }

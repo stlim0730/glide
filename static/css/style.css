@@ -43,9 +43,6 @@ ul.subtree {
 }
 .file-node-file { color: #222222 !important; }
 .new-file-button { color: #3fb618 !important; }
-/*.repo-file-link.opened {
-  font-weight: bold;
-}*/
 .v-middle {
   position: relative;
   top: 50%;

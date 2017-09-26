@@ -15,7 +15,7 @@ import './lib/bootstrap/bootstrap.min.js';
 // 
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
-import CloneRepoModalContent from './components/CloneRepoModalContent.js';
+// import CloneRepoModalContent from './components/CloneRepoModalContent.js';
 import CreateBranchModalContent from './components/CreateBranchModalContent.js';
 import GitStatusModalContent from './components/GitStatusModalContent.js';
 import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
@@ -24,6 +24,7 @@ import GitResetModalContent from './components/GitResetModalContent.js';
 import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
+import RepoListPane from './components/RepoListPane.js';
 import RepoToolBar from './components/RepoToolBar.js';
 import FileSideBar from './components/FileSideBar.js';
 import EditorPane from './components/EditorPane.js';
@@ -41,6 +42,7 @@ class App extends React.Component {
     this.state = {
       constants: {
         APP_PHASE_CLEAN_SLATE: 'clean_slate',
+        APP_PHASE_REPOSITORY_SELECTION: 'repository_selection',
         APP_PHASE_REPOSITORY_OPEN: 'repository_open',
         APP_PHASE_BRANCH_OPEN: 'branch_open',
         APP_PHASE_COMMIT_OPEN: 'commit_open',
@@ -48,6 +50,7 @@ class App extends React.Component {
       },
 
       phase: 'clean_slate',
+      repositories: [],
       repository: null,
       branches: [],
       branch: null,
@@ -118,12 +121,14 @@ class App extends React.Component {
 
     let modals = (
       <div>
-        <Modal id="clone-repository-modal"
-          modalContent={
-            <CloneRepoModalContent
-              app={this} />
-          }
-          large={false} />
+        {
+          // <Modal id="clone-repository-modal"
+          //   modalContent={
+          //     <CloneRepoModalContent
+          //       app={this} />
+          //   }
+          //   large={false} />
+        }
         <Modal id="create-branch-modal"
           modalContent={
             <CreateBranchModalContent
@@ -190,17 +195,26 @@ class App extends React.Component {
 
         return (
           <div className="row full-height">
-            <NavBar />
+            <NavBar app={this} />
             {modals}
           </div>
-          // <StartPanel />
+        );
+
+      case this.state.constants.APP_PHASE_REPOSITORY_SELECTION:
+
+        return (
+          <div className="row full-height">
+            <NavBar app={this} />
+            {modals}
+            <RepoListPane app={this} />
+          </div>
         );
 
       case this.state.constants.APP_PHASE_REPOSITORY_OPEN:
       case this.state.constants.APP_PHASE_BRANCH_OPEN:
         return (
           <div className="row full-height">
-            <NavBar />
+            <NavBar app={this} />
             {modals}
             <RepoToolBar
               app={this}
@@ -215,7 +229,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         return (
           <div className="row full-height">
-            <NavBar />
+            <NavBar app={this} />
             {modals}
             <RepoToolBar
               app={this}
@@ -245,7 +259,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_LOADING:
         return (
           <div>
-            <NavBar />
+            <NavBar app={this} />
             {modals}
           </div>
         );
