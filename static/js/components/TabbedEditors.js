@@ -55,6 +55,7 @@ class TabbedEditors extends React.Component {
   }
 
   handleTabClick(file, e) {
+    let self = this;
     let app = this.props.app;
     this.setState({
       fileActive: file
@@ -62,6 +63,15 @@ class TabbedEditors extends React.Component {
       app.setState({
         fileActive: file
       });
+
+      let content = null;
+      if(file.newContent) {
+        content = file.newContent;
+      }
+      else {
+        content = file.originalContent;
+      }
+      self._requestRender(content, file.name);
     });
   }
 
@@ -108,16 +118,29 @@ class TabbedEditors extends React.Component {
     // let currentFilesOpened = this.state.filesOpened;
     // let nextFilesOpened = nextProps.filesOpened;
     // _.forEach()
-
+    let self = this;
+    let prevFileActive = this.state.fileActive;
 
     this.setState({
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
 
-      if(this.state.filesOpened == [] && this.state.fileActive == null) {
+      if(self.state.filesOpened == [] && self.state.fileActive == null) {
         $('#tabbed-editors-tabs').empty();
         $('#tabbed-editors-editors').empty();
+      }
+      else if(self.state.fileActive && prevFileActive != nextProps.fileActive){
+        let fileActive = self.state.fileActive;
+        let content = null;
+        if(fileActive.newContent) {
+          content = fileActive.newContent;
+        }
+        else {
+          content = fileActive.originalContent;
+        }
+        
+        self._requestRender(content, fileActive.name);
       }
       // $('.CodeMirror').each(function(i, el){
       //   el.CodeMirror.refresh();
