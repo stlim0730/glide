@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
   # url(r'^theme/?(?P<slug>.*)$', views.theme, name='theme'),
+  url(r'^project/repositories$', views.repositories, name='repositories'),
+  url(r'^project/readme/(?P<owner>.+)/(?P<repo>.+)$', views.readme, name='readme'),
   url(r'^project/clone$', views.clone, name='clone'),
   url(r'^project/branch$', views.branch, name='branch'),
   # url(r'^project/create$', views.createProject, name='createProject'),

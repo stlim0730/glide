@@ -5,10 +5,12 @@ from .serializers import *
 import json
 from urllib.parse import urlencode
 from urllib.request import urlopen, Request
+from urllib.error import HTTPError
 from django.contrib.auth.models import User
 from workspace.models import Project, Theme
 from copy import deepcopy
 import markdown
+import base64
 from glide import *
 
 
@@ -35,6 +37,58 @@ from glide import *
 #     projects = projects.filter(slug=slug)
 #   serializer = ProjectSerializer(projects, many=True)
 #   return Response(serializer.data)
+
+
+@api_view(['GET'])
+def repositories(request):
+  """
+  Responds with a list of repositories
+    that are accessible to the authenticated user
+  """
+  accessToken = request.session['accessToken']
+  getAllReposUrl = 'https://api.github.com/user/repos?access_token={}'
+  getAllReposUrl = getAllReposUrl.format(accessToken)
+  getAllReposUrl = getAuthUrl(getAllReposUrl)
+  with urlopen(getAllReposUrl) as allReposRes:
+    resStr = allReposRes.read().decode('utf-8')
+    return Response({ 'repositories': resStr })
+
+
+@api_view(['GET'])
+def readme(request, owner, repo):
+  """
+  Responds with HTML-rendered README.md
+    that are accessible to the authenticated user
+  """
+  accessToken = request.session['accessToken']
+  getReadmeUrl = 'https://api.github.com/repos/{}/{}/readme?access_token={}'
+  getReadmeUrl = getReadmeUrl.format(owner, repo, accessToken)
+  getReadmeUrl = getAuthUrl(getReadmeUrl)
+  # with urlopen(getReadmeUrl) as readmeRes:
+  #   resStr = readmeRes.read().decode('utf-8')
+  #   return Response({ 'branches': resStr })
+  req = Request(
+    url=getReadmeUrl, method='GET',
+    headers={'Content-Type': 'application/vnd.github.v3.html+json'})
+  try:
+    with urlopen(req) as readmeRes:
+      resStr = readmeRes.read().decode('utf-8')
+      readmeObj = json.loads(resStr)
+      mdContent = readmeObj['content']
+      if readmeObj['encoding'] == 'base64':
+        mdContent = base64.b64decode(mdContent).decode('utf-8')
+        res = _mdToHtml(mdContent)
+        return Response({
+          'readme': res
+        })
+      else:
+        return Response({
+          'error': 'decoding'
+        })
+  except HTTPError:
+    return Response({
+      'error': 'HTTPError'
+    })
 
 
 @api_view(['GET'])
@@ -197,6 +251,10 @@ def _updateReference(accessToken, owner, repo, ref, refTo):
 #   with urlopen(req) as createFileRes:
 #     resStr = createFileRes.read().decode('utf-8')
 #     return json.loads(resStr)
+
+
+def _mdToHtml(md):
+  return markdown.markdown(md)
 
 
 @api_view(['POST'])
@@ -580,6 +638,11 @@ def pull(request, owner, repo):
 
 @api_view(['POST'])
 def render(request):
+  """
+  Respond with rendered html
+  Consider using Misaka (https://github.com/FSX/misaka) package,
+    which has more like GitHub flavored markdown renderer
+  """
   data = request.data['data']
   fileName = request.data['fileName']
   extension = fileName.split('.')
@@ -591,7 +654,7 @@ def render(request):
     extension = None
   if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
     # Markdown
-    res['html'] = markdown.markdown(data)
+    res['html'] = _mdToHtml(data)#markdown.markdown(data)
   else:
     pass
   return Response(res)
