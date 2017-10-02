@@ -11,6 +11,9 @@ from workspace.models import Project, Theme
 from copy import deepcopy
 import markdown
 import base64
+import yaml
+import traceback
+import re
 from glide import *
 
 
@@ -654,7 +657,54 @@ def render(request):
     extension = None
   if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
     # Markdown
-    res['html'] = _mdToHtml(data)#markdown.markdown(data)
+    res['html'] = _mdToHtml(data)
+  elif extension in ['yaml', 'yml']:
+    # YAML
+    try:
+      res['yaml'] = yaml.load(data)
+    except (yaml.scanner.ScannerError, yaml.parser.ParserError) as e:
+      exceptions = traceback.format_exception_only(yaml.scanner.ScannerError, e)
+      error = []
+      for exception in exceptions:
+        exception = exception.replace('\n', ' ')
+        noColon = re.search('could not find expected \':\'', exception)
+        listHanging = re.search('expected the node content, but found \'<stream end>\'', exception)
+        stringHanging = re.search(r'while scanning a quoted scalar.+found unexpected end of stream', exception)
+        if noColon:
+          line = re.findall('line \d+', exception)[-1]
+          line = int(line.split(' ')[-1])
+          error.append({
+            'line': line,
+            'type': 'error',
+            'file': fileName,
+            'message': 'Could not find expected \':\''
+          })
+        elif listHanging:
+          line = re.findall('line \d+', exception)[-1]
+          line = int(line.split(' ')[-1])
+          error.append({
+            'line': line,
+            'type': 'error',
+            'file': fileName,
+            'message': 'Expected \',\' or \']\''
+          })
+        elif stringHanging:
+          line = re.findall('line \d+', exception)[0]
+          line = int(line.split(' ')[-1])
+          error.append({
+            'line': line,
+            'type': 'error',
+            'file': fileName,
+            'message': 'Expected \'"\' (end of quoted scalar)'
+          })
+        else:
+          error.append(exception)
+      return Response({
+        'error': error
+      })
+    # There was no YAML syntax error
+    # TODO: template engine
   else:
+    # Unsupported file type
     pass
   return Response(res)

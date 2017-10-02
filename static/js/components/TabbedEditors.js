@@ -43,12 +43,23 @@ class TabbedEditors extends React.Component {
       success: function(response) {
         console.info(response);
         if('error' in response) {
-          //
+          app.setState({
+            liveBugs: response.error,
+            liveHtml: null
+          });
         }
         else {
-          app.setState({
-            liveHtml: response.html
-          });
+          if('html' in response) {
+            app.setState({
+              liveHtml: response.html,
+              liveBugs: []
+            });
+          }
+          else {
+            app.setState({
+              liveBugs: []
+            });
+          }
         }
       }
     });
