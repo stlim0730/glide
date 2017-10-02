@@ -186,14 +186,14 @@ class CreateNewFileModalContent extends React.Component {
           <h4 className="modal-title">Create a New File or Folder</h4>
         </div>
         
-        <div className="modal-body">
-          <fieldset>
-            <div className="row">
+        <div className="modal-body row">
+          <div className="col-md-3 right-border">
+            <fieldset>
               <div className="form-group">
-                <label className="col-md-3 control-label text-right">
+                <label className="control-label text-right">
                   Path
                 </label>
-                <div className="col-md-7">
+                <div className="">
                   <input
                     type="text"
                     ref={(c) => this.pathInput = c}
@@ -202,10 +202,8 @@ class CreateNewFileModalContent extends React.Component {
                     disabled />
                 </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="form-group">                  
-                <div className="col-md-2 col-md-offset-4 inline-block margin-top-15 margin-bottom-15">
+              <div className="form-group margin-top-15">                  
+                
                   <label>
                     <input
                       type="radio"
@@ -213,8 +211,7 @@ class CreateNewFileModalContent extends React.Component {
                       checked={this.state.fileOrFolder=='file'}
                       onChange={this.handleFileOrFolderChange} /> File
                   </label>
-                </div>
-                <div className="col-md-2 col-md-offset-1 inline-block margin-top-15 margin-bottom-15">
+                  &emsp;
                   <label>
                     <input
                       type="radio"
@@ -222,15 +219,13 @@ class CreateNewFileModalContent extends React.Component {
                       checked={this.state.fileOrFolder=='folder'}
                       onChange={this.handleFileOrFolderChange} /> Folder
                   </label>
-                </div>
+                
               </div>
-            </div>
-            <div className="row">
               <div className="form-group">
-                <label className="col-md-3 control-label text-right">
+                <label className="control-label text-right">
                   {this.state.fileOrFolder == 'folder' ? 'Folder' : 'File'} Name
                 </label>
-                <div className="col-md-7">
+                <div className="">
                   <input
                     type="text"
                     onChange={this.handleFileNameChange}
@@ -240,8 +235,47 @@ class CreateNewFileModalContent extends React.Component {
                     maxLength="255" />
                 </div>
               </div>
-            </div>
-          </fieldset>
+            </fieldset>
+          </div>
+
+          <div className="col-md-9">
+            <fieldset>
+              <label className="control-label text-right">
+                Choose a Design Layout
+                <button
+                  type="button" className="btn btn-sm btn-link"
+                  data-container="body" data-toggle="popover"
+                  data-placement="bottom" data-original-title="" title=""
+                  data-content="Layout selection is available when you author YAML(.yaml) or HTML(.html) files.">
+                  <span className="glyphicon glyphicon-info-sign"></span>
+                </button>
+              </label>
+              <div className="form-group well">
+                <div className="inline-block">
+                  {
+                    this.state.repositories.map(function(item, index) {
+                      return (
+                        <label>
+                          <input
+                            type="radio"
+                            value="file"
+                            disabled={
+                              !(this.state.fileName.endsWith('yaml')
+                              || this.state.fileName.endsWith('yml')
+                              || this.state.fileName.endsWith('html')
+                              || this.state.fileName.endsWith('htm'))
+                            }
+                            checked={this.state.fileOrFolder=='file'}
+                            onChange={this.handleFileOrFolderChange} /> File
+                        </label>
+                      );
+                    }.bind(this));
+                  }
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
         </div>
         
         <div className="modal-footer">

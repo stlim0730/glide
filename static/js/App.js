@@ -147,7 +147,7 @@ class App extends React.Component {
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree} />
           }
-          large={false} />
+          large={true} />
         <Modal id="git-status-modal"
           modalContent={
             <GitStatusModalContent
@@ -278,3 +278,4 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, $('#content')[0]);
+$('[data-toggle="popover"]').popover();

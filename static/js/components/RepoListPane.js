@@ -174,7 +174,6 @@ class RepoListPane extends React.Component {
 
   componentDidMount() {
     this._ajaxRepositories();
-    $('[data-toggle="popover"]').popover();
   }
 
   render () {
