@@ -348,18 +348,20 @@ class CreateNewFileModalContent extends React.Component {
                   this.state.layouts.map(function(item, index) {
                     return (
                       <div key={index}>
-                        <input
-                          type="radio"
-                          name="pageLayout"
-                          value={item.name}
-                          disabled={
-                            !(this.state.fileName.endsWith('.yaml')
-                            || this.state.fileName.endsWith('.yml')
-                            || this.state.fileName.endsWith('.html')
-                            || this.state.fileName.endsWith('.htm'))
-                          }
-                          onClick={this.handleLayoutChange.bind(this, item)}
-                          />&emsp;{item.name}
+                        <label className="btn btn-link">
+                          <input
+                            type="radio"
+                            name="pageLayout"
+                            value={item.name}
+                            disabled={
+                              !(this.state.fileName.endsWith('.yaml')
+                              || this.state.fileName.endsWith('.yml')
+                              || this.state.fileName.endsWith('.html')
+                              || this.state.fileName.endsWith('.htm'))
+                            }
+                            onClick={this.handleLayoutChange.bind(this, item)}
+                            /> {item.name}
+                          </label>
                         <br />
                       </div>
                     );
