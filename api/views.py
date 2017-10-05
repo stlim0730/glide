@@ -94,6 +94,23 @@ def readme(request, owner, repo):
     })
 
 
+@api_view(['POST'])
+def cdn(request, owner, repo):
+  """
+  Responds with RawGit url for the specified file
+  """
+  res = {}
+  accessToken = request.session['accessToken']
+  file = request.data['file']
+  # branch = request.data['branch']
+  commit = _getLatestCommit(accessToken, owner, repo)
+  cdnUrl = 'https://cdn.rawgit.com/{}/{}/{}/{}'
+  cdnUrl = cdnUrl.format(owner, repo, commit['sha'], file['path'])
+  return Response({
+    'cdnUrl': cdnUrl
+  })
+
+
 @api_view(['GET'])
 def branches(request, repositoryFullName):
   """
@@ -695,7 +712,7 @@ def render(request):
             'line': line,
             'type': 'error',
             'file': fileName,
-            'message': 'Expected \'"\' (end of quoted scalar)'
+            'message': 'Expected " (end of quoted scalar)'
           })
         else:
           error.append(exception)

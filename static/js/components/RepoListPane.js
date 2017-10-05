@@ -44,7 +44,6 @@ class RepoListPane extends React.Component {
         }
         else {
           let repositories = JSON.parse(response.repositories);
-          console.info(repositories);
           self.setState({
             repositories: repositories,
             repository: null

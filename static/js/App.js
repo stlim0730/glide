@@ -144,6 +144,7 @@ class App extends React.Component {
           modalContent={
             <CreateNewFileModalContent
               app={this}
+              repository={this.state.repository}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree} />
           }

@@ -6,17 +6,23 @@ class CreateNewFileModalContent extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
       fileOrFolder: null,
       fileName: '',
       tree: null,
-      recursiveTree: null
+      recursiveTree: null,
+      layouts: [],
+      layout: null,
+      liveHtmlSrc: null
     };
 
     this._reset = this._reset.bind(this);
     this._validateFileName = this._validateFileName.bind(this);
-    this.__addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
+    this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleLayoutChange = this.handleLayoutChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -24,7 +30,9 @@ class CreateNewFileModalContent extends React.Component {
   _reset() {
     this.setState({
       fileOrFolder: null,
-      fileName: ''
+      fileName: '',
+      layout: null,
+      liveHtmlSrc: null
     });
 
     this.fileNameInput.value = '';
@@ -39,6 +47,27 @@ class CreateNewFileModalContent extends React.Component {
     else {
       return false;
     }
+  }
+
+  _addFileToRecursiveTree(recursiveTree, newFile, folders) {
+    if(folders.length == 1) {
+      recursiveTree.nodes.push(newFile);
+    }
+    else {
+      let targetFolder = _.find(recursiveTree.nodes, {name: folders.shift(), type: 'tree'});
+      this._addFileToRecursiveTree(targetFolder, newFile, folders);
+    }
+  }
+
+  _loadTemplateFiles(tree) {
+    if(!tree) return [];
+
+    let layouts = _.filter(tree.tree, function(file) {
+      let layoutFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
+      return layoutFileRegex.test(file.path);
+    });
+
+    return layouts;
   }
 
   handleFileOrFolderChange(e) {
@@ -62,20 +91,66 @@ class CreateNewFileModalContent extends React.Component {
     }
   }
 
+  handleLayoutChange(file, e) {
+    // Load layout file content
+    let url = '/api/project/cdn/' + this.state.repository.full_name;
+    // let url = '/api/project/blob/' + this.state.repository.full_name + '/' + file.sha;
+    let self = this;
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        file: file,
+        branch: null
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          // let content = atob(response.blob.content);
+          // content = self._resolveBookmarks(content)
+          // content = self._resolveRelativePaths(content)
+
+          self.setState({
+            layout: file,
+            liveHtmlSrc: response.cdnUrl
+          });
+        }
+      }
+    });
+
+    // $.ajax({
+    //   url: url,
+    //   method: 'GET',
+    //   success: function(response) {
+    //     console.info(response);
+    //     if('error' in response) {
+    //       // TODO
+    //     }
+    //     else {
+    //       let content = atob(response.blob.content);
+    //       content = self._resolveBookmarks(content)
+    //       content = self._resolveRelativePaths(content)
+
+    //       self.setState({
+    //         layout: file,
+    //         liveHtml: content
+    //       });
+    //     }
+    //   }
+    // });
+  }
+
   handleKeyUp(e) {
     let keyCode = e.keyCode;
     if(keyCode == 13) {
       this.submitButton.click();
-    }
-  }
-
-  _addFileToRecursiveTree(recursiveTree, newFile, folders) {
-    if(folders.length == 1) {
-      recursiveTree.nodes.push(newFile);
-    }
-    else {
-      let targetFolder = _.find(recursiveTree.nodes, {name: folders.shift(), type: 'tree'});
-      this._addFileToRecursiveTree(targetFolder, newFile, folders);
     }
   }
 
@@ -125,6 +200,15 @@ class CreateNewFileModalContent extends React.Component {
       return;
     }
 
+    // Add layout if the file is yaml
+    if((newFile.name.endsWith('.yaml')
+      || newFile.name.endsWith('.yml'))
+      && this.state.layout) {
+      newFile.newContent = 'layout: ';
+      newFile.newContent += this.state.layout.path;
+      newFile.newContent += '\n';
+    }
+
     // Push the file into tree
     tree.tree.push(newFile);
 
@@ -161,16 +245,26 @@ class CreateNewFileModalContent extends React.Component {
   }
 
   componentDidMount() {
+    let layouts = this._loadTemplateFiles(this.props.tree);
+
     this.setState({
+      repository: this.props.repository,
       tree: this.props.tree,
-      recursiveTree: this.props.recursiveTree
+      recursiveTree: this.props.recursiveTree,
+      layouts: layouts,
+      layout: null
     });
   }
 
   componentWillReceiveProps(nextProps) {
+    let layouts = this._loadTemplateFiles(nextProps.tree);
+    
     this.setState({
+      repository: nextProps.repository,
       tree: nextProps.tree,
-      recursiveTree: nextProps.recursiveTree
+      recursiveTree: nextProps.recursiveTree,
+      layouts: layouts,
+      layout: null
     });
   }
 
@@ -190,7 +284,7 @@ class CreateNewFileModalContent extends React.Component {
           <div className="col-md-3 right-border">
             <fieldset>
               <div className="form-group">
-                <label className="control-label text-right">
+                <label className="control-label">
                   Path
                 </label>
                 <div className="">
@@ -222,7 +316,7 @@ class CreateNewFileModalContent extends React.Component {
                 
               </div>
               <div className="form-group">
-                <label className="control-label text-right">
+                <label className="control-label">
                   {this.state.fileOrFolder == 'folder' ? 'Folder' : 'File'} Name
                 </label>
                 <div className="">
@@ -235,13 +329,10 @@ class CreateNewFileModalContent extends React.Component {
                     maxLength="255" />
                 </div>
               </div>
-            </fieldset>
-          </div>
-
-          <div className="col-md-9">
-            <fieldset>
-              <label className="control-label text-right">
-                Choose a Design Layout
+              <div className="form-group">
+                <label className="control-label">
+                  Page Layout
+                </label>
                 <button
                   type="button" className="btn btn-sm btn-link"
                   data-container="body" data-toggle="popover"
@@ -249,31 +340,46 @@ class CreateNewFileModalContent extends React.Component {
                   data-content="Layout selection is available when you author YAML(.yaml) or HTML(.html) files.">
                   <span className="glyphicon glyphicon-info-sign"></span>
                 </button>
-              </label>
-              <div className="form-group well">
-                <div className="inline-block">
-                  {
-                    this.state.repositories.map(function(item, index) {
-                      return (
-                        <label>
-                          <input
-                            type="radio"
-                            value="file"
-                            disabled={
-                              !(this.state.fileName.endsWith('yaml')
-                              || this.state.fileName.endsWith('yml')
-                              || this.state.fileName.endsWith('html')
-                              || this.state.fileName.endsWith('htm'))
-                            }
-                            checked={this.state.fileOrFolder=='file'}
-                            onChange={this.handleFileOrFolderChange} /> File
-                        </label>
-                      );
-                    }.bind(this));
-                  }
-                </div>
+                <br />
+                <span className="help-block">
+                  This repository has {this.state.layouts.length} layout(s) available.
+                </span>
+                {
+                  this.state.layouts.map(function(item, index) {
+                    return (
+                      <div key={index}>
+                        <input
+                          type="radio"
+                          name="pageLayout"
+                          value={item.name}
+                          disabled={
+                            !(this.state.fileName.endsWith('.yaml')
+                            || this.state.fileName.endsWith('.yml')
+                            || this.state.fileName.endsWith('.html')
+                            || this.state.fileName.endsWith('.htm'))
+                          }
+                          onClick={this.handleLayoutChange.bind(this, item)}
+                          />&emsp;{item.name}
+                        <br />
+                      </div>
+                    );
+                  }.bind(this))
+                }
               </div>
             </fieldset>
+          </div>
+
+          <div className="col-md-9">
+            <label className="control-label">
+              Page Layout Preview
+            </label>
+            <div className="form-group">
+              <iframe
+                width="600px"
+                height="350px"
+                src={this.state.liveHtmlSrc}>
+              </iframe>
+            </div>
           </div>
 
         </div>
@@ -290,7 +396,14 @@ class CreateNewFileModalContent extends React.Component {
             className="btn btn-primary"
             onClick={this.handleSubmit}
             data-dismiss="modal"
-            disabled={!this.state.fileOrFolder || this.state.fileName.trim().length==0}>
+            disabled={
+              !this.state.fileOrFolder
+              || this.state.fileName.trim().length==0
+              || ((this.state.fileName.endsWith('yaml')
+                || this.state.fileName.endsWith('yml')
+                || this.state.fileName.endsWith('html')
+                || this.state.fileName.endsWith('htm')) && !this.state.layout)
+            }>
             Submit
           </button>
         </div>
