@@ -45,21 +45,28 @@ class TabbedEditors extends React.Component {
         if('error' in response) {
           app.setState({
             liveBugs: response.error,
+            liveYaml: null,
             liveHtml: null
           });
         }
         else {
+
+          let liveHtml = null;
+          let liveYaml = null;
+
           if('html' in response) {
-            app.setState({
-              liveHtml: response.html,
-              liveBugs: []
-            });
+            liveHtml = response.html;
           }
-          else {
-            app.setState({
-              liveBugs: []
-            });
+
+          if('yaml' in response) {
+            liveYaml = response.yaml;
           }
+
+          app.setState({
+            liveHtml: liveHtml,
+            liveYaml: liveYaml,
+            liveBugs: []
+          });
         }
       }
     });

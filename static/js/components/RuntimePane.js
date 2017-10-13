@@ -9,6 +9,7 @@ class RuntimePane extends React.Component {
     super(props);
 
     this.state = {
+      liveYaml: null,
       liveHtml: null,
       liveBugs: []
     };
@@ -16,6 +17,7 @@ class RuntimePane extends React.Component {
 
   componentDidMount() {
     this.setState({
+      liveYaml: this.props.liveYaml,
       liveHtml: this.props.liveHtml,
       liveBugs: this.props.liveBugs
     });
@@ -23,6 +25,7 @@ class RuntimePane extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
+      liveYaml: nextProps.liveYaml,
       liveHtml: nextProps.liveHtml,
       liveBugs: nextProps.liveBugs
     });
@@ -34,6 +37,7 @@ class RuntimePane extends React.Component {
         <RendererPane
           liveHtml={this.state.liveHtml} />
         <DebuggerPane
+          liveYaml={this.state.liveYaml}
           liveBugs={this.state.liveBugs} />
       </div>
     );

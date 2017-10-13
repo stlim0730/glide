@@ -62,6 +62,7 @@ class App extends React.Component {
       fileActive: null,
       changedFiles: [],
       addedFiles: [],
+      liveYaml: null,
       liveHtml: null,
       liveBugs: []
     };
@@ -82,6 +83,7 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
+        liveYaml: null,
         liveHtml: null,
         liveBugs: []
       });
@@ -98,6 +100,7 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
+        liveYaml: null,
         liveHtml: null,
         liveBugs: []
       });
@@ -114,6 +117,7 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
+        liveYaml: null,
         liveHtml: null,
         liveBugs: []
       });
@@ -257,6 +261,7 @@ class App extends React.Component {
               filesOpened={this.state.filesOpened} />
             <RuntimePane
               app={this}
+              liveYaml={this.state.liveYaml}
               liveHtml={this.state.liveHtml}
               liveBugs={this.state.liveBugs} />
           </div>
