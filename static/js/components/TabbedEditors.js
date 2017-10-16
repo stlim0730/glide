@@ -10,13 +10,16 @@ class TabbedEditors extends React.Component {
     super(props);
 
     this.state = {
+      tree: null,
       filesOpened: [],
       fileActive: null,
       editors: {}
     };
 
     this._getEditorId = this._getEditorId.bind(this);
-    this._requestRender = this._requestRender.bind(this);
+    this._getBlob = this._getBlob.bind(this);
+    this._prepareRenderingReq = this._prepareRenderingReq.bind(this);
+    this._requestRendering = this._requestRendering.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
@@ -26,19 +29,117 @@ class TabbedEditors extends React.Component {
     return fileObj.sha + suffix;
   }
 
-  _requestRender(data, fileName) {
+  _getBlob(repository, file) {
+    let url = '/api/project/blob/' + repository.full_name + '/' + file.sha;
+    let app = this.props.app;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        console.info('blob loaded', response);
+        if('error' in response) {
+          // TODO
+          return null;
+        }
+        else {
+          let content = atob(response.blob.content)
+          file.originalContent = content;
+          return content;
+        }
+      }
+    });
+
+    return null;
+  }
+
+  _prepareRenderingReq(data, file) {
+    // 
+    // Returns data package
+    //   to make rendering request with
+    // 
+
+    let app = this.props.app;
+    let fileName = file.name;
+
+    // Build data to make rendering request with
+    //   - if the file is yaml, build a package with it's layout content.
+    if(fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
+      let layoutFileRegex = /layout\s*:\s*templates\/([a-z0-9\/\s\._-]+)\.(html|htm)/im;
+      if(layoutFileRegex.test(data)) {
+        // Layout specified
+        let matchRes = layoutFileRegex.exec(data);
+        // Note that the regex only returns the first match
+        let layoutFileName = _.join(_.concat(matchRes[1], matchRes[2]), '.');
+        let layoutFilePath = 'templates/' + layoutFileName;
+        // Find the templateFile
+        let tree = this.state.tree.tree;
+        let layoutFile = _.find(tree, ['path', layoutFilePath]);
+        // Load layout file content
+        let layoutFileContent = null;
+        if(layoutFile) {
+          // Layout file exists in the repository
+          if(layoutFile.newContent) {
+            // The user has been modified the layout file content
+            layoutFileContent = layoutFile.newContent;
+          }
+          else if(layoutFile.originalContent) {
+            // The layout file content exists in the repository
+            layoutFileContent = layoutFile.originalContent;
+          }
+          else {
+            // The layout file content hasn't been loaded
+            // Load the layout file content through the server
+            layoutFileContent = this._getBlob(app.state.repository, layoutFile);
+          }
+
+          return {
+            data: data,
+            fileName: fileName,
+            layoutFileContent: layoutFileContent
+          };
+        }
+        else {
+          // Layout file doesn't exist
+          // TODO: Show the error in the debugger
+          return {
+            data: data,
+            fileName: fileName
+          };
+        }
+      }
+      else {
+        // TODO: Layout file not specified
+        return {
+          data: data,
+          fileName: fileName
+        };
+      }
+    }
+    else {
+      // TODO: The other file types
+      return {
+        data: data,
+        fileName: fileName
+      };
+    }
+  }
+
+  _requestRendering(data) {
+    if(!data) {
+      return;
+    }
+
     // POST Request rendering
     let url = '/api/project/render';
     let app = this.props.app;
+
     $.ajax({
       url: url,
       method: 'POST',
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
-      data: JSON.stringify({
-        data: data,
-        fileName: fileName
-      }),
+      data: JSON.stringify(data),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
         console.info(response);
@@ -89,7 +190,8 @@ class TabbedEditors extends React.Component {
       else {
         content = file.originalContent;
       }
-      self._requestRender(content, file.name);
+      let data = self._prepareRenderingReq(content, file);
+      self._requestRendering(data);
     });
   }
 
@@ -121,11 +223,13 @@ class TabbedEditors extends React.Component {
       });
     }
 
-    this._requestRender(file.newContent, file.name);
+    let data = this._prepareRenderingReq(file.newContent, file);
+    this._requestRendering(data);
   }
 
   componentDidMount() {
     this.setState({
+      tree: this.props.tree,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive
     });
@@ -140,6 +244,7 @@ class TabbedEditors extends React.Component {
     let prevFileActive = this.state.fileActive;
 
     this.setState({
+      tree: nextProps.tree,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
@@ -158,7 +263,8 @@ class TabbedEditors extends React.Component {
           content = fileActive.originalContent;
         }
         
-        self._requestRender(content, fileActive.name);
+        let data = self._prepareRenderingReq(content, fileActive);
+        self._requestRendering(data);
       }
       // $('.CodeMirror').each(function(i, el){
       //   el.CodeMirror.refresh();

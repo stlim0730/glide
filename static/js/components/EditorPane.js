@@ -45,6 +45,7 @@ class EditorPane extends React.Component {
             }
             <TabbedEditors
               app={this.props.app}
+              tree={this.props.tree}
               filesOpened={this.state.filesOpened}
               fileActive={this.state.fileActive} />
           </div>
