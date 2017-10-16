@@ -12,6 +12,7 @@ from copy import deepcopy
 import markdown
 import base64
 import yaml
+from jinja2 import Template
 import traceback
 import re
 from glide import *
@@ -679,6 +680,13 @@ def render(request):
     # YAML
     try:
       res['yaml'] = yaml.load(data)
+      templateFileContent = None
+      if 'templateFileContent' in request.data:
+        templateFileContent = request.data['templateFileContent']
+      if templateFileContent:
+        # Render yaml with the given design template
+        template = Template(templateFileContent)
+        res['html'] = template.render(res['yaml'])
     except (yaml.scanner.ScannerError, yaml.parser.ParserError) as e:
       exceptions = traceback.format_exception_only(yaml.scanner.ScannerError, e)
       error = []

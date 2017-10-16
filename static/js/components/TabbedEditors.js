@@ -63,40 +63,40 @@ class TabbedEditors extends React.Component {
     let fileName = file.name;
 
     // Build data to make rendering request with
-    //   - if the file is yaml, build a package with it's layout content.
+    //   - if the file is yaml, build a package with its template content.
     if(fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
-      let layoutFileRegex = /layout\s*:\s*templates\/([a-z0-9\/\s\._-]+)\.(html|htm)/im;
-      if(layoutFileRegex.test(data)) {
+      let templateFileRegex = /template\s*:\s*templates\/([a-z0-9\/\s\._-]+)\.(html|htm)/im;
+      if(templateFileRegex.test(data)) {
         // Layout specified
-        let matchRes = layoutFileRegex.exec(data);
+        let matchRes = templateFileRegex.exec(data);
         // Note that the regex only returns the first match
-        let layoutFileName = _.join(_.concat(matchRes[1], matchRes[2]), '.');
-        let layoutFilePath = 'templates/' + layoutFileName;
+        let templateFileName = _.join(_.concat(matchRes[1], matchRes[2]), '.');
+        let templateFilePath = 'templates/' + templateFileName;
         // Find the templateFile
         let tree = this.state.tree.tree;
-        let layoutFile = _.find(tree, ['path', layoutFilePath]);
-        // Load layout file content
-        let layoutFileContent = null;
-        if(layoutFile) {
+        let templateFile = _.find(tree, ['path', templateFilePath]);
+        // Load template file content
+        let templateFileContent = null;
+        if(templateFile) {
           // Layout file exists in the repository
-          if(layoutFile.newContent) {
-            // The user has been modified the layout file content
-            layoutFileContent = layoutFile.newContent;
+          if(templateFile.newContent) {
+            // The user has been modified the template file content
+            templateFileContent = templateFile.newContent;
           }
-          else if(layoutFile.originalContent) {
-            // The layout file content exists in the repository
-            layoutFileContent = layoutFile.originalContent;
+          else if(templateFile.originalContent) {
+            // The template file content exists in the repository
+            templateFileContent = templateFile.originalContent;
           }
           else {
-            // The layout file content hasn't been loaded
-            // Load the layout file content through the server
-            layoutFileContent = this._getBlob(app.state.repository, layoutFile);
+            // The template file content hasn't been loaded
+            // Load the template file content through the server
+            templateFileContent = this._getBlob(app.state.repository, templateFile);
           }
 
           return {
             data: data,
             fileName: fileName,
-            layoutFileContent: layoutFileContent
+            templateFileContent: templateFileContent
           };
         }
         else {

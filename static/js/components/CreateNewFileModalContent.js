@@ -11,8 +11,8 @@ class CreateNewFileModalContent extends React.Component {
       fileName: '',
       tree: null,
       recursiveTree: null,
-      layouts: [],
-      layout: null,
+      templates: [],
+      template: null,
       liveHtmlSrc: null
     };
 
@@ -31,7 +31,7 @@ class CreateNewFileModalContent extends React.Component {
     this.setState({
       fileOrFolder: null,
       fileName: '',
-      layout: null,
+      template: null,
       liveHtmlSrc: null
     });
 
@@ -62,12 +62,12 @@ class CreateNewFileModalContent extends React.Component {
   _loadTemplateFiles(tree) {
     if(!tree) return [];
 
-    let layouts = _.filter(tree.tree, function(file) {
-      let layoutFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
-      return layoutFileRegex.test(file.path);
+    let templates = _.filter(tree.tree, function(file) {
+      let templateFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
+      return templateFileRegex.test(file.path);
     });
 
-    return layouts;
+    return templates;
   }
 
   handleFileOrFolderChange(e) {
@@ -92,7 +92,7 @@ class CreateNewFileModalContent extends React.Component {
   }
 
   handleLayoutChange(file, e) {
-    // Load layout file content
+    // Load template file content
     let url = '/api/project/cdn/' + this.state.repository.full_name;
     // let url = '/api/project/blob/' + this.state.repository.full_name + '/' + file.sha;
     let self = this;
@@ -118,7 +118,7 @@ class CreateNewFileModalContent extends React.Component {
           // content = self._resolveRelativePaths(content)
 
           self.setState({
-            layout: file,
+            template: file,
             liveHtmlSrc: response.cdnUrl
           });
         }
@@ -139,7 +139,7 @@ class CreateNewFileModalContent extends React.Component {
     //       content = self._resolveRelativePaths(content)
 
     //       self.setState({
-    //         layout: file,
+    //         template: file,
     //         liveHtml: content
     //       });
     //     }
@@ -200,12 +200,12 @@ class CreateNewFileModalContent extends React.Component {
       return;
     }
 
-    // Add layout if the file is yaml
+    // Add template if the file is yaml
     if((newFile.name.endsWith('.yaml')
       || newFile.name.endsWith('.yml'))
-      && this.state.layout) {
-      newFile.newContent = 'layout: ';
-      newFile.newContent += this.state.layout.path;
+      && this.state.template) {
+      newFile.newContent = 'template: ';
+      newFile.newContent += this.state.template.path;
       newFile.newContent += '\n';
     }
 
@@ -245,26 +245,26 @@ class CreateNewFileModalContent extends React.Component {
   }
 
   componentDidMount() {
-    let layouts = this._loadTemplateFiles(this.props.tree);
+    let templates = this._loadTemplateFiles(this.props.tree);
 
     this.setState({
       repository: this.props.repository,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      layouts: layouts,
-      layout: null
+      templates: templates,
+      template: null
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    let layouts = this._loadTemplateFiles(nextProps.tree);
+    let templates = this._loadTemplateFiles(nextProps.tree);
     
     this.setState({
       repository: nextProps.repository,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      layouts: layouts,
-      layout: null
+      templates: templates,
+      template: null
     });
   }
 
@@ -342,10 +342,10 @@ class CreateNewFileModalContent extends React.Component {
                 </button>
                 <br />
                 <span className="help-block">
-                  This repository has {this.state.layouts.length} layout(s) available.
+                  This repository has {this.state.templates.length} template(s) available.
                 </span>
                 {
-                  this.state.layouts.map(function(item, index) {
+                  this.state.templates.map(function(item, index) {
                     return (
                       <div key={index}>
                         <label className="btn btn-link">
@@ -404,7 +404,7 @@ class CreateNewFileModalContent extends React.Component {
               || ((this.state.fileName.endsWith('yaml')
                 || this.state.fileName.endsWith('yml')
                 || this.state.fileName.endsWith('html')
-                || this.state.fileName.endsWith('htm')) && !this.state.layout)
+                || this.state.fileName.endsWith('htm')) && !this.state.template)
             }>
             Submit
           </button>

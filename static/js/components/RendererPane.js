@@ -26,10 +26,14 @@ class RendererPane extends React.Component {
     return (
       <div className="height-60 panel panel-default">
         <div className="panel-heading">Preview</div>
-        <div
+        <iframe
           className="auto-scroll height-90 panel-body"
-          dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
-        </div>
+          // dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
+          srcDoc={this.state.liveHtml}
+          width="100%"
+          style={{border:'none'}}
+          sandbox="allow-scripts">
+        </iframe>
       </div>
     );
   }
