@@ -20,6 +20,7 @@ class CreateNewFileModalContent extends React.Component {
     this._validateFileName = this._validateFileName.bind(this);
     this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this._loadTemplateContent = this._loadTemplateContent.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleLayoutChange = this.handleLayoutChange.bind(this);
@@ -70,6 +71,51 @@ class CreateNewFileModalContent extends React.Component {
     return templates;
   }
 
+  _loadTemplateContent(repository, templateFile, yamlFile) {
+    let url = '/api/project/blob/' + repository.full_name + '/' + templateFile.sha;
+    let app = this.props.app;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          let content = atob(response.blob.content)
+          templateFile.originalContent = content;
+          // return content;
+
+          // Request template variable parsing
+          $.ajax({
+            url: '/api/project/parse/template',
+            method: 'POST',
+            headers: { 'X-CSRFToken': window.glide.csrfToken },
+            dataType: 'json',
+            data: JSON.stringify({
+              templateFileContent: content
+            }),
+            contentType: 'application/json; charset=utf-8',
+            success: function(response) {
+              console.info(response);
+              if('error' in response) {
+                // TODO
+              }
+              else {
+                _.forEach(response.keys, function(value, key) {
+                  yamlFile.newContent += value + ': ';
+                  yamlFile.newContent += '\n';
+                });
+              }
+            }
+          });
+        }
+      }
+    });
+  }
+
   handleFileOrFolderChange(e) {
     this.setState({
       fileOrFolder: e.target.value
@@ -94,7 +140,6 @@ class CreateNewFileModalContent extends React.Component {
   handleLayoutChange(file, e) {
     // Load template file content
     let url = '/api/project/cdn/' + this.state.repository.full_name;
-    // let url = '/api/project/blob/' + this.state.repository.full_name + '/' + file.sha;
     let self = this;
 
     $.ajax({
@@ -113,10 +158,6 @@ class CreateNewFileModalContent extends React.Component {
           // TODO
         }
         else {
-          // let content = atob(response.blob.content);
-          // content = self._resolveBookmarks(content)
-          // content = self._resolveRelativePaths(content)
-
           self.setState({
             template: file,
             liveHtmlSrc: response.cdnUrl
@@ -124,27 +165,6 @@ class CreateNewFileModalContent extends React.Component {
         }
       }
     });
-
-    // $.ajax({
-    //   url: url,
-    //   method: 'GET',
-    //   success: function(response) {
-    //     console.info(response);
-    //     if('error' in response) {
-    //       // TODO
-    //     }
-    //     else {
-    //       let content = atob(response.blob.content);
-    //       content = self._resolveBookmarks(content)
-    //       content = self._resolveRelativePaths(content)
-
-    //       self.setState({
-    //         template: file,
-    //         liveHtml: content
-    //       });
-    //     }
-    //   }
-    // });
   }
 
   handleKeyUp(e) {
@@ -155,6 +175,7 @@ class CreateNewFileModalContent extends React.Component {
   }
 
   handleSubmit() {
+    let app = this.props.app;
     let path = this.pathInput.value.trim();
     path = (path.startsWith('/') ? path.substring(1) : path);
     let fileName = this.state.fileName;
@@ -207,6 +228,9 @@ class CreateNewFileModalContent extends React.Component {
       newFile.newContent = 'template: ';
       newFile.newContent += this.state.template.path;
       newFile.newContent += '\n';
+      // Load the template file content through the server
+      let templateFile = _.find(tree.tree, ['path', this.state.template.path]);
+      this._loadTemplateContent(app.state.repository, templateFile, newFile);
     }
 
     // Push the file into tree
@@ -221,7 +245,6 @@ class CreateNewFileModalContent extends React.Component {
     //   TODO: Should I do this only for files
     //   TODO: because an empty folder can't be pushed to GitHub anyway?
     //   TODO: I'm Thinking...
-    let app = this.props.app;
     let addedFiles = app.state.addedFiles;
     addedFiles.push(newFile);
 
@@ -331,7 +354,7 @@ class CreateNewFileModalContent extends React.Component {
               </div>
               <div className="form-group">
                 <label className="control-label">
-                  Page Layout
+                  Design Template
                 </label>
                 <button
                   type="button" className="btn btn-sm btn-link"
@@ -373,7 +396,7 @@ class CreateNewFileModalContent extends React.Component {
 
           <div className="col-md-9">
             <label className="control-label">
-              Page Layout Preview
+              Design Template Preview
             </label>
             <div className="form-group">
               <iframe

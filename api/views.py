@@ -12,7 +12,7 @@ from copy import deepcopy
 import markdown
 import base64
 import yaml
-from jinja2 import Template
+from jinja2 import Template, Environment, meta
 import traceback
 import re
 from glide import *
@@ -109,6 +109,20 @@ def cdn(request, owner, repo):
   cdnUrl = cdnUrl.format(owner, repo, commit['sha'], file['path'])
   return Response({
     'cdnUrl': cdnUrl
+  })
+
+
+@api_view(['POST'])
+def parse(request):
+  template = request.data['templateFileContent']
+  jinjaEnv = Environment()
+  absSynTree = jinjaEnv.parse(template)
+  keys = list(meta.find_undeclared_variables(absSynTree))
+  # TODO: Sort it properly:
+  #   Allow whitespaces after/before the curly braces
+  keys = sorted(keys, key=lambda x:template.index('{{'+x+'}}'))
+  return Response({
+    'keys': keys
   })
 
 

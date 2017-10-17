@@ -17,7 +17,7 @@ class TabbedEditors extends React.Component {
     };
 
     this._getEditorId = this._getEditorId.bind(this);
-    this._getBlob = this._getBlob.bind(this);
+    // this._getBlob = this._getBlob.bind(this);
     this._prepareRenderingReq = this._prepareRenderingReq.bind(this);
     this._requestRendering = this._requestRendering.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
@@ -29,29 +29,29 @@ class TabbedEditors extends React.Component {
     return fileObj.sha + suffix;
   }
 
-  _getBlob(repository, file) {
-    let url = '/api/project/blob/' + repository.full_name + '/' + file.sha;
-    let app = this.props.app;
+  // _getBlob(repository, file) {
+  //   let url = '/api/project/blob/' + repository.full_name + '/' + file.sha;
+  //   let app = this.props.app;
 
-    $.ajax({
-      url: url,
-      method: 'GET',
-      success: function(response) {
-        console.info('blob loaded', response);
-        if('error' in response) {
-          // TODO
-          return null;
-        }
-        else {
-          let content = atob(response.blob.content)
-          file.originalContent = content;
-          return content;
-        }
-      }
-    });
+  //   $.ajax({
+  //     url: url,
+  //     method: 'GET',
+  //     success: function(response) {
+  //       console.info('blob loaded', response);
+  //       if('error' in response) {
+  //         // TODO
+  //         return null;
+  //       }
+  //       else {
+  //         let content = atob(response.blob.content)
+  //         file.originalContent = content;
+  //         return content;
+  //       }
+  //     }
+  //   });
 
-    return null;
-  }
+  //   return null;
+  // }
 
   _prepareRenderingReq(data, file) {
     // 
@@ -88,9 +88,8 @@ class TabbedEditors extends React.Component {
             templateFileContent = templateFile.originalContent;
           }
           else {
-            // The template file content hasn't been loaded
-            // Load the template file content through the server
-            templateFileContent = this._getBlob(app.state.repository, templateFile);
+            // This must not happen: originalContent should exist
+            // templateFileContent = this._getBlob(app.state.repository, templateFile);
           }
 
           return {
