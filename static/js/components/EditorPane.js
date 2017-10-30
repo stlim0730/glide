@@ -9,9 +9,6 @@ class EditorPane extends React.Component {
     super(props);
 
     this.state = {
-      constants: {
-        //
-      },
       filesOpened: [],
       fileActive: null
     };
@@ -46,6 +43,7 @@ class EditorPane extends React.Component {
             <TabbedEditors
               app={this.props.app}
               tree={this.props.tree}
+              recursiveTree={this.props.recursiveTree}
               filesOpened={this.state.filesOpened}
               fileActive={this.state.fileActive} />
           </div>

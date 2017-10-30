@@ -67,12 +67,12 @@ class GitStatusModalContent extends React.Component {
               <p>Your branch is up-to-date with 'origin/{this.state.branch.name}'.</p>
             }
             {
-              this.state.changedFiles.length > 0 &&
+              this.state.addedFiles.length > 0 &&
               <div>
-                <label>Changed Files:</label>
+                <label>Added Files:</label>
                 <div>
                   {
-                    this.state.changedFiles.map(function(item, index) {
+                    this.state.addedFiles.map(function(item, index) {
                       return (
                         <p
                           key={item.path}
@@ -88,15 +88,15 @@ class GitStatusModalContent extends React.Component {
               </div>
             }
             {
-              this.state.addedFiles.length > 0 &&
+              this.state.changedFiles.length > 0 &&
               <div>
-                <label>Added Files:</label>
+                <label>Changed Files:</label>
                 <div>
                   {
-                    this.state.addedFiles.map(function(item, index) {
+                    this.state.changedFiles.map(function(item, index) {
                       return (
                         <p
-                          key={item.path}
+                          key={index}
                           className={item.type == "tree" ? "text-primary" : "file-node-file"}
                           // onClick={this.handleChangedFileClick.bind(this, item)}>
                           >

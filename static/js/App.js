@@ -258,6 +258,7 @@ class App extends React.Component {
             <EditorPane
               app={this}
               tree={this.state.tree}
+              recursiveTree={this.state.recursiveTree}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened} />
             <RuntimePane

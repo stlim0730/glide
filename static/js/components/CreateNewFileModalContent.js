@@ -79,7 +79,7 @@ class CreateNewFileModalContent extends React.Component {
       url: url,
       method: 'GET',
       success: function(response) {
-        console.info(response);
+        // console.info('Template content loaded', response);
         if('error' in response) {
           // TODO
         }
@@ -99,7 +99,7 @@ class CreateNewFileModalContent extends React.Component {
             }),
             contentType: 'application/json; charset=utf-8',
             success: function(response) {
-              console.info(response);
+              // console.info('Keys in the template parsed', response);
               if('error' in response) {
                 // TODO
               }
@@ -181,6 +181,9 @@ class CreateNewFileModalContent extends React.Component {
     let fileName = this.state.fileName;
     
     // Duplicate check
+    // This block might have a bug:
+    //   returns true for files with the same name in different path
+    //   More tests required.
     let tree = this.state.tree;
     let exists = _.find(tree.tree, function(file) {
       return _.lowerCase(file.path) === _.lowerCase(path + fileName);
@@ -244,7 +247,7 @@ class CreateNewFileModalContent extends React.Component {
     // Update the states
     //   TODO: Should I do this only for files
     //   TODO: because an empty folder can't be pushed to GitHub anyway?
-    //   TODO: I'm Thinking...
+    //   TODO: I'm Thinking... More tests required.
     let addedFiles = app.state.addedFiles;
     addedFiles.push(newFile);
 
@@ -261,7 +264,8 @@ class CreateNewFileModalContent extends React.Component {
 
     //
     // Note:
-    //   Create blob on GitHub when the branch is pushed!
+    //   Blob is automatically created on GitHub
+    //   when the branch is pushed and tree has blob content.
     // 
 
     this._reset();
