@@ -10,13 +10,19 @@ class TabbedEditors extends React.Component {
     super(props);
 
     this.state = {
+      tree: null,
+      recursiveTree: null,
       filesOpened: [],
       fileActive: null,
       editors: {}
     };
 
     this._getEditorId = this._getEditorId.bind(this);
-    this._requestRender = this._requestRender.bind(this);
+    this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this._updateFileInRecursiveTree = this._updateFileInRecursiveTree.bind(this);
+    // this._getBlob = this._getBlob.bind(this);
+    this._prepareRenderingReq = this._prepareRenderingReq.bind(this);
+    this._requestRendering = this._requestRendering.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
@@ -26,28 +32,276 @@ class TabbedEditors extends React.Component {
     return fileObj.sha + suffix;
   }
 
-  _requestRender(data, fileName) {
+  _addFileToRecursiveTree(recursiveTree, newFile, folders) {
+    if(folders.length == 1) {
+      recursiveTree.nodes.push(newFile);
+    }
+    else {
+      let targetFolder = _.find(recursiveTree.nodes, {name: folders.shift(), type: 'tree'});
+      this._addFileToRecursiveTree(targetFolder, newFile, folders);
+    }
+  }
+
+  _updateFileInRecursiveTree(recursiveTree, targetFile, folders) {
+    console.info('_update', folders);
+    if(folders.length == 1) {
+      // Found the path
+      recursiveTree.nodes.push(targetFile);
+      let index = _.findIndex(recursiveTree.nodes, function(file) {
+        return file.path == targetFile.path;
+      });
+      recursiveTree.nodes[index] = targetFile;
+    }
+    else {
+      let targetFolder = _.find(recursiveTree.nodes, {name: folders.shift(), type: 'tree'});
+      this._updateFileInRecursiveTree(targetFolder, targetFile, folders);
+    }
+  }
+
+  // _getBlob(repository, file) {
+  //   let url = '/api/project/blob/' + repository.full_name + '/' + file.sha;
+  //   let app = this.props.app;
+
+  //   $.ajax({
+  //     url: url,
+  //     method: 'GET',
+  //     success: function(response) {
+  //       console.info('blob loaded', response);
+  //       if('error' in response) {
+  //         // TODO
+  //         return null;
+  //       }
+  //       else {
+  //         let content = atob(response.blob.content)
+  //         file.originalContent = content;
+  //         return content;
+  //       }
+  //     }
+  //   });
+
+  //   return null;
+  // }
+
+  _prepareRenderingReq(data, file) {
+    // 
+    // Returns data package
+    //   to make rendering request with
+    // 
+
+    let app = this.props.app;
+    let fileName = file.name;
+
+    // Build data to make rendering request with
+    //   - if the file is yaml, build a package with its template content.
+    if(fileName.endsWith('.yaml') || fileName.endsWith('.yml')) {
+      let templateFileRegex = /template\s*:\s*templates\/([a-z0-9\/\s\._-]+)\.(html|htm)/im;
+      if(templateFileRegex.test(data)) {
+        // Layout specified
+        let matchRes = templateFileRegex.exec(data);
+        // Note that the regex only returns the first match
+        let templateFileName = _.join(_.concat(matchRes[1], matchRes[2]), '.');
+        let templateFilePath = 'templates/' + templateFileName;
+        // Find the templateFile
+        let tree = this.state.tree.tree;
+        let templateFile = _.find(tree, ['path', templateFilePath]);
+        // Load template file content
+        let templateFileContent = null;
+        if(templateFile) {
+          // Layout file exists in the repository
+          if(templateFile.newContent) {
+            // The user has been modified the template file content
+            templateFileContent = templateFile.newContent;
+          }
+          else if(templateFile.originalContent) {
+            // The template file content exists in the repository
+            templateFileContent = templateFile.originalContent;
+          }
+          else {
+            // This must not happen: originalContent must exist
+            // templateFileContent = this._getBlob(app.state.repository, templateFile);
+          }
+
+          return {
+            data: data,
+            fileName: fileName,
+            templateFileContent: templateFileContent
+          };
+        }
+        else {
+          // Layout file doesn't exist
+          // TODO: Show the error in the debugger
+          return {
+            data: data,
+            fileName: fileName
+          };
+        }
+      }
+      else {
+        // TODO: Layout file not specified
+        return {
+          data: data,
+          fileName: fileName
+        };
+      }
+    }
+    else {
+      // TODO: The other file types
+      return {
+        data: data,
+        fileName: fileName
+      };
+    }
+  }
+
+  _requestRendering(data) {
+    if(!data) {
+      return;
+    }
+
     // POST Request rendering
     let url = '/api/project/render';
     let app = this.props.app;
+    let self = this;
+
     $.ajax({
       url: url,
       method: 'POST',
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
-      data: JSON.stringify({
-        data: data,
-        fileName: fileName
-      }),
+      data: JSON.stringify(data),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        // console.info(response);
         if('error' in response) {
-          //
+          // TODO: Remove the HTML file in tree and recursive tree if it exists
+          app.setState({
+            liveBugs: response.error,
+            liveYaml: null,
+            liveHtml: null
+          });
         }
         else {
+
+          let liveHtml = null;
+          let liveYaml = null;
+
+          // If the response has html structure
+          if('html' in response) {
+            liveHtml = response.html;
+            // TODO: Create an HTML file in tree and recursive tree
+            //   cf. CreateNewModalContent component
+
+            let htmlFileName = data.fileName.replace(/\.(yaml|yml)$/, '.html');
+
+            let tree = self.state.tree;
+            let recursiveTree = self.state.recursiveTree;
+            let filesOpened = self.state.filesOpened;
+            let addedFiles = app.state.addedFiles;
+            let changedFiles = app.state.changedFiles;
+
+            let htmlFile = _.find(tree.tree, function(file) {
+              return _.lowerCase(file.path) === _.lowerCase('docs/' + htmlFileName);
+            });
+
+            if(!htmlFile) {
+              // Create a new HTML file
+              htmlFile = {
+                name: htmlFileName,
+                nodes: [],
+                path: 'docs/' + htmlFileName,
+                added: true,
+                modified: false,
+                originalContent: '',
+                newContent: liveHtml,
+                sha: null,
+                size: liveHtml.length,
+                url: null,
+                type: 'blob',
+                mode: '100644'
+              };
+
+              // Push the file into tree
+              tree.tree.push(htmlFile);
+
+              // Push the file into recursiveTree
+              let folders = htmlFile.path.split('/');
+              self._addFileToRecursiveTree(recursiveTree, htmlFile, folders);
+              // console.info('see if tree has the new html file', recursiveTree);
+
+              // Push the file into addedFiles
+              addedFiles.push(htmlFile);
+            }
+            else {
+              // Update the existing HTML file
+              //   in tree and recursiveTree
+              htmlFile.newContent = liveHtml;
+              htmlFile.size = liveHtml.length;
+              htmlFile.modified = true;
+              
+              let treeIndex = _.findIndex(tree.tree, function(file) {
+                return file.path === htmlFile.path;
+              });
+              tree.tree[treeIndex] = htmlFile;
+              // Note: Seems that recursiveTree doesn't have to be manually updated
+              //   since it already has the reference to htmlFile.
+              // let folders = htmlFile.path.split('/');
+              // self._updateFileInRecursiveTree(recursiveTree, htmlFile, folders);
+              // console.info('see if tree has the updated html file', recursiveTree);
+              
+              // Push the file into changedFiles
+              if(htmlFile.originalContent != htmlFile.newContent) {
+                // This file has been modified.
+                //   CURRENTLY NOT USING file.modified = true;
+                if(!_.find(changedFiles, { path: htmlFile.path })) {
+                  changedFiles.push(htmlFile);
+                }
+              }
+              else {
+                changedFiles = _.remove(changedFiles, function(file) {
+                  return file.path != htmlFile.path;
+                });
+              }
+
+              // Update editor if the HTML file is opened
+              let htmlFileIndex = _.findIndex(filesOpened, function(file) {
+                return file.path == htmlFile.path;
+              });
+
+              if(htmlFileIndex >= 0) {
+                filesOpened[htmlFileIndex] = htmlFile;
+              }
+
+              // TODO: Refresh CodeMirror elements
+              // TODO
+              console.info($('#cm-' + htmlFile.path.replace('/', '--')));
+
+            }
+
+            // Update the states
+            self.setState({
+              recursiveTree: recursiveTree,
+              tree: tree,
+              filesOpened: filesOpened
+            }, function() {
+              app.setState({
+                recursiveTree: recursiveTree,
+                tree: tree,
+                addedFiles: addedFiles,
+                changedFiles: changedFiles,
+                filesOpened: filesOpened
+              });
+            });
+          }
+
+          // If the response has yaml structure
+          if('yaml' in response) {
+            liveYaml = response.yaml;
+          }
+
           app.setState({
-            liveHtml: response.html
+            liveHtml: liveHtml,
+            liveYaml: liveYaml,
+            liveBugs: []
           });
         }
       }
@@ -71,7 +325,8 @@ class TabbedEditors extends React.Component {
       else {
         content = file.originalContent;
       }
-      self._requestRender(content, file.name);
+      let data = self._prepareRenderingReq(content, file);
+      self._requestRendering(data);
     });
   }
 
@@ -103,11 +358,14 @@ class TabbedEditors extends React.Component {
       });
     }
 
-    this._requestRender(file.newContent, file.name);
+    let data = this._prepareRenderingReq(file.newContent, file);
+    this._requestRendering(data);
   }
 
   componentDidMount() {
     this.setState({
+      tree: this.props.tree,
+      recursiveTree: this.props.recursiveTree,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive
     });
@@ -122,11 +380,13 @@ class TabbedEditors extends React.Component {
     let prevFileActive = this.state.fileActive;
 
     this.setState({
+      tree: nextProps.tree,
+      recursiveTree: nextProps.recursiveTree,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
 
-      if(self.state.filesOpened == [] && self.state.fileActive == null) {
+      if(self.state.filesOpened.length==0 && self.state.fileActive == null) {
         $('#tabbed-editors-tabs').empty();
         $('#tabbed-editors-editors').empty();
       }
@@ -140,7 +400,8 @@ class TabbedEditors extends React.Component {
           content = fileActive.originalContent;
         }
         
-        self._requestRender(content, fileActive.name);
+        let data = self._prepareRenderingReq(content, fileActive);
+        self._requestRendering(data);
       }
       // $('.CodeMirror').each(function(i, el){
       //   el.CodeMirror.refresh();
@@ -205,21 +466,21 @@ class TabbedEditors extends React.Component {
       //   <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
       // );
 
-      let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
-      let options = {
-        lineNumbers: true
-      };
-      tabbedEditors.push(
-        // <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
-        <CodeMirror
-          key={item.path}
-          file={item}
-          value={item.newContent ? item.newContent : item.originalContent}
-          className={editorClassName}
-          autoFocus={true}
-          options={options}
-          onChange={this.handleEditorChange.bind(this, item)} />
-      );
+      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
+      // let options = {
+      //   lineNumbers: true
+      // };
+      // tabbedEditors.push(
+      //   // <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
+      //   <CodeMirror
+      //     key={item.path}
+      //     file={item}
+      //     value={item.newContent ? item.newContent : item.originalContent}
+      //     className={editorClassName}
+      //     autoFocus={true}
+      //     options={options}
+      //     onChange={this.handleEditorChange.bind(this, item)} />
+      // );
 
     }.bind(this))
 
@@ -229,7 +490,27 @@ class TabbedEditors extends React.Component {
           {tabs}
         </ul>
         <div className="tab-content height-95" id="tabbed-editors-editors">
-          {tabbedEditors}
+          {//tabbedEditors
+            this.state.filesOpened.map(function(item) {
+              let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
+              let options = {
+                lineNumbers: true
+              };
+              let idStr = 'cm-' + item.path.replace('/', '--');
+
+              return (
+                <CodeMirror
+                  id={idStr}
+                  key={item.path}
+                  file={item}
+                  value={item.newContent ? item.newContent : item.originalContent}
+                  className={editorClassName}
+                  autoFocus={true}
+                  options={options}
+                  onChange={this.handleEditorChange.bind(this, item)} />
+              );
+            }.bind(this))
+          }
         </div>
       </div>
     );

@@ -62,7 +62,9 @@ class App extends React.Component {
       fileActive: null,
       changedFiles: [],
       addedFiles: [],
-      liveHtml: null
+      liveYaml: null,
+      liveHtml: null,
+      liveBugs: []
     };
   }
 
@@ -81,7 +83,9 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
-        liveHtml: null
+        liveYaml: null,
+        liveHtml: null,
+        liveBugs: []
       });
     }
     else if(prevState.branch != this.state.branch) {
@@ -96,7 +100,9 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
-        liveHtml: null
+        liveYaml: null,
+        liveHtml: null,
+        liveBugs: []
       });
     }
     else if(this.state.commit && !this.state.commit.pushed && prevState.commit != this.state.commit) {
@@ -111,7 +117,9 @@ class App extends React.Component {
         fileActive: null,
         changedFiles: [],
         addedFiles: [],
-        liveHtml: null
+        liveYaml: null,
+        liveHtml: null,
+        liveBugs: []
       });
     }
   }
@@ -140,10 +148,11 @@ class App extends React.Component {
           modalContent={
             <CreateNewFileModalContent
               app={this}
+              repository={this.state.repository}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree} />
           }
-          large={false} />
+          large={true} />
         <Modal id="git-status-modal"
           modalContent={
             <GitStatusModalContent
@@ -248,11 +257,15 @@ class App extends React.Component {
               recursiveTree={this.state.recursiveTree} />
             <EditorPane
               app={this}
+              tree={this.state.tree}
+              recursiveTree={this.state.recursiveTree}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened} />
             <RuntimePane
               app={this}
-              liveHtml={this.state.liveHtml} />
+              liveYaml={this.state.liveYaml}
+              liveHtml={this.state.liveHtml}
+              liveBugs={this.state.liveBugs} />
           </div>
         );
 
@@ -273,3 +286,4 @@ class App extends React.Component {
 }
 
 ReactDOM.render(<App />, $('#content')[0]);
+$('[data-toggle="popover"]').popover();

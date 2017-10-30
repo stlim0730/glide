@@ -73,7 +73,7 @@ class NavBar extends React.Component {
         <form>
           <div className="container">
             <div className="navbar-header">
-              <a href="../" className="navbar-brand">Glide</a>
+              <a href="../" className="navbar-brand">GLIDE</a>
               <button className="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
                 <span className="icon-bar"></span>
                 <span className="icon-bar"></span>

@@ -58,3 +58,5 @@ ul.subtree {
   background-color: #f5f5f5;
 }
 div.CodeMirror.cm-s-default { height: 100%; }
+.red-bg { background-color: red; }
+.right-border { border-right: 1px solid #e5e5e5; }

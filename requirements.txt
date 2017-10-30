@@ -3,7 +3,7 @@ psycopg2
 asgi_redis
 channels
 daphne
-jinja2
+Jinja2
 django-webpack-loader
 djangorestframework
 markdown
