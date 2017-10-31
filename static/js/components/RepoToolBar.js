@@ -99,8 +99,3 @@ class RepoToolBar extends React.Component {
 }
 
 export default RepoToolBar
-
-// <small className="hidden">
-//   <span className="glyphicon glyphicon-cog" aria-hidden="true"></span> Configure project...&emsp;
-//   <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span> Open in a new window
-// </small>

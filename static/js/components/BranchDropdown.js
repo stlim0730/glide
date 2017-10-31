@@ -17,7 +17,7 @@ class BranchDropdown extends React.Component {
     this.handleBranchClick = this.handleBranchClick.bind(this);
   }
 
-  _ajaxBranches(repository) {
+  _ajaxBranches(repository, _nextBranch) {
     // GET project branches
     let url = '/api/project/branches/' + repository.full_name;
     let self = this;
@@ -33,14 +33,15 @@ class BranchDropdown extends React.Component {
         else {
           let branches = JSON.parse(response.branches);
           let masterBranch = _.find(branches, function(branch) { return branch.name == 'master'; });
+          let nextBranch = _nextBranch ? _nextBranch : masterBranch;
 
           self.setState({
             branches: branches,
-            branch: masterBranch
+            branch: nextBranch
           }, function() {
             app.setState({
               branches: branches,
-              branch: masterBranch,
+              branch: nextBranch,
               phase: app.state.constants.APP_PHASE_BRANCH_OPEN
             });
           });
@@ -76,8 +77,9 @@ class BranchDropdown extends React.Component {
       commit: nextProps.commit
     }, function() {
       if(!_.isEqual(prevBranch, nextProps.branch)) {
-        // A new branch is created
-        this._ajaxBranches(this.state.repository);
+        // This block is supposed to run
+        //   only when a new branch is created.
+        this._ajaxBranches(this.state.repository, nextProps.branch);
       }
     });
   }
