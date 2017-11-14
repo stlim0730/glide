@@ -54,7 +54,7 @@ class RepoControls extends React.Component {
               className="btn btn-sm btn-success"
               data-toggle="modal"
               data-target="#git-commit-push-modal"
-              disabled={this.state.changedFiles.length==0 && this.state.addedFiles.length==0}>
+              disabled={this.state.changedFiles==[] && this.state.addedFiles==[]}>
               Commit &amp; Push
             </button>&nbsp;
             <button
@@ -70,7 +70,7 @@ class RepoControls extends React.Component {
               className="btn btn-sm btn-danger"
               data-toggle="modal"
               data-target="#git-reset-modal"
-              disabled={this.state.commit.pushed || (this.state.changedFiles.length==0 && this.state.addedFiles.length==0)}>
+              disabled={this.state.commit.pushed || (this.state.changedFiles==[] && this.state.addedFiles==[])}>
               Reset
             </button>
           </div>

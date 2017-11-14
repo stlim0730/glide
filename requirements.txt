@@ -7,3 +7,4 @@ Jinja2
 django-webpack-loader
 djangorestframework
 markdown
+PyYaml
