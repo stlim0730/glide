@@ -134,4 +134,4 @@ class BranchDropdown extends React.Component {
   }
 }
 
-export default BranchDropdown
+export default BranchDropdown;

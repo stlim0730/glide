@@ -25,6 +25,7 @@ import CreateNewFileModalContent from './components/CreateNewFileModalContent.js
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepoListPane from './components/RepoListPane.js';
+import BranchPane from './components/BranchPane.js';
 import RepoToolBar from './components/RepoToolBar.js';
 import FileSideBar from './components/FileSideBar.js';
 import EditorPane from './components/EditorPane.js';
@@ -216,6 +217,18 @@ class App extends React.Component {
             <NavBar app={this} />
             {modals}
             <RepoListPane app={this} />
+          </div>
+        );
+
+      case this.state.constants.APP_PHASE_BRANCH_SELECTION:
+
+        return (
+          <div className="row full-height">
+            <NavBar app={this} />
+            {modals}
+            <BranchPane
+              app={this}
+              repository={this.state.repository} />
           </div>
         );
 

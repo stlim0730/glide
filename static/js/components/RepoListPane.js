@@ -1,5 +1,3 @@
-// import EditorToolBar from './EditorToolBar.js';
-
 // 
 // RepoListPane component
 // 
@@ -159,7 +157,8 @@ class RepoListPane extends React.Component {
           let repository = JSON.parse(response.repository);
           let app = self.props.app;
           app.setState({
-            phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
+            // phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
+            phase: app.state.constants.APP_PHASE_BRANCH_SELECTION,
             repository: repository,
             branches: [],
             branch: null,
@@ -323,4 +322,4 @@ class RepoListPane extends React.Component {
   }
 }
 
-export default RepoListPane
+export default RepoListPane;
