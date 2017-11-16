@@ -95,49 +95,41 @@ class BranchPane extends React.Component {
   }
 
   handleBranchClick(branch) {
+    // let branchDesc;
+    let repoFullName = this.state.repository.full_name;
+    let owner = repoFullName.split('/')[0];
+    let repo = repoFullName.split('/')[1];
+    let url = '/api/project/branch/' + owner + '/' + repo + '/' + branch.name;
+    let self = this;
 
-    let branchDesc;
-    
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        // console.info(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          let branch = response.branch;
+          let committer = branch.commit.committer || branch.commit.author;
+          let committerUrl = 'https://github.com/' + committer.login;
+          let date = branch.commit.commit.committer.date || branch.commit.commit.author.date;
+          let branchDesc = {
+            committer: committer.login,
+            committerUrl: committerUrl,
+            date: date
+          };
 
-    this.setState({
-      branch: branch,
-      branchDesc: branchDesc
-    }, function() {
-      // TODO
+          self.setState({
+            branch: branch,
+            branchDesc: branchDesc
+          }, function() {
+            // TODO
+          });
+        }
+      }
     });
-    // // GET repository url to clone from
-    // let owner = repository.owner.login;
-    // let repo = repository.name;
-    // let url = '/api/project/readme/' + owner + '/' + repo;
-    // let self = this;
-
-    // $.ajax({
-    //   url: url,
-    //   method: 'GET',
-    //   success: function(response) {
-    //     if('error' in response) {
-    //       if(response.error == 'HTTPError') {
-    //         self.setState({
-    //           repository: repository,
-    //           liveHtml: 'Can\'t find README.md in this repository.'
-    //         });
-    //       }
-    //       else if(response.error == 'decoding') {
-    //         self.setState({
-    //           repository: repository,
-    //           liveHtml: 'Can\'t decode README.md.'
-    //         });
-    //       }
-    //     }
-    //     else {
-    //       let readme = response.readme;
-    //       self.setState({
-    //         repository: repository,
-    //         liveHtml: readme
-    //       });
-    //     }
-    //   }
-    // });
   }
 
   handleCheckoutClick() {
@@ -198,7 +190,7 @@ class BranchPane extends React.Component {
     return (
       <div className="full-height">
         <div className="row">
-          <div className="col-lg-4 col-md-4 col-lg-offset-3 col-md-offset-3">
+          <div className="col-lg-3 col-md-3 col-lg-offset-3 col-md-offset-3">
 
             <label>Checkout a Branch or Create New</label>
             <button
@@ -215,7 +207,7 @@ class BranchPane extends React.Component {
                   type="radio" onClick={this.handleRadioClick.bind(this, 'existingBranch')}
                   name="branchSelMode" value="existingBranch"
                    />
-                Existing Branch
+                Existing Branches
 
                 <button
                   type="button" className="btn btn-sm btn-link"
@@ -257,11 +249,25 @@ class BranchPane extends React.Component {
 
           </div>
 
-          <div className="col-lg-2 col-md-2">
+          <div className="col-lg-3 col-md-3">
             {
               this.state.branchDesc &&
               <div>
-                &nbsp;
+                <br /><br /><br />
+                <p>
+                  <label>Latest committer</label>&emsp;
+                  <a
+                    target="_blank"
+                    href={this.state.branchDesc.committerUrl}>
+                    {this.state.branchDesc.committer}
+                  </a>
+                  <br />
+                </p>
+                <p>
+                  <label>Committed at</label>&emsp;
+                  {new Date(this.state.branchDesc.date).toLocaleTimeString()}&nbsp;
+                  on {new Date(this.state.branchDesc.date).toLocaleDateString()}
+                </p>
               </div>
             }
           </div>
