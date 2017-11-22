@@ -137,7 +137,8 @@ def branches(request, repositoryFullName):
   getBranchesUrl = getAuthUrl(getBranchesUrl)
   with urlopen(getBranchesUrl) as branchesRes:
     resStr = branchesRes.read().decode('utf-8')
-    return Response({ 'branches': resStr })
+    res = json.loads(resStr)
+    return Response({ 'branches': res })
 
 
 @api_view(['GET'])
@@ -152,7 +153,8 @@ def commits(request, owner, repo, branch):
   getCommitsUrl = getAuthUrl(getCommitsUrl)
   with urlopen(getCommitsUrl) as commitsRes:
     resStr = commitsRes.read().decode('utf-8')
-    return Response({ 'commits': resStr })
+    res = json.loads(resStr)
+    return Response({ 'commits': res })
 
 
 def _getLatestCommit(accessToken, repoUsername, projectSlug):
@@ -313,21 +315,34 @@ def clone(request):
     return Response({ 'repository': resStr })
 
 
-@api_view(['POST'])
-def branch(request):
+@api_view(['GET', 'POST'])
+def branch(request, owner=None, repo=None, branch=None):
   """
-  Create a reference on GitHub repo as a new branch
+  GETs a branch from GitHub
+  POSTs a reference on GitHub repo as a new branch
   """
-  accessToken = request.session['accessToken']
-  newBranchName = request.data['newBranch']
-  shaBranchFrom = request.data['branchFrom']
-  owner = request.data['owner']
-  repo = request.data['repo']
-  createRefRes = _createReference(accessToken, owner, repo, newBranchName, shaBranchFrom)
-  return Response({
-    'createRefRes': createRefRes
-    # 'code': createRefRes.getcode()
-  })
+  if request.method == 'GET':
+    accessToken = request.session['accessToken']
+    # owner = request.data['owner']
+    # repo = request.data['repo']
+    # branch = request.data['branch']
+    getBranchUrl = 'https://api.github.com/repos/{}/{}/branches/{}?access_token={}'
+    getBranchUrl = getBranchUrl.format(owner, repo, branch, accessToken)
+    getBranchUrl = getAuthUrl(getBranchUrl)
+    with urlopen(getBranchUrl) as branchRes:
+      resStr = branchRes.read().decode('utf-8')
+      return Response({ 'branch': json.loads(resStr) })
+  elif request.method == 'POST':
+    accessToken = request.session['accessToken']
+    newBranchName = request.data['newBranchName']
+    shaBranchFrom = request.data['shaBranchFrom']
+    owner = request.data['owner']
+    repo = request.data['repo']
+    createRefRes = _createReference(accessToken, owner, repo, newBranchName, shaBranchFrom)
+    return Response({
+      'createRefRes': createRefRes
+      # 'code': createRefRes.getcode()
+    })
 
 
 @api_view(['POST'])

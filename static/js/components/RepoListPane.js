@@ -1,5 +1,3 @@
-// import EditorToolBar from './EditorToolBar.js';
-
 // 
 // RepoListPane component
 // 
@@ -28,7 +26,7 @@ class RepoListPane extends React.Component {
       liveHtml: null
     });
   }
-
+  
   _ajaxRepositories() {
     // GET project branches
     let url = '/api/project/repositories';
@@ -150,7 +148,7 @@ class RepoListPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        // console.info(response);
         if('error' in response) {
           //
         }
@@ -159,7 +157,8 @@ class RepoListPane extends React.Component {
           let repository = JSON.parse(response.repository);
           let app = self.props.app;
           app.setState({
-            phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
+            // phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
+            phase: app.state.constants.APP_PHASE_BRANCH_SELECTION,
             repository: repository,
             branches: [],
             branch: null,
@@ -220,7 +219,8 @@ class RepoListPane extends React.Component {
                     <h4 className="list-group-item-heading">{item.full_name}</h4>
                     <p className="list-group-item-text text-right">
                       Owned by {item.owner.login}<br />
-                      Created at {new Date(item.created_at).toLocaleTimeString()} on {new Date(item.created_at).toLocaleDateString()}
+                      Created at {new Date(item.created_at).toLocaleTimeString()}&nbsp;
+                      on {new Date(item.created_at).toLocaleDateString()}
                     </p>
                   </button>
                 );
@@ -280,7 +280,8 @@ class RepoListPane extends React.Component {
                   Created At
                 </label>
                 <div className="col-lg-9">
-                  {new Date(this.state.repository.created_at).toLocaleTimeString()} on {new Date(this.state.repository.created_at).toLocaleDateString()}
+                  {new Date(this.state.repository.created_at).toLocaleTimeString()}&nbsp;
+                  on {new Date(this.state.repository.created_at).toLocaleDateString()}
                 </div>
               </div>
 
@@ -323,4 +324,4 @@ class RepoListPane extends React.Component {
   }
 }
 
-export default RepoListPane
+export default RepoListPane;

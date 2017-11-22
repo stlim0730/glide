@@ -179,7 +179,7 @@ class GitCommitPushModalContent extends React.Component {
                 // TODO
               }
               else {
-                let commits = JSON.parse(response.commits);
+                let commits = response.commits;
                 let newCommit = commits[0];
                 newCommit.pushed = true;
                 app.setState({

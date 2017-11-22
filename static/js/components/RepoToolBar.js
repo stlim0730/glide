@@ -72,19 +72,23 @@ class RepoToolBar extends React.Component {
             <span className="h3 text-muted">{this.state.repository.owner.login}/</span><span className="h3">{this.state.repository.name}</span>
           </div>
         </div>
-        <BranchDropdown
-          app={this.props.app}
-          repository={this.state.repository}
-          branches={this.state.branches}
-          branch={this.state.branch}
-          commits={this.state.commits}
-          commit={this.state.commit} />
-        <CommitDropdown
-          app={this.props.app}
-          repository={this.state.repository}
-          branch={this.state.branch}
-          commits={this.state.commits}
-          commit={this.state.commit} />
+        {
+          // <BranchDropdown
+          //   app={this.props.app}
+          //   repository={this.state.repository}
+          //   branches={this.state.branches}
+          //   branch={this.state.branch}
+          //   commits={this.state.commits}
+          //   commit={this.state.commit} />
+        }
+        {
+          // <CommitDropdown
+          //   app={this.props.app}
+          //   repository={this.state.repository}
+          //   branch={this.state.branch}
+          //   commits={this.state.commits}
+          //   commit={this.state.commit} />
+        }
         <RepoControls
           app={this.props.app}
           repository={this.state.repository}
@@ -98,9 +102,4 @@ class RepoToolBar extends React.Component {
   }
 }
 
-export default RepoToolBar
-
-// <small className="hidden">
-//   <span className="glyphicon glyphicon-cog" aria-hidden="true"></span> Configure project...&emsp;
-//   <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span> Open in a new window
-// </small>
+export default RepoToolBar;

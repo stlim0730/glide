@@ -49,6 +49,7 @@ INSTALLED_APPS = [
   'channels',
   'webpack_loader',
   'markdown',
+  'yaml',
   
   # Local apps
   'workspace',

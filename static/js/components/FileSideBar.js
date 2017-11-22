@@ -38,9 +38,11 @@ class FileSideBar extends React.Component {
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
     console.info('FileSideBar _ajaxTree', this.state);
-    let url = '/api/project/tree/' + repository.full_name + '/' + branch.name + '/' + commit.sha;
-    let self = this;
+    let url = '/api/project/tree/'
+      + repository.full_name + '/'
+      + branch.name + '/' + commit.sha;
     let app = this.props.app;
+    let self = this;
 
     $.ajax({
       url: url,
@@ -66,34 +68,33 @@ class FileSideBar extends React.Component {
   }
   
   componentDidMount() {
-    // console.info('FileSideBar CDM', this.state);
     let self = this;
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
       commit: this.props.commit
     }, function() {
+      // console.info('FileSideBar CDM', this.state);
       let repository = self.state.repository;
       let branch = self.state.branch;
       let commit = self.state.commit;
-      if(repository && branch && commit) {
+      // if(repository && branch && commit) {
         self._ajaxTree(
           self.state.repository,
           self.state.branch,
           self.state.commit
         );
-      }
+      // }
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    console.info('FileSideBar CWRP', this.state);
-    if(this.state.repository == nextProps.repository
-      && this.state.branch == nextProps.branch
-      && this.state.commit == nextProps.commit) {
-      // To avoid unnecessary _ajaxTree call
-      return;
-    }
+    // if(this.state.repository == nextProps.repository
+    //   && this.state.branch == nextProps.branch
+    //   && this.state.commit == nextProps.commit) {
+    //   // To avoid unnecessary _ajaxTree call
+    //   return;
+    // }
 
     // if(this.state.recursiveTree != nextProps.recursiveTree) {
     //   // No need to make _ajaxTree call:
@@ -113,11 +114,12 @@ class FileSideBar extends React.Component {
       branch: nextProps.branch,
       commit: nextProps.commit,
     }, function() {
-      self._ajaxTree(
-        self.state.repository,
-        self.state.branch,
-        self.state.commit
-      );
+      console.info('FileSideBar WRP', this.state, nextProps);
+      // self._ajaxTree(
+      //   self.state.repository,
+      //   self.state.branch,
+      //   self.state.commit
+      // );
     });
 
     // 
@@ -139,7 +141,7 @@ class FileSideBar extends React.Component {
   }
 
   render () {
-    console.info('FileSideBar', this.state);
+    // console.info('FileSideBar', this.state);
     return (
       <div className="col-lg-2 col-md-2 full-height">
         <div className="panel panel-default full-height">
@@ -160,4 +162,4 @@ class FileSideBar extends React.Component {
   }
 }
 
-export default FileSideBar
+export default FileSideBar;

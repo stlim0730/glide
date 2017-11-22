@@ -105,8 +105,8 @@ class CreateBranchModalContent extends React.Component {
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
       data: JSON.stringify({
-        newBranch: self.state.newBranch,
-        branchFrom: self.state.commit.sha,
+        newBranchName: self.state.newBranch,
+        shaBranchFrom: self.state.commit.sha,
         owner: owner,
         repo: repo
       }),
@@ -163,24 +163,24 @@ class CreateBranchModalContent extends React.Component {
                     onKeyUp={this.handleKeyUp} />
                 </div>
               </div>
-              <div className="form-group">
-                <div className="col-md-7 col-md-offset-3">
-                  <span className="text-primary">
-                    A branch name <a target="_blank" href="https://stackoverflow.com/questions/3651860/which-characters-are-illegal-within-a-branch-name"><strong>cannot</strong></a>:
-                  </span>
-                  {
-                    // <ul>
-                    //   <li>Have a <span className="text-danger">path component</span> that begins with "."</li>
-                    //   <li>Have a double dot <span className="text-danger">".."</span></li>
-                    //   <li>End with a <span className="text-danger">"/"</span></li>
-                    //   <li>End with <span className="text-danger">".lock"</span></li>
-                    //   <li>Contain an <span className="text-danger">ASCII control characters</span>, "~", "^", or ":"</li>
-                    //   <li>Contain a <span className="text-danger">"\"</span> (backslash)</li>
-                    //   <li>Contain <span className="text-danger">whitespace</span></li>
-                    // </ul>
-                  }
-                </div>
-              </div>
+              {
+                // <div className="form-group">
+                //   <div className="col-md-7 col-md-offset-3">
+                //     <span className="text-primary">
+                //       A branch name <a target="_blank" href="https://stackoverflow.com/questions/3651860/which-characters-are-illegal-within-a-branch-name"><strong>cannot</strong></a>:
+                //     </span>
+                //     <ul>
+                //       <li>Have a <span className="text-danger">path component</span> that begins with "."</li>
+                //       <li>Have a double dot <span className="text-danger">".."</span></li>
+                //       <li>End with a <span className="text-danger">"/"</span></li>
+                //       <li>End with <span className="text-danger">".lock"</span></li>
+                //       <li>Contain an <span className="text-danger">ASCII control characters</span>, "~", "^", or ":"</li>
+                //       <li>Contain a <span className="text-danger">"\"</span> (backslash)</li>
+                //       <li>Contain <span className="text-danger">whitespace</span></li>
+                //     </ul>
+                //   </div>
+                // </div>
+              }
             </fieldset>
           </div>
         </div>

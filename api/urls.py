@@ -7,6 +7,7 @@ urlpatterns = [
   url(r'^project/readme/(?P<owner>.+)/(?P<repo>.+)$', views.readme, name='readme'),
   url(r'^project/cdn/(?P<owner>.+)/(?P<repo>.+)$', views.cdn, name='cdn'),
   url(r'^project/clone$', views.clone, name='clone'),
+  url(r'^project/branch/(?P<owner>.+)/(?P<repo>.+)/(?P<branch>.+)$', views.branch, name='branch'),
   url(r'^project/branch$', views.branch, name='branch'),
   # url(r'^project/create$', views.createProject, name='createProject'),
   # url(r'^project/get/(?P<slug>.*)$', views.project, name='project'),
