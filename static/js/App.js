@@ -70,61 +70,61 @@ class App extends React.Component {
     };
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if(prevState.repository != this.state.repository) {
-      // When a new repository is opened,
-      //   the substructures should reset
-      // TODO: Check if the changedFiles is empty
-      // TODO: Check if the addedFiles is empty
-      this.setState({
-        branches: [],
-        branch: null,
-        commits: [],
-        commit: null,
-        filesOpened: [],
-        fileActive: null,
-        changedFiles: [],
-        addedFiles: [],
-        liveYaml: null,
-        liveHtml: null,
-        liveBugs: []
-      });
-    }
-    else if(prevState.branch != this.state.branch) {
-      // When shifted to another branch,
-      //   the substructures should reset
-      // TODO: Check if the changedFiles is empty
-      // TODO: Check if the addedFiles is empty
-      this.setState({
-        commits: [],
-        commit: null,
-        filesOpened: [],
-        fileActive: null,
-        changedFiles: [],
-        addedFiles: [],
-        liveYaml: null,
-        liveHtml: null,
-        liveBugs: []
-      });
-    }
-    else if(this.state.commit && !this.state.commit.pushed && prevState.commit != this.state.commit) {
-      // When checked out another commit,
-      //   the substructures should reset
-      // Commit & Push that forces to switch to the new commit
-      //   shouldn't fall in this conditional block
-      // TODO: Check if the changedFiles is empty
-      // TODO: Check if the addedFiles is empty
-      this.setState({
-        filesOpened: [],
-        fileActive: null,
-        changedFiles: [],
-        addedFiles: [],
-        liveYaml: null,
-        liveHtml: null,
-        liveBugs: []
-      });
-    }
-  }
+  // componentDidUpdate(prevProps, prevState) {
+    // if(prevState.repository != this.state.repository) {
+    //   // When a new repository is opened,
+    //   //   the substructures should reset
+    //   // TODO: Check if the changedFiles is empty
+    //   // TODO: Check if the addedFiles is empty
+    //   this.setState({
+    //     branches: [],
+    //     branch: null,
+    //     commits: [],
+    //     commit: null,
+    //     filesOpened: [],
+    //     fileActive: null,
+    //     changedFiles: [],
+    //     addedFiles: [],
+    //     liveYaml: null,
+    //     liveHtml: null,
+    //     liveBugs: []
+    //   });
+    // }
+    // else if(prevState.branch != this.state.branch) {
+    //   // When shifted to another branch,
+    //   //   the substructures should reset
+    //   // TODO: Check if the changedFiles is empty
+    //   // TODO: Check if the addedFiles is empty
+    //   this.setState({
+    //     commits: [],
+    //     commit: null,
+    //     filesOpened: [],
+    //     fileActive: null,
+    //     changedFiles: [],
+    //     addedFiles: [],
+    //     liveYaml: null,
+    //     liveHtml: null,
+    //     liveBugs: []
+    //   });
+    // }
+    // else if(this.state.commit && !this.state.commit.pushed && prevState.commit != this.state.commit) {
+    //   // When checked out another commit,
+    //   //   the substructures should reset
+    //   // Commit & Push that forces to switch to the new commit
+    //   //   shouldn't fall in this conditional block
+    //   // TODO: Check if the changedFiles is empty
+    //   // TODO: Check if the addedFiles is empty
+    //   this.setState({
+    //     filesOpened: [],
+    //     fileActive: null,
+    //     changedFiles: [],
+    //     addedFiles: [],
+    //     liveYaml: null,
+    //     liveHtml: null,
+    //     liveBugs: []
+    //   });
+    // }
+  // }
 
   render() {
     console.info('App', this.state);
@@ -229,7 +229,9 @@ class App extends React.Component {
             {modals}
             <BranchPane
               app={this}
-              repository={this.state.repository} />
+              repository={this.state.repository}
+              branches={this.state.branches}
+              branch={this.state.branch} />
           </div>
         );
 
@@ -250,6 +252,7 @@ class App extends React.Component {
       //   );
 
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
+        
         return (
           <div className="row full-height">
             <NavBar app={this} />
@@ -267,8 +270,7 @@ class App extends React.Component {
               app={this}
               repository={this.state.repository}
               branch={this.state.branch}
-              commit={this.state.commit}
-              recursiveTree={this.state.recursiveTree} />
+              commit={this.state.commit} />
             <EditorPane
               app={this}
               tree={this.state.tree}

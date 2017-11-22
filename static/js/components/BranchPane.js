@@ -125,6 +125,8 @@ class BranchPane extends React.Component {
         else {
           // Set the current branches, branch, commits, and commit
           //   as specified
+          let commits = response.commits;
+          let latestCommit = commits[0];
           let branches = self.state.branches;
           let isExisting = _.find(branches, function(b) {
             return b.name == branch.name;
@@ -132,12 +134,18 @@ class BranchPane extends React.Component {
           if(!isExisting) {
             branches.push(branch);
           }
+
           app.setState({
+            phase: app.state.constants.APP_PHASE_COMMIT_OPEN,
             branches: branches,
             branch: branch,
-            commits: response.commits,
-            commit: response.commits[0],
-            phase: app.state.constants.APP_PHASE_COMMIT_OPEN
+            commits: commits,
+            commit: latestCommit
+          }, function() {
+            // console.info(app.state, commits, latestCommit);
+            // app.setState({
+            //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
+            // });
           });
         }
       }
@@ -281,7 +289,7 @@ class BranchPane extends React.Component {
                 url: url
               }
             };
-            // self._ajaxBranches();
+                        
             self._openCommit(newBranch);
           }
         }
@@ -289,16 +297,20 @@ class BranchPane extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentDidMount() {
     let self = this;
 
     this.setState({
-      repository: nextProps.repository,
+      repository: this.props.repository,
       branches: [],
       branch: null
     }, function() {
       self._ajaxBranches();
     });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    //
   }
 
   render () {
