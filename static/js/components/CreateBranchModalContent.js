@@ -105,8 +105,8 @@ class CreateBranchModalContent extends React.Component {
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
       data: JSON.stringify({
-        newBranch: self.state.newBranch,
-        branchFrom: self.state.commit.sha,
+        newBranchName: self.state.newBranch,
+        shaBranchFrom: self.state.commit.sha,
         owner: owner,
         repo: repo
       }),

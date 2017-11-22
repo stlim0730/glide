@@ -12,8 +12,6 @@ class RepoControls extends React.Component {
       changedFiles: [],
       addedFiles: []
     };
-
-    // this._ajaxCommits = this._ajaxCommits.bind(this);
   }
 
   componentDidMount() {
@@ -80,4 +78,4 @@ class RepoControls extends React.Component {
   }
 }
 
-export default RepoControls
+export default RepoControls;

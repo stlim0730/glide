@@ -38,9 +38,11 @@ class FileSideBar extends React.Component {
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
     console.info('FileSideBar _ajaxTree', this.state);
-    let url = '/api/project/tree/' + repository.full_name + '/' + branch.name + '/' + commit.sha;
-    let self = this;
+    let url = '/api/project/tree/'
+      + repository.full_name + '/'
+      + branch.name + '/' + commit.sha;
     let app = this.props.app;
+    let self = this;
 
     $.ajax({
       url: url,
@@ -139,7 +141,7 @@ class FileSideBar extends React.Component {
   }
 
   render () {
-    console.info('FileSideBar', this.state);
+    // console.info('FileSideBar', this.state);
     return (
       <div className="col-lg-2 col-md-2 full-height">
         <div className="panel panel-default full-height">
@@ -160,4 +162,4 @@ class FileSideBar extends React.Component {
   }
 }
 
-export default FileSideBar
+export default FileSideBar;

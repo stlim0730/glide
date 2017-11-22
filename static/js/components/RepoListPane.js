@@ -26,7 +26,7 @@ class RepoListPane extends React.Component {
       liveHtml: null
     });
   }
-
+  
   _ajaxRepositories() {
     // GET project branches
     let url = '/api/project/repositories';

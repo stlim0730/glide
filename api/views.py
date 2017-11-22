@@ -137,7 +137,8 @@ def branches(request, repositoryFullName):
   getBranchesUrl = getAuthUrl(getBranchesUrl)
   with urlopen(getBranchesUrl) as branchesRes:
     resStr = branchesRes.read().decode('utf-8')
-    return Response({ 'branches': resStr })
+    res = json.loads(resStr)
+    return Response({ 'branches': res })
 
 
 @api_view(['GET'])
@@ -152,7 +153,8 @@ def commits(request, owner, repo, branch):
   getCommitsUrl = getAuthUrl(getCommitsUrl)
   with urlopen(getCommitsUrl) as commitsRes:
     resStr = commitsRes.read().decode('utf-8')
-    return Response({ 'commits': resStr })
+    res = json.loads(resStr)
+    return Response({ 'commits': res })
 
 
 def _getLatestCommit(accessToken, repoUsername, projectSlug):
@@ -332,8 +334,8 @@ def branch(request, owner=None, repo=None, branch=None):
       return Response({ 'branch': json.loads(resStr) })
   elif request.method == 'POST':
     accessToken = request.session['accessToken']
-    newBranchName = request.data['newBranch']
-    shaBranchFrom = request.data['branchFrom']
+    newBranchName = request.data['newBranchName']
+    shaBranchFrom = request.data['shaBranchFrom']
     owner = request.data['owner']
     repo = request.data['repo']
     createRefRes = _createReference(accessToken, owner, repo, newBranchName, shaBranchFrom)

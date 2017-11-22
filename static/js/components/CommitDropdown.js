@@ -30,7 +30,7 @@ class CommitDropdown extends React.Component {
           // TODO
         }
         else {
-          let commits = JSON.parse(response.commits);
+          let commits = response.commits;
           self.setState({
             commits: commits,
             commit: commits[0]

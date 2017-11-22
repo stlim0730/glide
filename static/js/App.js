@@ -44,6 +44,7 @@ class App extends React.Component {
       constants: {
         APP_PHASE_CLEAN_SLATE: 'clean_slate',
         APP_PHASE_REPOSITORY_SELECTION: 'repository_selection',
+        APP_PHASE_BRANCH_SELECTION: 'branch_selection',
         APP_PHASE_REPOSITORY_OPEN: 'repository_open',
         APP_PHASE_BRANCH_OPEN: 'branch_open',
         APP_PHASE_COMMIT_OPEN: 'commit_open',
@@ -232,21 +233,21 @@ class App extends React.Component {
           </div>
         );
 
-      case this.state.constants.APP_PHASE_REPOSITORY_OPEN:
-      case this.state.constants.APP_PHASE_BRANCH_OPEN:
-        return (
-          <div className="row full-height">
-            <NavBar app={this} />
-            {modals}
-            <RepoToolBar
-              app={this}
-              repository={this.state.repository}
-              branches={this.state.branches}
-              branch={this.state.branch}
-              commits={this.state.commits}
-              commit={this.state.commit} />
-          </div>
-        );
+      // case this.state.constants.APP_PHASE_REPOSITORY_OPEN:
+      // case this.state.constants.APP_PHASE_BRANCH_OPEN:
+      //   return (
+      //     <div className="row full-height">
+      //       <NavBar app={this} />
+      //       {modals}
+      //       <RepoToolBar
+      //         app={this}
+      //         repository={this.state.repository}
+      //         branches={this.state.branches}
+      //         branch={this.state.branch}
+      //         commits={this.state.commits}
+      //         commit={this.state.commit} />
+      //     </div>
+      //   );
 
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         return (
