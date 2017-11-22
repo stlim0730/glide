@@ -39,7 +39,8 @@ module.exports = {
       ReactDOM: 'react-dom',
       $: 'jquery',
       jQuery: 'jquery',
-      _: 'lodash'
+      _: 'lodash',
+      Popper: 'popper.js'
     }),
     new BundleTracker({
       filename: './webpack-stats.json'
