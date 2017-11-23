@@ -214,7 +214,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_REPOSITORY_SELECTION:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
             <RepoListPane app={this} />

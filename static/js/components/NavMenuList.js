@@ -10,23 +10,22 @@ class NavMenuList extends React.Component {
   }
 
   render () {
-    let children = this.props.children.map(function(menuListItem, index) {
-      return <NavMenuListItem key={'menuListItem_' + index} label={menuListItem.label} dataTarget={menuListItem.targetModal} disabled={menuListItem.disabled} />;
+    let children = this.props.children.map(function(item, index) {
+      return <NavMenuListItem key={index} label={item.label} dataTarget={item.targetModal} disabled={item.disabled} />;
     });
 
     return (
-      <li className="dropdown">
-        <a className="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+      <li className="nav-item dropdown">
+        <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           {this.props.label} <span className="caret"></span>
         </a>
-        
-        <ul className="dropdown-menu">
-          {children}
-        </ul>
 
+        <div className="dropdown-menu">
+          {children}
+        </div>
       </li>
     );
   }
 }
 
-export default NavMenuList
+export default NavMenuList;

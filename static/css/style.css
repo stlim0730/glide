@@ -1,5 +1,5 @@
 html,body{ height:100%; overflow: hidden; }
-body { padding-top: 70px; padding-bottom: 21px;}
+/*body { padding-top: 70px; padding-bottom: 21px;}*/
 *:focus { outline: none !important; }  /* To disable web browser's highlight box */
 @media screen and (max-width: 768px) {
   html,body{ height:100%; overflow: auto; }
@@ -17,9 +17,9 @@ body { padding-top: 70px; padding-bottom: 21px;}
 div.panel + div.panel {
   margin-top: -15px;
 }
-.navbar button.btn-sm {
+/*.navbar button.btn-sm {
   margin-top: 10px;
-}
+}*/
 .block { display: block; }
 .inline-block { display: inline-block; }
 .margin-top-15 { margin-top: 15px; }

@@ -69,30 +69,40 @@ class NavBar extends React.Component {
     });
 
     return (
-      <div className="navbar navbar-inverse navbar-fixed-top">
-        <form>
-          <div className="container">
-            <div className="navbar-header">
-              <a href="../" className="navbar-brand">GLIDE</a>
-              <button className="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-              </button>
-            </div>
-  
-            <div className="navbar-collapse collapse" id="navbar-main">
-              <ul className="nav navbar-nav">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div className="container">
+          
+          <a className="navbar-brand" href="../">GLIDE</a>
+          <button className="navbar-toggler"
+            type="button" data-toggle="collapse"
+            data-target="#nav-menus">
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
-                { menu }
-                
-              </ul>
-            </div>
+          <div className="collapse navbar-collapse" id="nav-menus">
+            
+            <ul className="navbar-nav mr-auto">
+              {menu}
+            </ul>
+
+            <form className="form-inline my-2 my-lg-0">
+              <input
+                className="form-control mr-sm-2"
+                type="search"
+                placeholder="Search" />
+              <button
+                className="btn btn-secondary my-2 my-sm-0"
+                type="submit">
+                Search
+              </button>
+            </form>
+
           </div>
-        </form>
-      </div>
+
+        </div>
+      </nav>
     );
   }
 }
 
-export default NavBar
+export default NavBar;
