@@ -2,6 +2,7 @@
 // Load CSS
 // 
 import bootstrap_style from '../css/bootstrap/bootstrap.css';
+import icon_style from '../css/icon/icon.min.css';
 import custom_style from '../css/style.css';
 
 //
@@ -24,7 +25,7 @@ import GitResetModalContent from './components/GitResetModalContent.js';
 import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
-import RepoListPane from './components/RepoListPane.js';
+import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import RepoToolBar from './components/RepoToolBar.js';
 import FileSideBar from './components/FileSideBar.js';
@@ -217,7 +218,7 @@ class App extends React.Component {
           <div>
             <NavBar app={this} />
             {modals}
-            <RepoListPane app={this} />
+            <RepositoryPane app={this} />
           </div>
         );
 
