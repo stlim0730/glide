@@ -70,3 +70,4 @@ ul.subtree {
 div.CodeMirror.cm-s-default { height: 100%; }
 .red-bg { background-color: red; } /* for debugging */
 .right-border { border-right: 1px solid #e5e5e5; }
+button[type="button"] { cursor: pointer; }

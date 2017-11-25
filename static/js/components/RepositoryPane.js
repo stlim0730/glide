@@ -243,6 +243,7 @@ class RepositoryPane extends React.Component {
           <div className="col-lg-7 col-md-7">
             {
               this.state.repository &&
+              <div>
               <p className="h2">
                 <span className="text-muted">Repository Name</span>&emsp;
                 <a
@@ -250,23 +251,28 @@ class RepositoryPane extends React.Component {
                   href={this.state.repository.html_url}>
                   {this.state.repository.name}
                 </a>
-                <br />
+              </p>
+              <p className="h2">
                 <span className="text-muted">Owner</span>&emsp;
                 <a
                   target="_blank"
                   href={this.state.repository.owner.html_url}>
                   {this.state.repository.owner.login}
                 </a>
-                <br />
-                <span className="text-muted">Created At</span>&emsp;
-                {
-                  new Date(this.state.repository.created_at).toLocaleTimeString()
-                }
-                <span className="text-muted">&nbsp;On&nbsp;</span>
-                {
-                  new Date(this.state.repository.created_at).toLocaleDateString()
-                }
               </p>
+              <p className="h2">
+                <span className="text-muted">Created At</span>&emsp;
+                <small>
+                  {
+                    new Date(this.state.repository.created_at).toLocaleTimeString()
+                  }
+                  <span className="text-muted">&nbsp;On&nbsp;</span>
+                  {
+                    new Date(this.state.repository.created_at).toLocaleDateString()
+                  }
+                </small>
+              </p>
+              </div>
             }
 
             {
@@ -281,13 +287,13 @@ class RepositoryPane extends React.Component {
                 </div>                
               </div>
             }
-
+            
             {
               this.state.repository &&
               <div className="margin-top-20">
                 <button
-                  onClick={this.handleCloneClick.bind(this)}
-                  className="btn btn-success btn-lg btn-block">
+                  type="button" className="btn btn-success btn-lg btn-block"
+                  onClick={this.handleCloneClick.bind(this)}>
                   Clone {this.state.repository.name}
                 </button>
                 <a
