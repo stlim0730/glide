@@ -3,7 +3,7 @@ html,body{ height:100%; overflow: hidden; }
 /**:focus { outline: none !important; }*/  /* To disable web browser's highlight box */
 @media screen and (max-width: 768px) {
   html,body{ height:100%; overflow: auto; }
-  body { padding-top: 0px; }
+  /*body { padding-top: 0px; }*/
 }
 .full-height { height: 98.3%; }
 .height-95 { height: 95%; }
@@ -13,6 +13,7 @@ html,body{ height:100%; overflow: hidden; }
 .height-200 { height: 200px; }
 .height-400 { height: 400px; }
 .height-600 { height: 600px; }
+.max-height-200 { max-height: 200px; }
 .max-height-400 { max-height: 400px; }
 .max-height-40 { max-height: 40%; }
 .max-height-50 { max-height: 50%; }
@@ -31,7 +32,8 @@ div.h1 { padding-top: 30px; }
 .inline-block { display: inline-block; }
 .padding-top-20 { padding-top: 20px; }
 .margin-top-15 { margin-top: 15px; }
-.margin-top-20 {margin-top: 20px; }
+.margin-top-20 { margin-top: 20px; }
+.margin-top-50 { margin-top: 50px; }
 .margin-bottom-15 { margin-bottom: 15px; }
 .page-thumbnail-wrapper {
   margin-bottom: 10px;
@@ -71,3 +73,15 @@ div.CodeMirror.cm-s-default { height: 100%; }
 .red-bg { background-color: red; } /* for debugging */
 .right-border { border-right: 1px solid #e5e5e5; }
 button[type="button"] { cursor: pointer; }
+.phase-previous {
+  position: relative;
+  top: -50px;
+  left: -200px;
+}
+@media screen and (max-width: 768px) {
+  .phase-previous {
+    position: relative;
+    top: -130px;
+    left: -12px;
+  }
+}

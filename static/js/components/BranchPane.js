@@ -18,6 +18,7 @@ class BranchPane extends React.Component {
     this._reset = this._reset.bind(this);
     this._ajaxBranches = this._ajaxBranches.bind(this);
     this._validateBranchName = this._validateBranchName.bind(this);
+    this.handlePreviousClick = this.handlePreviousClick.bind(this);
     this.handleRefreshClick = this.handleRefreshClick.bind(this);
     this.handleRadioClick = this.handleRadioClick.bind(this);
     this.handleBranchClick = this.handleBranchClick.bind(this);
@@ -152,9 +153,16 @@ class BranchPane extends React.Component {
     });
   }
 
+  handlePreviousClick() {
+    this._reset();
+    let app = this.props.app;
+    app.setState({
+      phase: app.state.constants.APP_PHASE_REPOSITORY_SELECTION
+    });
+  }
+
   handleRefreshClick() {
     let self = this;
-
     this.setState({
       branches: [],
       branch: null
@@ -302,56 +310,86 @@ class BranchPane extends React.Component {
 
     this.setState({
       repository: this.props.repository,
-      branches: [],
-      branch: null
+      // branches: this.props.branches,
+      // branch: this.props.branch
     }, function() {
       self._ajaxBranches();
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    //
+    console.info('BranchPane WRP');
   }
 
   render () {
     return (
-      <div className="full-height">
-        <div className="row">
-          <div className="col-lg-3 col-md-3 col-lg-offset-3 col-md-offset-3">
+      <div className="container">
 
-            <label>Checkout a Branch or Create New</label>
+        <div className="row">
+          <div className="col">
+            <div className="h1">
+              Checkout a Branch
+              <button
+                type="button" className="btn btn-lg btn-link" data-placement="bottom"
+                title="" data-container="body" data-toggle="popover"
+                data-original-title="Branch?"
+                data-content="TBD">
+                <i className="info circle icon"></i>
+              </button>
+            </div>
             <button
-              type="button" className="btn btn-sm btn-link"
-              data-container="body" data-toggle="popover"
-              data-placement="bottom" data-original-title="" title=""
-              data-content="TBD">
-              <span className="glyphicon glyphicon-info-sign"></span>
+              type="button" onClick={this.handlePreviousClick.bind(this)}
+              className="btn btn-secondary btn-sm phase-previous">
+              <i className="chevron left icon"></i> Repository Selection
             </button>
+          </div>
+        </div>
+
+        <div className="row">
+
+          <div className="col-lg-3 col-md-3">
+
+            {
+              this.state.repository &&
+              <h2>
+                Branches in&nbsp;
+                <a
+                  target="_blank"
+                  href={this.state.repository.html_url}>
+                  {this.state.repository.name}
+                </a>
+              </h2>
+              
+            }
 
             <div className="radio">
-              <label onFocus={this.handleLabelFocus.bind(this, 'existingBranch')}>
+              <label className="h4 text-muted"
+                onFocus={this.handleLabelFocus.bind(this, 'existingBranch')}>
                 <input
                   type="radio" onClick={this.handleRadioClick.bind(this, 'existingBranch')}
-                  name="branchSelMode" value="existingBranch"
-                   />
+                  name="branchSelMode" value="existingBranch" />&nbsp;
                 Existing Branches
 
                 <button
-                  type="button" className="btn btn-sm btn-link"
-                  onClick={this.handleRefreshClick}>
-                  <span className="glyphicon glyphicon-refresh"></span> Refresh
+                  type="button" className="btn btn-link"
+                  onClick={this.handleRefreshClick.bind(this)}>
+                  <i className="refresh icon"></i> Refresh
                 </button>
 
-                <div className="max-height-90 auto-scroll list-group">
+                <div className="list-group max-height-200 auto-scroll margin-top-15">
                   {
                     this.state.branches.map(function(item, index) {
+                      let className = this.state.branch && this.state.branch.name==item.name
+                        ? 'list-group-item active'
+                        : 'list-group-item';
                       return (
-                        <button
-                          key={index} type="button"
-                          className={this.state.branch && this.state.branch.name==item.name ? "list-group-item active" : "list-group-item"}
+                        <a
+                          key={index} href="#" className={className}
                           onClick={this.handleBranchClick.bind(this, item)}>
-                          <h4 className="list-group-item-heading">{item.name}</h4>
-                        </button>
+                          <h5 className="list-group-item-heading">
+                            {item.name}
+                          </h5>
+                        </a>
                       );
                     }.bind(this))
                   }
@@ -359,67 +397,87 @@ class BranchPane extends React.Component {
               </label>
             </div>
 
-            <div className="radio">
-              <label onFocus={this.handleLabelFocus.bind(this, 'newBranch')}>
+            <div className="radio margin-top-20">
+              <label className="h4 text-muted"
+                onFocus={this.handleLabelFocus.bind(this, 'newBranch')}>
                 <input
                   type="radio" onClick={this.handleRadioClick.bind(this, 'newBranch')}
-                  name="branchSelMode" value="newBranch" />
+                  name="branchSelMode" value="newBranch" />&nbsp;
                 Create a New Branch
                 <div className="form-group">
                   <input
-                    type="text" className="form-control"
+                    type="text"
+                    className="form-control form-control-lg margin-top-15"
                     placeholder="Be concise and descriptive"
                     onKeyUp={this.handleBranchNameKeyUp} />
-                  <p className="text-danger">
+                  <p className="text-danger margin-top-15">
                     {this.state.branchNameErrMsg}
                   </p>
                 </div>
+                {
+                  this.state.branchSelMode=='newBranch' &&
+                  this.state.newBranchName &&
+                  <div className="margin-top-15">
+                    <button
+                      onClick={this.handleCheckoutClick.bind(this)}
+                      className="btn btn-success btn-lg btn-block">
+                      Create Branch
+                    </button>
+                  </div>
+                }
               </label>
             </div>
 
           </div>
 
-          <div className="col-lg-3 col-md-3">
+          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1 margin-top-50">
             {
-              this.state.branchDesc &&
+              this.state.branch &&
               <div>
-                <br /><br /><br />
-                <p>
-                  <label>Latest committer</label>&emsp;
+                <p className="h3">
+                  <span className="text-muted">Latest committer</span>&emsp;
                   <a
                     target="_blank"
                     href={this.state.branchDesc.committerUrl}>
                     {this.state.branchDesc.committer}
                   </a>
-                  <br />
                 </p>
-                <p>
-                  <label>Committed at</label>&emsp;
-                  {new Date(this.state.branchDesc.date).toLocaleTimeString()}&nbsp;
-                  on {new Date(this.state.branchDesc.date).toLocaleDateString()}
+                <p className="h3">
+                  <span className="text-muted">Committed At</span>&emsp;
+                  <small>
+                    {
+                      new Date(this.state.branchDesc.date).toLocaleTimeString()
+                    }
+                    <span className="text-muted">&nbsp;On&nbsp;</span>
+                    {
+                      new Date(this.state.branchDesc.date).toLocaleDateString()
+                    }
+                  </small>
                 </p>
               </div>
             }
+            
+            {
+              this.state.branchSelMode=='existingBranch' &&
+              this.state.branch &&
+              <div className="margin-top-20">
+                <button
+                  onClick={this.handleCheckoutClick.bind(this)}
+                  className="btn btn-success btn-lg btn-block">
+                  Checkout Branch
+                </button>
+
+                <a
+                  target="_blank" href={this.state.branch._links.html}
+                  className="btn btn-outline-success btn-sm btn-block">
+                  <i className="external icon"></i>&nbsp;
+                  Open Branch on GitHub
+                </a>
+              </div>
+            }
+
           </div>
 
-        </div>
-
-        <div className="row">
-          <div className="col-lg-6 col-md-6 col-lg-offset-3 col-md-offset-3">
-            <button
-              onClick={this.handleCheckoutClick.bind(this)}
-              className="btn btn-primary btn-block"
-              disabled={
-                (this.state.branchSelMode=='existingBranch'
-                  && !this.state.branch)
-                || (this.state.branchSelMode=='newBranch'
-                  && !this.state.newBranchName)
-              }>
-              {
-                this.state.branchSelMode=='newBranch' ? 'Create Branch' : 'Checkout Branch'
-              }
-            </button>
-          </div>
         </div>
 
       </div>

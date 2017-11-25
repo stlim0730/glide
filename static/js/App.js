@@ -206,7 +206,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_CLEAN_SLATE:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
           </div>
@@ -225,7 +225,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_BRANCH_SELECTION:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
             <BranchPane
@@ -255,7 +255,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
             <RepoToolBar
