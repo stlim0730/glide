@@ -28,7 +28,7 @@ class DebuggerPane extends React.Component {
   render () {
     return (
       <div className="card no-padding height-40">
-        <h5 className="card-header">Debugger</h5>
+        <h6 className="card-header">Debugger</h6>
         <div className="auto-scroll full-height">
           <table className="table table-striped table-hover ">
             <thead>

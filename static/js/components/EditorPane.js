@@ -33,7 +33,7 @@ class EditorPane extends React.Component {
       <div className="col-lg-5 col-md-5 no-padding full-height">
 
         <div className="card full-height">
-          <h5 className="card-header">Editor</h5>
+          <h6 className="card-header">Editor</h6>
           <TabbedEditors
             app={this.props.app}
             tree={this.props.tree}

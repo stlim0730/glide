@@ -147,7 +147,7 @@ class FileSideBar extends React.Component {
 
 
         <div className="card full-height">
-          <h5 className="card-header">Files</h5>
+          <h6 className="card-header">Files</h6>
           {
             this.state.recursiveTree &&
             <div className="auto-scroll height-90 panel-body">

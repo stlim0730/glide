@@ -25,7 +25,7 @@ class RendererPane extends React.Component {
   render () {
     return (
       <div className="height-60 card">
-        <h5 className="card-header">Preview</h5>
+        <h6 className="card-header">Preview</h6>
         <iframe
           className="auto-scroll height-90 panel-body"
           srcDoc={this.state.liveHtml}

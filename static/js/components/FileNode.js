@@ -151,7 +151,7 @@ class FileNode extends React.Component {
                     className="btn btn-link file-node-folder block"
                     data-toggle="collapse"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
-                    {item.name}
+                    <i className="folder icon"></i> {item.name}
                   </button>
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="collapse subtree">
@@ -171,8 +171,12 @@ class FileNode extends React.Component {
                   key={index}
                   className="btn btn-link file-node-file block"
                   onClick={this.handleFileClick.bind(this, item)}>
-                  {item.name} {item.modified && !item.added && <span className="glyphicon glyphicon-asterisk
-                  "></span>}
+                  <i className="file text outline icon"></i> {item.name}
+                  {
+                    item.modified &&
+                    !item.added &&
+                    <span className="glyphicon glyphicon-asterisk"></span>
+                  }
                 </button>
               );
             }
@@ -183,11 +187,11 @@ class FileNode extends React.Component {
           onClick={this.handleCreateNewFileClick.bind(this)}
           data-toggle="modal"
           data-target="#create-new-file-modal">
-          <span className="glyphicon glyphicon-plus"></span> Create New...
+          <i className="add square icon"></i> Create New...
         </button>
       </div>
     );
   }
 }
 
-export default FileNode
+export default FileNode;
