@@ -27,10 +27,8 @@ import CreateNewFileModalContent from './components/CreateNewFileModalContent.js
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
+import WorkspacePane from './components/WorkspacePane.js';
 import RepoToolBar from './components/RepoToolBar.js';
-import FileSideBar from './components/FileSideBar.js';
-import EditorPane from './components/EditorPane.js';
-import RuntimePane from './components/RuntimePane.js';
 
 // 
 // App component
@@ -255,31 +253,29 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         
         return (
-          <div>
+          <div className="full-height">
             <NavBar app={this} />
             {modals}
-            <RepoToolBar
+            {
+              // <RepoToolBar
+              //   app={this}
+              //   repository={this.state.repository}
+              //   branches={this.state.branches}
+              //   branch={this.state.branch}
+              //   commits={this.state.commits}
+              //   commit={this.state.commit}
+              //   changedFiles={this.state.changedFiles}
+              //   addedFiles={this.state.addedFiles} />
+            }
+            <WorkspacePane
               app={this}
               repository={this.state.repository}
-              branches={this.state.branches}
               branch={this.state.branch}
-              commits={this.state.commits}
               commit={this.state.commit}
-              changedFiles={this.state.changedFiles}
-              addedFiles={this.state.addedFiles} />
-            <FileSideBar
-              app={this}
-              repository={this.state.repository}
-              branch={this.state.branch}
-              commit={this.state.commit} />
-            <EditorPane
-              app={this}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
               fileActive={this.state.fileActive}
-              filesOpened={this.state.filesOpened} />
-            <RuntimePane
-              app={this}
+              filesOpened={this.state.filesOpened}
               liveYaml={this.state.liveYaml}
               liveHtml={this.state.liveHtml}
               liveBugs={this.state.liveBugs} />

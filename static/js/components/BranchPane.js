@@ -20,6 +20,7 @@ class BranchPane extends React.Component {
     this._validateBranchName = this._validateBranchName.bind(this);
     this.handlePreviousClick = this.handlePreviousClick.bind(this);
     this.handleRefreshClick = this.handleRefreshClick.bind(this);
+    this.handleLabelFocus = this.handleLabelFocus.bind(this);
     this.handleRadioClick = this.handleRadioClick.bind(this);
     this.handleBranchClick = this.handleBranchClick.bind(this);
     this.handleBranchNameKeyUp = this.handleBranchNameKeyUp.bind(this);
@@ -143,6 +144,7 @@ class BranchPane extends React.Component {
             commits: commits,
             commit: latestCommit
           }, function() {
+            // self._reset();
             // console.info(app.state, commits, latestCommit);
             // app.setState({
             //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
@@ -318,6 +320,7 @@ class BranchPane extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // This lifecycle callback is not expected to be called
     console.info('BranchPane WRP');
   }
 
@@ -337,11 +340,13 @@ class BranchPane extends React.Component {
                 <i className="info circle icon"></i>
               </button>
             </div>
-            <button
-              type="button" onClick={this.handlePreviousClick.bind(this)}
-              className="btn btn-secondary btn-sm phase-previous">
-              <i className="chevron left icon"></i> Repository Selection
-            </button>
+            {
+              // <button
+              //   type="button" onClick={this.handlePreviousClick.bind(this)}
+              //   className="btn btn-secondary btn-sm phase-previous">
+              //   <i className="chevron left icon"></i> Repository Selection
+              // </button>
+            }
           </div>
         </div>
 
@@ -462,6 +467,7 @@ class BranchPane extends React.Component {
               this.state.branch &&
               <div className="margin-top-20">
                 <button
+                  type="button"
                   onClick={this.handleCheckoutClick.bind(this)}
                   className="btn btn-success btn-lg btn-block">
                   Checkout Branch

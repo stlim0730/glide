@@ -24,11 +24,10 @@ class RendererPane extends React.Component {
 
   render () {
     return (
-      <div className="height-60 panel panel-default">
-        <div className="panel-heading">Preview</div>
+      <div className="height-60 card">
+        <h5 className="card-header">Preview</h5>
         <iframe
           className="auto-scroll height-90 panel-body"
-          // dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
           srcDoc={this.state.liveHtml}
           width="100%"
           style={{border:'none'}}
@@ -39,4 +38,4 @@ class RendererPane extends React.Component {
   }
 }
 
-export default RendererPane
+export default RendererPane;

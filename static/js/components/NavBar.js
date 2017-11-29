@@ -8,6 +8,9 @@ class NavBar extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
+      commit: null,
       menu: [
         {
           // slug: 'projects',
@@ -53,7 +56,7 @@ class NavBar extends React.Component {
       ]
     };
   }
-
+  
   componentDidMount() {
     let app = this.props.app;
     if(app.state.phase == app.state.constants.APP_PHASE_CLEAN_SLATE) {
@@ -63,10 +66,24 @@ class NavBar extends React.Component {
     }
   }
 
-  render () {
-    let menu = this.state.menu.map(function(menuItem, index){
-      return <NavMenuList key={'menuItem_' + index} label={menuItem.label} disabled={menuItem.disabled} children={menuItem.children} />;
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      commit: nextProps.commit
     });
+  }
+
+  render () {
+    let menu = this.state.menu.map(function(item, index){
+      return (
+        <NavMenuList
+          key={index} label={item.label}
+          disabled={item.disabled} children={item.children} />
+      );
+    });
+
+    let gitToolBar;
 
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -82,8 +99,43 @@ class NavBar extends React.Component {
           <div className="collapse navbar-collapse" id="nav-menus">
             
             <ul className="navbar-nav mr-auto">
-              {menu}
+
+              {
+                this.props.app.state.repository &&
+                <li className="nav-item dropdown">
+                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                    Repository: {this.props.app.state.repository.name} <span className="caret"></span>
+                  </a>
+  
+                  <div className="dropdown-menu">
+                    <a className="dropdown-item" href="#">
+                      Close
+                    </a>
+                  </div>
+                </li>
+              }
+
+              {
+                this.props.app.state.branch &&
+                <li className="nav-item dropdown">
+                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                    Branch: {this.props.app.state.branch.name} <span className="caret"></span>
+                  </a>
+  
+                  <div className="dropdown-menu">
+                    <a className="dropdown-item" href="#">
+                      Close
+                    </a>
+                  </div>
+                </li>
+              }
+
             </ul>
+
+            {
+              // this.state.commit &&
+              // <GitToolBar />
+            }
 
             <form className="form-inline my-2 my-lg-0">
               <input

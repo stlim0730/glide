@@ -75,9 +75,9 @@ class FileSideBar extends React.Component {
       commit: this.props.commit
     }, function() {
       // console.info('FileSideBar CDM', this.state);
-      let repository = self.state.repository;
-      let branch = self.state.branch;
-      let commit = self.state.commit;
+      // let repository = self.state.repository;
+      // let branch = self.state.branch;
+      // let commit = self.state.commit;
       // if(repository && branch && commit) {
         self._ajaxTree(
           self.state.repository,
@@ -143,9 +143,11 @@ class FileSideBar extends React.Component {
   render () {
     // console.info('FileSideBar', this.state);
     return (
-      <div className="col-lg-2 col-md-2 full-height">
-        <div className="panel panel-default full-height">
-          <div className="panel-heading">Files</div>
+      <div className="col-lg-2 col-md-2 no-padding full-height">
+
+
+        <div className="card full-height">
+          <h5 className="card-header">Files</h5>
           {
             this.state.recursiveTree &&
             <div className="auto-scroll height-90 panel-body">
@@ -157,6 +159,23 @@ class FileSideBar extends React.Component {
             </div>
           }
         </div>
+
+
+        {
+          // <div className="panel panel-default full-height">
+          //   <div className="panel-heading">Files</div>
+          //   {
+          //     this.state.recursiveTree &&
+          //     <div className="auto-scroll height-90 panel-body">
+          //       <FileNode
+          //         currentPath=''
+          //         nodes={this.state.recursiveTree.nodes}
+          //         fileSideBar={this}
+          //         app={this.props.app} />
+          //     </div>
+          //   }
+          // </div>
+        }
       </div>
     );
   }
