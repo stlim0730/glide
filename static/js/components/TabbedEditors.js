@@ -372,10 +372,6 @@ class TabbedEditors extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-
-    // let currentFilesOpened = this.state.filesOpened;
-    // let nextFilesOpened = nextProps.filesOpened;
-    // _.forEach()
     let self = this;
     let prevFileActive = this.state.fileActive;
 
@@ -439,9 +435,11 @@ class TabbedEditors extends React.Component {
     let tabbedEditors = [];
     this.state.filesOpened.map(function(item, index) {
 
-      let tabClassName = (item == this.state.fileActive ? "active" : "");
+      let tabClassName = (
+        item.path == this.state.fileActive.path ? "nav-link active" : "nav-link"
+      );
       tabs.push(
-        <li key={item.path} className={tabClassName}>
+        <li key={index} className={tabClassName}>
           <a
             href={"#" + this._getEditorId(item)}
             data-toggle="tab"
@@ -461,27 +459,6 @@ class TabbedEditors extends React.Component {
       //   <AceEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive}/>
       // );
 
-      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
-      // tabbedEditors.push(
-      //   <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
-      // );
-
-      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
-      // let options = {
-      //   lineNumbers: true
-      // };
-      // tabbedEditors.push(
-      //   // <CodeMirrorEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive} />
-      //   <CodeMirror
-      //     key={item.path}
-      //     file={item}
-      //     value={item.newContent ? item.newContent : item.originalContent}
-      //     className={editorClassName}
-      //     autoFocus={true}
-      //     options={options}
-      //     onChange={this.handleEditorChange.bind(this, item)} />
-      // );
-
     }.bind(this))
 
     return (
@@ -490,20 +467,30 @@ class TabbedEditors extends React.Component {
           {tabs}
         </ul>
         <div className="tab-content height-95" id="tabbed-editors-editors">
-          {//tabbedEditors
-            this.state.filesOpened.map(function(item) {
-              let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height" : "tab-pane fade full-height");
+          {
+            this.state.filesOpened.map(function(item, index) {
+              let editorClassName = (
+                this.state.fileActive.path == item.path ?
+                "tab-pane fade active in full-height" :
+                "tab-pane fade full-height"
+              );
+              
               let options = {
                 lineNumbers: true
               };
-              let idStr = 'cm-' + item.path.replace('/', '--');
+              // let idStr = 'cm-' + item.path.replace('/', '--');
+              let idStr = this._getEditorId(item);
 
               return (
                 <CodeMirror
                   id={idStr}
-                  key={item.path}
+                  key={index}
                   file={item}
-                  value={item.newContent ? item.newContent : item.originalContent}
+                  value={
+                    item.newContent ?
+                    item.newContent :
+                    item.originalContent
+                  }
                   className={editorClassName}
                   autoFocus={true}
                   options={options}
@@ -517,4 +504,4 @@ class TabbedEditors extends React.Component {
   }
 }
 
-export default TabbedEditors
+export default TabbedEditors;
