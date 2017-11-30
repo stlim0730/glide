@@ -147,9 +147,8 @@ class FileNode extends React.Component {
               return (
                 <div key={index}>
                   <button
-                    href="#"
                     className="btn btn-link file-node-folder block"
-                    data-toggle="collapse"
+                    data-toggle="collapse" type="button"
                     data-target={"#" + this._slugify(item.path) + "-list-group"}>
                     <i className="folder icon"></i> {item.name}
                   </button>
@@ -168,7 +167,7 @@ class FileNode extends React.Component {
               // Render a file.
               return (
                 <button
-                  key={index}
+                  key={index} type="button"
                   className="btn btn-link file-node-file block"
                   onClick={this.handleFileClick.bind(this, item)}>
                   <i className="file text outline icon"></i> {item.name}
@@ -185,7 +184,7 @@ class FileNode extends React.Component {
         <button
           className="btn btn-link new-file-button block"
           onClick={this.handleCreateNewFileClick.bind(this)}
-          data-toggle="modal"
+          data-toggle="modal" type="button"
           data-target="#create-new-file-modal">
           <i className="add square icon"></i> Create New...
         </button>

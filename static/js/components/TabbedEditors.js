@@ -1,6 +1,8 @@
 import '../../css/codemirror/codemirror.css';
 var CodeMirror = require('react-codemirror');
-
+// Tried 'react-ace' package.
+// Didn't work well because there seemed to be conflicts in switching tabs.
+// Another alternative might be 'react-ace-editor' if things go wrong with 'react-codemirror'
 
 // 
 // TabbedEditors component
@@ -23,6 +25,9 @@ class TabbedEditors extends React.Component {
     // this._getBlob = this._getBlob.bind(this);
     this._prepareRenderingReq = this._prepareRenderingReq.bind(this);
     this._requestRendering = this._requestRendering.bind(this);
+    this.handleTabMouseOver = this.handleTabMouseOver.bind(this);
+    this.handleTabMouseOut = this.handleTabMouseOut.bind(this);
+    this.handleTabCloseClick = this.handleTabCloseClick.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
@@ -308,6 +313,20 @@ class TabbedEditors extends React.Component {
     });
   }
 
+  handleTabMouseOver(e) {
+    let closeButton = $(e.target).children('button.invisible');
+    $(closeButton).removeClass('invisible');
+  }
+
+  handleTabMouseOut(e) {
+    let closeButton = $(e.target).children('button');
+    $(closeButton).addClass('invisible');
+  }
+
+  handleTabCloseClick(e) {
+    // TODO
+  }
+
   handleTabClick(file, e) {
     let self = this;
     let app = this.props.app;
@@ -439,46 +458,42 @@ class TabbedEditors extends React.Component {
         item.path == this.state.fileActive.path ? "nav-link active" : "nav-link"
       );
       tabs.push(
-        <li key={index} className={tabClassName}>
+        <li key={index} className={tabClassName}
+          style={{paddingRight: 8}}
+          onMouseEnter={this.handleTabMouseOver.bind(this)}
+          onMouseLeave={this.handleTabMouseOut.bind(this)}>
           <a
-            href={"#" + this._getEditorId(item)}
-            data-toggle="tab"
+            href={"#" + this._getEditorId(item)} data-toggle="tab"
             onClick={this.handleTabClick.bind(this, item)}>
             {item.name}
           </a>
+          <button
+            type="button" style={{paddingRight: 0}}
+            onClick={this.handleTabCloseClick.bind(this)}
+            className="btn btn-sm btn-link invisible">
+            <i className="remove icon text-danger"></i>
+          </button>
         </li>
       );
-      
-      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
-      // tabbedEditors.push(
-      //   <div key={item.path} id={this._getEditorId(item)} className={editorClassName}></div>
-      // );
-
-      // let editorClassName = (this.state.fileActive == item ? "tab-pane fade active in full-height position-relative" : "tab-pane fade full-height position-relative");
-      // tabbedEditors.push(
-      //   <AceEditor key={item.path} id={this._getEditorId(item)} className={editorClassName} file={this.state.fileActive}/>
-      // );
-
     }.bind(this))
 
     return (
-      <div className="height-95">
-        <ul className="nav nav-tabs" id="tabbed-editors-tabs">
+      <div className="full-height">
+        <ul className="nav nav-tabs">
           {tabs}
         </ul>
-        <div className="tab-content height-95" id="tabbed-editors-editors">
+        <div className="tab-content">
           {
             this.state.filesOpened.map(function(item, index) {
               let editorClassName = (
                 this.state.fileActive.path == item.path ?
-                "tab-pane fade active in full-height" :
-                "tab-pane fade full-height"
+                "tab-pane fade in active show" :
+                "tab-pane fade"
               );
               
               let options = {
                 lineNumbers: true
               };
-              // let idStr = 'cm-' + item.path.replace('/', '--');
               let idStr = this._getEditorId(item);
 
               return (
