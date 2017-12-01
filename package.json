@@ -23,9 +23,7 @@
     "url": "https://github.com/stlim0730/glide/issues"
   },
   "homepage": "https://github.com/stlim0730/glide#readme",
-  "devDependencies": {
-    
-  },
+  "devDependencies": {},
   "dependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
@@ -33,14 +31,15 @@
     "babel-preset-react": "^6.24.1",
     "css-loader": "^0.28.3",
     "file-loader": "^0.11.2",
+    "jquery": "3.2.1",
+    "lodash": "^4.17.4",
+    "popper.js": "^1.12.9",
     "react": "^15.5.4",
+    "react-codemirror": "^1.0.0",
     "react-dom": "^15.5.4",
     "style-loader": "^0.18.1",
     "url-loader": "^0.5.8",
     "webpack": "^2.6.1",
-    "webpack-bundle-tracker": "^0.2.0",
-    "jquery": "2.2.4",
-    "lodash": "^4.17.4",
-    "react-codemirror": "^1.0.0"
+    "webpack-bundle-tracker": "^0.2.0"
   }
 }

@@ -1,7 +1,7 @@
 // 
-// CreateNewFileModalContent component
+// CreateFileModalContent component
 // 
-class CreateNewFileModalContent extends React.Component {
+class CreateFileModalContent extends React.Component {
   constructor(props) {
     super(props);
 
@@ -177,12 +177,13 @@ class CreateNewFileModalContent extends React.Component {
   handleSubmit() {
     let app = this.props.app;
     let path = this.pathInput.value.trim();
+    // Remove leading '/'
     path = (path.startsWith('/') ? path.substring(1) : path);
     let fileName = this.state.fileName;
     
     // Duplicate check
     // This block might have a bug:
-    //   returns true for files with the same name in different path
+    //   returns true for files with the same name in different path.
     //   More tests required.
     let tree = this.state.tree;
     let exists = _.find(tree.tree, function(file) {
@@ -299,16 +300,17 @@ class CreateNewFileModalContent extends React.Component {
     return (
       <div className="modal-content">
         <div className="modal-header">
-          <button type="button"
-            className="close"
-            data-dismiss="modal">
-            &times;
+          <h5 className="modal-title">
+            Create a New File or Folder
+          </h5>
+          <button
+            type="button" className="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
           </button>
-          <h4 className="modal-title">Create a New File or Folder</h4>
         </div>
         
         <div className="modal-body row">
-          <div className="col-md-3 right-border">
+          <div className="col-md-4 right-border">
             <fieldset>
               <div className="form-group">
                 <label className="control-label">
@@ -348,12 +350,11 @@ class CreateNewFileModalContent extends React.Component {
                 </label>
                 <div className="">
                   <input
-                    type="text"
+                    type="text" disabled={!this.state.fileOrFolder}
                     onChange={this.handleFileNameChange}
                     onKeyUp={this.handleKeyUp}
                     ref={(c) => this.fileNameInput = c}
-                    className="form-control"
-                    maxLength="255" />
+                    className="form-control" maxLength="255" />
                 </div>
               </div>
               <div className="form-group">
@@ -381,10 +382,11 @@ class CreateNewFileModalContent extends React.Component {
                             name="pageLayout"
                             value={item.name}
                             disabled={
-                              !(this.state.fileName.endsWith('.yaml')
+                              !this.state.fileName
+                              || (!(this.state.fileName.endsWith('.yaml')
                               || this.state.fileName.endsWith('.yml')
                               || this.state.fileName.endsWith('.html')
-                              || this.state.fileName.endsWith('.htm'))
+                              || this.state.fileName.endsWith('.htm')))
                             }
                             onClick={this.handleLayoutChange.bind(this, item)}
                             /> {item.name}
@@ -398,16 +400,23 @@ class CreateNewFileModalContent extends React.Component {
             </fieldset>
           </div>
 
-          <div className="col-md-9">
+          <div className="col-md-8">
             <label className="control-label">
               Design Template Preview
             </label>
             <div className="form-group">
-              <iframe
-                width="600px"
-                height="350px"
-                src={this.state.liveHtmlSrc}>
-              </iframe>
+              {
+                this.state.liveHtmlSrc &&
+                <iframe
+                  width="100%"
+                  height="350px"
+                  src={this.state.liveHtmlSrc}>
+                </iframe>
+              }
+              {
+                !this.state.liveHtmlSrc &&
+                'Select a design template for preview.'
+              }
             </div>
           </div>
 
@@ -415,17 +424,14 @@ class CreateNewFileModalContent extends React.Component {
         
         <div className="modal-footer">
           <button
-            type="button"
-            className="btn btn-default"
-            data-dismiss="modal"
-            onClick={this._reset}>Close</button>
+            type="button" className="btn btn-secondary"
+            data-dismiss="modal" onClick={this._reset}>
+            Close
+          </button>
           <button
-            type="button"
-            ref={(c) => this.submitButton = c}
-            className="btn btn-primary"
-            onClick={this.handleSubmit}
-            data-dismiss="modal"
-            disabled={
+            type="button" ref={(c) => this.submitButton = c}
+            className="btn btn-primary" onClick={this.handleSubmit}
+            data-dismiss="modal" disabled={
               !this.state.fileOrFolder
               || this.state.fileName.trim().length==0
               || ((this.state.fileName.endsWith('yaml')
@@ -441,4 +447,4 @@ class CreateNewFileModalContent extends React.Component {
   }
 }
 
-export default CreateNewFileModalContent;
+export default CreateFileModalContent;

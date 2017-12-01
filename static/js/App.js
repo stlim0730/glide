@@ -2,6 +2,7 @@
 // Load CSS
 // 
 import bootstrap_style from '../css/bootstrap/bootstrap.css';
+import icon_style from '../css/icon/icon.min.css';
 import custom_style from '../css/style.css';
 
 //
@@ -21,15 +22,13 @@ import GitStatusModalContent from './components/GitStatusModalContent.js';
 import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
 import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
 import GitResetModalContent from './components/GitResetModalContent.js';
-import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
+import CreateFileModalContent from './components/CreateFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
-import RepoListPane from './components/RepoListPane.js';
+import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
+import WorkspacePane from './components/WorkspacePane.js';
 import RepoToolBar from './components/RepoToolBar.js';
-import FileSideBar from './components/FileSideBar.js';
-import EditorPane from './components/EditorPane.js';
-import RuntimePane from './components/RuntimePane.js';
 
 // 
 // App component
@@ -132,23 +131,17 @@ class App extends React.Component {
     let modals = (
       <div>
         {
-          // <Modal id="clone-repository-modal"
+          // <Modal id="create-branch-modal"
           //   modalContent={
-          //     <CloneRepoModalContent
-          //       app={this} />
+          //     <CreateBranchModalContent
+          //       app={this}
+          //       commit={this.state.commit} />
           //   }
           //   large={false} />
         }
-        <Modal id="create-branch-modal"
+        <Modal id="create-file-modal"
           modalContent={
-            <CreateBranchModalContent
-              app={this}
-              commit={this.state.commit} />
-          }
-          large={false} />
-        <Modal id="create-new-file-modal"
-          modalContent={
-            <CreateNewFileModalContent
+            <CreateFileModalContent
               app={this}
               repository={this.state.repository}
               tree={this.state.tree}
@@ -205,7 +198,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_CLEAN_SLATE:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
           </div>
@@ -214,17 +207,17 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_REPOSITORY_SELECTION:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
-            <RepoListPane app={this} />
+            <RepositoryPane app={this} />
           </div>
         );
 
       case this.state.constants.APP_PHASE_BRANCH_SELECTION:
 
         return (
-          <div className="row full-height">
+          <div>
             <NavBar app={this} />
             {modals}
             <BranchPane
@@ -254,31 +247,29 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         
         return (
-          <div className="row full-height">
+          <div className="full-height">
             <NavBar app={this} />
             {modals}
-            <RepoToolBar
+            {
+              // <RepoToolBar
+              //   app={this}
+              //   repository={this.state.repository}
+              //   branches={this.state.branches}
+              //   branch={this.state.branch}
+              //   commits={this.state.commits}
+              //   commit={this.state.commit}
+              //   changedFiles={this.state.changedFiles}
+              //   addedFiles={this.state.addedFiles} />
+            }
+            <WorkspacePane
               app={this}
               repository={this.state.repository}
-              branches={this.state.branches}
               branch={this.state.branch}
-              commits={this.state.commits}
               commit={this.state.commit}
-              changedFiles={this.state.changedFiles}
-              addedFiles={this.state.addedFiles} />
-            <FileSideBar
-              app={this}
-              repository={this.state.repository}
-              branch={this.state.branch}
-              commit={this.state.commit} />
-            <EditorPane
-              app={this}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
               fileActive={this.state.fileActive}
-              filesOpened={this.state.filesOpened} />
-            <RuntimePane
-              app={this}
+              filesOpened={this.state.filesOpened}
               liveYaml={this.state.liveYaml}
               liveHtml={this.state.liveHtml}
               liveBugs={this.state.liveBugs} />

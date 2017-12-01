@@ -8,6 +8,9 @@ class NavBar extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
+      commit: null,
       menu: [
         {
           // slug: 'projects',
@@ -53,7 +56,7 @@ class NavBar extends React.Component {
       ]
     };
   }
-
+  
   componentDidMount() {
     let app = this.props.app;
     if(app.state.phase == app.state.constants.APP_PHASE_CLEAN_SLATE) {
@@ -63,36 +66,95 @@ class NavBar extends React.Component {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      commit: nextProps.commit
+    });
+  }
+
   render () {
-    let menu = this.state.menu.map(function(menuItem, index){
-      return <NavMenuList key={'menuItem_' + index} label={menuItem.label} disabled={menuItem.disabled} children={menuItem.children} />;
+    let menu = this.state.menu.map(function(item, index){
+      return (
+        <NavMenuList
+          key={index} label={item.label}
+          disabled={item.disabled} children={item.children} />
+      );
     });
 
-    return (
-      <div className="navbar navbar-inverse navbar-fixed-top">
-        <form>
-          <div className="container">
-            <div className="navbar-header">
-              <a href="../" className="navbar-brand">GLIDE</a>
-              <button className="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-              </button>
-            </div>
-  
-            <div className="navbar-collapse collapse" id="navbar-main">
-              <ul className="nav navbar-nav">
+    let gitToolBar;
 
-                { menu }
-                
-              </ul>
-            </div>
+    return (
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div className="container">
+          
+          <a className="navbar-brand" href="../">GLIDE</a>
+          <button className="navbar-toggler"
+            type="button" data-toggle="collapse"
+            data-target="#nav-menus">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+
+          <div className="collapse navbar-collapse" id="nav-menus">
+            
+            <ul className="navbar-nav mr-auto">
+
+              {
+                this.props.app.state.repository &&
+                <li className="nav-item dropdown">
+                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                    Repository: {this.props.app.state.repository.name} <span className="caret"></span>
+                  </a>
+  
+                  <div className="dropdown-menu">
+                    <a className="dropdown-item" href="#">
+                      Close
+                    </a>
+                  </div>
+                </li>
+              }
+
+              {
+                this.props.app.state.branch &&
+                <li className="nav-item dropdown">
+                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+                    Branch: {this.props.app.state.branch.name} <span className="caret"></span>
+                  </a>
+  
+                  <div className="dropdown-menu">
+                    <a className="dropdown-item" href="#">
+                      Close
+                    </a>
+                  </div>
+                </li>
+              }
+
+            </ul>
+
+            {
+              // this.state.commit &&
+              // <GitToolBar />
+            }
+
+            <form className="form-inline my-2 my-lg-0">
+              <input
+                className="form-control mr-sm-2"
+                type="search"
+                placeholder="Search" />
+              <button
+                className="btn btn-secondary my-2 my-sm-0"
+                type="submit">
+                Search
+              </button>
+            </form>
+
           </div>
-        </form>
-      </div>
+
+        </div>
+      </nav>
     );
   }
 }
 
-export default NavBar
+export default NavBar;

@@ -7,18 +7,18 @@ class NavMenuListItem extends React.Component {
   }
 
   render () {
+    let className = this.props.disabled
+      ? "dropdown-item disabled"
+      : "dropdown-item";
+
     return (
-      <li>
-        <a
-          href="#"
-          disabled={this.props.disabled}
-          data-toggle="modal"
-          data-target={this.props.dataTarget}>
-          {this.props.label}
-        </a>
-      </li>
+      <a
+        className={className} href="#"
+        data-toggle="modal" data-target={this.props.dataTarget}>
+        {this.props.label}
+      </a>
     );
   }
 }
 
-export default NavMenuListItem
+export default NavMenuListItem;

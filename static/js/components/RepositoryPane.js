@@ -1,7 +1,7 @@
 // 
-// RepoListPane component
+// RepositoryPane component
 // 
-class RepoListPane extends React.Component {
+class RepositoryPane extends React.Component {
   constructor(props) {
     super(props);
 
@@ -150,7 +150,7 @@ class RepoListPane extends React.Component {
       success: function(response) {
         // console.info(response);
         if('error' in response) {
-          //
+          // TODO
         }
         else {
           self._reset();
@@ -176,147 +176,138 @@ class RepoListPane extends React.Component {
 
   render () {
     return (
-      <div className="full-height">
+      <div className="container">
 
-        <div className="full-height col-lg-3 col-md-3">
-          
-          <label>Select a Repository to Clone</label>
-          <button
-            type="button" className="btn btn-sm btn-link"
-            data-container="body" data-toggle="popover"
-            data-placement="bottom" data-original-title="" title=""
-            data-content="If you don't see the repository you want to clone, request the repository owner to add you as a collaborator.">
-            <span className="glyphicon glyphicon-info-sign"></span>
-          </button>
-          <button
-            type="button" className="btn btn-sm btn-link"
-            onClick={this.handleRefreshClick.bind(this)}>
-            <span className="glyphicon glyphicon-refresh"></span> Refresh
-          </button>
-
-          <div className="text-right">
-            Sort by: 
-            <div className="btn-group">
+        <div className="row">
+          <div className="col">
+            <div className="h1">
+              Select a Repository to Clone
               <button
-                onClick={this.handleSortRepo.bind(this, 'date')}
-                className="btn btn-sm btn-link">Date</button>
-              <button
-                onClick={this.handleSortRepo.bind(this, 'name')}
-                className="btn btn-sm btn-link">Name</button>
-              <button
-                onClick={this.handleSortRepo.bind(this, 'owner')}
-                className="btn btn-sm btn-link">Owner</button>
+                type="button" className="btn btn-lg btn-link" data-placement="bottom"
+                title="" data-container="body" data-toggle="popover"
+                data-original-title="Don't you see your repository?"
+                data-content="If you don't, request the repository owner to add you as a collaborator.">
+                <i className="info circle icon"></i>
+              </button>
             </div>
-          </div>
-
-          <div className="height-95 auto-scroll list-group">
-            {
-              this.state.repositories.map(function(item, index) {
-                return (
-                  <button
-                    key={index} type="button" className="list-group-item"
-                    onClick={this.handleRepositoryClick.bind(this, item)}>
-                    <h4 className="list-group-item-heading">{item.full_name}</h4>
-                    <p className="list-group-item-text text-right">
-                      Owned by {item.owner.login}<br />
-                      Created at {new Date(item.created_at).toLocaleTimeString()}&nbsp;
-                      on {new Date(item.created_at).toLocaleDateString()}
-                    </p>
-                  </button>
-                );
-              }.bind(this))
-            }
           </div>
         </div>
 
-        <br />
-        <br />
-        <br />
-        <div className="full-height col-lg-6 col-md-6">
-          {
-            this.state.liveHtml && 
-            <div className="height-60 panel panel-default">
-              <div className="panel-heading">
-                README.md
-              </div>
-              <div
-                className="auto-scroll height-90 panel-body"
-                dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
-              </div>
+        <div className="row">
+          <div style={{marginLeft: -12}}
+            className="col-lg-1 col-md-1">
+            <button
+              type="button" className="btn btn-link"
+              onClick={this.handleRefreshClick.bind(this)}>
+              <i className="refresh icon"></i> Refresh
+            </button>
+          </div>
+
+          <div className="col offset-lg-1 offset-md-1">
+            Sort by:
+            <button
+              onClick={this.handleSortRepo.bind(this, 'date')}
+              className="btn btn-link">Date</button>
+            <button
+              onClick={this.handleSortRepo.bind(this, 'name')}
+              className="btn btn-link">Name</button>
+            <button
+              onClick={this.handleSortRepo.bind(this, 'owner')}
+              className="btn btn-link">Owner</button>
+          </div>
+        </div>
+
+        <div className="row">
+
+          <div className="col-lg-5 col-md-5">
+
+            <div className="list-group height-600 auto-scroll margin-top-15">
+              {
+                this.state.repositories.map(function(item, index) {
+                  let className = this.state.repository && this.state.repository.full_name==item.full_name
+                    ? 'list-group-item active'
+                    : 'list-group-item';
+                  return (
+                    <a
+                      key={index} href="#" className={className}
+                      onClick={this.handleRepositoryClick.bind(this, item)}>
+                      <h5 className="list-group-item-heading">
+                        {item.full_name}
+                      </h5>
+                    </a>
+                  );
+                }.bind(this))
+              }
             </div>
-          }
-          {
-            this.state.repository &&
-            <div className="height-40">
-              
-              <div className="row">
-                <label className="col-lg-3 control-label text-right">
-                  Repository Name
-                </label>
-                <div className="col-lg-9">
+          </div>
+
+          <div className="col-lg-7 col-md-7">
+            {
+              this.state.repository &&
+              <div>
+                <p className="h3">
+                  <span className="text-muted">Repository Name</span>&emsp;
                   <a
                     target="_blank"
                     href={this.state.repository.html_url}>
                     {this.state.repository.name}
                   </a>
-                </div>
-              </div>
-
-              <div className="row">
-                <label className="col-lg-3 control-label text-right">
-                  Owner
-                </label>
-                <div className="col-lg-9">
+                </p>
+                <p className="h3">
+                  <span className="text-muted">Owner</span>&emsp;
                   <a
                     target="_blank"
                     href={this.state.repository.owner.html_url}>
                     {this.state.repository.owner.login}
                   </a>
-                </div>
+                </p>
+                <p className="h3">
+                  <span className="text-muted">Created At</span>&emsp;
+                  <small>
+                    {
+                      new Date(this.state.repository.created_at).toLocaleTimeString()
+                    }
+                    <span className="text-muted">&nbsp;On&nbsp;</span>
+                    {
+                      new Date(this.state.repository.created_at).toLocaleDateString()
+                    }
+                  </small>
+                </p>
               </div>
+            }
 
-              <div className="row">
-                <label className="col-lg-3 control-label text-right">
-                  Created At
-                </label>
-                <div className="col-lg-9">
-                  {new Date(this.state.repository.created_at).toLocaleTimeString()}&nbsp;
-                  on {new Date(this.state.repository.created_at).toLocaleDateString()}
-                </div>
+            {
+              this.state.liveHtml &&
+              <div className="card height-400 margin-top-15">
+                <h5 className="card-header">README.md</h5>
+                <div className="card-body max-height-400 auto-scroll">
+                  <div
+                    className=""
+                    dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
+                  </div>
+                </div>                
               </div>
+            }
 
-              {
-                // <div className="row">
-                //   <label className="col-lg-3 control-label text-right">
-                //     Updated At
-                //   </label>
-                //   <div className="col-lg-9">
-                //     {new Date(this.state.repository.updated_at).toLocaleTimeString()} on {new Date(this.state.repository.updated_at).toLocaleDateString()}
-                //   </div>
-                // </div>
-              }
+            {
+              this.state.repository &&
+              <div className="margin-top-15">
+                <button
+                  type="button" className="btn btn-success btn-lg btn-block"
+                  onClick={this.handleCloneClick.bind(this)}>
+                  Clone {this.state.repository.name}
+                </button>
+                <a
+                  target="_blank" href={this.state.repository.html_url}
+                  className="btn btn-outline-success btn-sm btn-block">
+                  <i className="external icon"></i>&nbsp;
+                  Open Repository on GitHub
+                </a>
+              </div>
+            }
 
-            </div>
-          }
-        </div>
+          </div>
 
-        <div className="col-lg-3 col-md-3">
-          {
-            this.state.repository &&
-            <div>
-              <button
-                onClick={this.handleCloneClick.bind(this)}
-                className="btn btn-primary btn-lg btn-block">
-                Clone {this.state.repository.name}
-              </button>
-              <a
-                target="_blank" href={this.state.repository.html_url}
-                className="btn btn-default btn-sm btn-block">
-                <span className="glyphicon glyphicon-new-window"></span>&nbsp;
-                Open on GitHub
-              </a>
-            </div>
-          }
         </div>
 
       </div>
@@ -324,4 +315,4 @@ class RepoListPane extends React.Component {
   }
 }
 
-export default RepoListPane;
+export default RepositoryPane;

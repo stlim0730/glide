@@ -30,24 +30,31 @@ class EditorPane extends React.Component {
 
   render () {
     return (
-      <div className="col-lg-6 col-md-6 full-height">
-        <div className="panel panel-default full-height">
-          <div className="panel-heading">Editor</div>
-          <div className="height-95 panel-body no-padding">
-            {
-              // <EditorToolBar
-              //   app={this.props.app}
-              //   filesOpened={this.state.filesOpened}
-              //   fileActive={this.state.fileActive} />
-            }
-            <TabbedEditors
-              app={this.props.app}
-              tree={this.props.tree}
-              recursiveTree={this.props.recursiveTree}
-              filesOpened={this.state.filesOpened}
-              fileActive={this.state.fileActive} />
-          </div>
+      <div className="col-lg-5 col-md-5 no-padding full-height">
+
+        <div className="card full-height">
+          <h6 className="card-header">Editor</h6>
+          <TabbedEditors
+            app={this.props.app}
+            tree={this.props.tree}
+            recursiveTree={this.props.recursiveTree}
+            filesOpened={this.state.filesOpened}
+            fileActive={this.state.fileActive} />
         </div>
+
+        {
+          // <div className="panel panel-default full-height">
+          //   <div className="panel-heading">Editor</div>
+          //   <div className="height-95 panel-body no-padding">
+          //     <TabbedEditors
+          //       app={this.props.app}
+          //       tree={this.props.tree}
+          //       recursiveTree={this.props.recursiveTree}
+          //       filesOpened={this.state.filesOpened}
+          //       fileActive={this.state.fileActive} />
+          //   </div>
+          // </div>
+        }
       </div>
     );
   }

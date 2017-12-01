@@ -27,9 +27,9 @@ class DebuggerPane extends React.Component {
 
   render () {
     return (
-      <div className="height-40 panel panel-default">
-        <div className="panel-heading">Debugger</div>
-        <div className="auto-scroll full-height panel-body">
+      <div className="card no-padding height-40">
+        <h6 className="card-header">Debugger</h6>
+        <div className="auto-scroll full-height">
           <table className="table table-striped table-hover ">
             <thead>
               {
@@ -108,4 +108,4 @@ class DebuggerPane extends React.Component {
   }
 }
 
-export default DebuggerPane
+export default DebuggerPane;
