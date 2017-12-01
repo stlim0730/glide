@@ -80,13 +80,15 @@ class WorkspacePane extends React.Component {
             app={this.props.app}
             repository={this.state.repository}
             branch={this.state.branch}
-            commit={this.state.commit} />
+            commit={this.state.commit}
+            filesOpened={this.state.filesOpened}
+            fileActive={this.state.fileActive} />
           <EditorPane
             app={this.props.app}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}
-            fileActive={this.state.fileActive}
-            filesOpened={this.state.filesOpened} />
+            filesOpened={this.state.filesOpened}
+            fileActive={this.state.fileActive} />
           <RuntimePane
             app={this.props.app}
             liveYaml={this.state.liveYaml}

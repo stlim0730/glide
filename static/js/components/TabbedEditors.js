@@ -22,7 +22,6 @@ class TabbedEditors extends React.Component {
     this._getEditorId = this._getEditorId.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this._updateFileInRecursiveTree = this._updateFileInRecursiveTree.bind(this);
-    // this._getBlob = this._getBlob.bind(this);
     this._prepareRenderingReq = this._prepareRenderingReq.bind(this);
     this._requestRendering = this._requestRendering.bind(this);
     this.handleTabMouseOver = this.handleTabMouseOver.bind(this);
@@ -314,22 +313,57 @@ class TabbedEditors extends React.Component {
   }
 
   handleTabMouseOver(e) {
-    let closeButton = $(e.target).children('button.invisible');
+    let closeButton = $(e.target).children('span.close-tab');
     $(closeButton).removeClass('invisible');
   }
 
   handleTabMouseOut(e) {
-    let closeButton = $(e.target).children('button');
+    let closeButton = $(e.target).children('span.close-tab');
     $(closeButton).addClass('invisible');
   }
 
-  handleTabCloseClick(e) {
-    // TODO
+  handleTabCloseClick(file, e) {
+    e.stopPropagation();
+    e.preventDefault();
+
+    let filesOpened = this.state.filesOpened;
+    let fileActive = this.state.fileActive;
+    let app = this.props.app;
+
+    // TODO: Should manually handle codemirror component
+    //   remove one of them and show the others
+
+    _.remove(filesOpened, function (f) {
+      return f.path == file.path;
+    });
+
+    if(fileActive.path == file.path) {
+      // Closing the active tab
+      fileActive = _.last(filesOpened);
+    }
+    else {
+      // Closing one of the other tabs
+      // Do nothing on fileActive
+    }
+
+    // let self = this;
+
+    this.setState({
+      filesOpened: filesOpened,
+      fileActive: fileActive
+    }, function() {
+      app.setState({
+        filesOpened: filesOpened,
+        fileActive: fileActive
+      });
+    });
   }
 
   handleTabClick(file, e) {
     let self = this;
     let app = this.props.app;
+
+    // TODO: manually hide all the tab pane first
     this.setState({
       fileActive: file
     }, function() {
@@ -402,21 +436,21 @@ class TabbedEditors extends React.Component {
     }, function() {
 
       if(self.state.filesOpened.length==0 && self.state.fileActive == null) {
-        $('#tabbed-editors-tabs').empty();
-        $('#tabbed-editors-editors').empty();
+        // $('#tabbed-editors-tabs').empty();
+        // $('#tabbed-editors-editors').empty();
       }
       else if(self.state.fileActive && prevFileActive != nextProps.fileActive){
-        let fileActive = self.state.fileActive;
-        let content = null;
-        if(fileActive.newContent) {
-          content = fileActive.newContent;
-        }
-        else {
-          content = fileActive.originalContent;
-        }
+        // let fileActive = self.state.fileActive;
+        // let content = null;
+        // if(fileActive.newContent) {
+        //   content = fileActive.newContent;
+        // }
+        // else {
+        //   content = fileActive.originalContent;
+        // }
         
-        let data = self._prepareRenderingReq(content, fileActive);
-        self._requestRendering(data);
+        // let data = self._prepareRenderingReq(content, fileActive);
+        // self._requestRendering(data);
       }
       // $('.CodeMirror').each(function(i, el){
       //   el.CodeMirror.refresh();
@@ -450,30 +484,61 @@ class TabbedEditors extends React.Component {
   }
 
   render () {
+
+    
     let tabs = [];
     let tabbedEditors = [];
-    this.state.filesOpened.map(function(item, index) {
 
+    this.state.filesOpened.map(function(item, index) {
       let tabClassName = (
-        item.path == this.state.fileActive.path ? "nav-link active" : "nav-link"
+        this.state.fileActive && 
+        item.path == this.state.fileActive.path ?
+        "nav-link active" :
+        "nav-link"
       );
       tabs.push(
-        <li key={index} className={tabClassName}
-          style={{paddingRight: 8}}
-          onMouseEnter={this.handleTabMouseOver.bind(this)}
-          onMouseLeave={this.handleTabMouseOut.bind(this)}>
+        <li key={index} className="nav-item">
           <a
-            href={"#" + this._getEditorId(item)} data-toggle="tab"
+            style={{paddingRight:8}}
+            href={"#" + this._getEditorId(item)}
+            data-toggle="tab" className={tabClassName}
+            onMouseEnter={this.handleTabMouseOver.bind(this)}
+            onMouseLeave={this.handleTabMouseOut.bind(this)}
             onClick={this.handleTabClick.bind(this, item)}>
             {item.name}
+            <span
+              style={{paddingTop:2, paddingRight:0}}
+              onClick={this.handleTabCloseClick.bind(this, item)}
+              className="btn btn-sm btn-link close-tab invisible">
+              <i className="remove icon text-danger"></i>
+            </span>
           </a>
-          <button
-            type="button" style={{paddingRight: 0}}
-            onClick={this.handleTabCloseClick.bind(this)}
-            className="btn btn-sm btn-link invisible">
-            <i className="remove icon text-danger"></i>
-          </button>
         </li>
+      );
+
+      let editorClassName = (
+        this.state.fileActive &&
+        this.state.fileActive.path == item.path ?
+        "tab-pane fade in active show" :
+        "tab-pane fade"
+      );
+      let options = {
+        lineNumbers: true
+      };
+      let idStr = this._getEditorId(item);
+      tabbedEditors.push(
+        <CodeMirror
+          id={idStr}
+          key={index}
+          value={
+            item.newContent ?
+            item.newContent :
+            item.originalContent
+          }
+          className={editorClassName}
+          autoFocus={true}
+          options={options}
+          onChange={this.handleEditorChange.bind(this, item)} />
       );
     }.bind(this))
 
@@ -483,36 +548,7 @@ class TabbedEditors extends React.Component {
           {tabs}
         </ul>
         <div className="tab-content">
-          {
-            this.state.filesOpened.map(function(item, index) {
-              let editorClassName = (
-                this.state.fileActive.path == item.path ?
-                "tab-pane fade in active show" :
-                "tab-pane fade"
-              );
-              
-              let options = {
-                lineNumbers: true
-              };
-              let idStr = this._getEditorId(item);
-
-              return (
-                <CodeMirror
-                  id={idStr}
-                  key={index}
-                  file={item}
-                  value={
-                    item.newContent ?
-                    item.newContent :
-                    item.originalContent
-                  }
-                  className={editorClassName}
-                  autoFocus={true}
-                  options={options}
-                  onChange={this.handleEditorChange.bind(this, item)} />
-              );
-            }.bind(this))
-          }
+          {tabbedEditors}
         </div>
       </div>
     );

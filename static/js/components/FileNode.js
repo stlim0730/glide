@@ -6,6 +6,9 @@ class FileNode extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      filesOpened: [],
+      fileActive: null,
       currentPath: '',
       nodes: []
     };
@@ -40,12 +43,11 @@ class FileNode extends React.Component {
   }
 
   handleFileClick(file, e) {
-    // console.info(file);
     // Folders don't call this event handler: yay
     let app = this.props.app;
-    let fileSideBar = this.props.fileSideBar;
-    let filesOpened = fileSideBar.state.filesOpened;
-    let fileActive = fileSideBar.state.fileActive;
+    let self = this;
+    let filesOpened = this.state.filesOpened;
+    let fileActive = this.state.fileActive;
 
     if(_.find(filesOpened, {'path': file.path})) {
       // Already opened
@@ -55,30 +57,30 @@ class FileNode extends React.Component {
       if(file.originalContent == null) {
         // Initial loading of an existing file in the repository:
         //   Request server to load remote resources
-        let url = '/api/project/blob/' + fileSideBar.state.repository.full_name + '/' + file.sha;
-        let app = this.props.app;
+        let url = '/api/project/blob/' + this.state.repository.full_name + '/' + file.sha;
 
         $.ajax({
           url: url,
           method: 'GET',
           success: function(response) {
-            console.info(response);
+            // console.info(response);
             if('error' in response) {
               // TODO
             }
             else {
               file.originalContent = atob(response.blob.content);
               
-              fileActive = file;
               filesOpened.push(file);
-              fileSideBar.setState({
+              self.setState({
                 filesOpened: filesOpened,
-                fileActive: fileActive
+                fileActive: file
               }, function() {
                 app.setState({
                   filesOpened: filesOpened,
-                  fileActive: fileActive
+                  fileActive: file
                 });
+
+                console.info(this.state.fileActive);
               });
             }
           }
@@ -86,25 +88,16 @@ class FileNode extends React.Component {
       }
       else {
         // Use local content
-        if(file.added) {
-          // Newly added file by the user:
-          //   There is no remote resources to load
-          fileActive = file;
-          filesOpened.push(file);
-          fileSideBar.setState({
+        filesOpened.push(file);
+        self.setState({
+          filesOpened: filesOpened,
+          fileActive: file
+        }, function() {
+          app.setState({
             filesOpened: filesOpened,
-            fileActive: fileActive
-          }, function() {
-            app.setState({
-              filesOpened: filesOpened,
-              fileActive: fileActive
-            });
+            fileActive: file
           });
-        }
-        else {
-          // TODO: existing file to use local content,
-          //   which means files changed and closed
-        }
+        });
       }
     }
   }
@@ -122,6 +115,9 @@ class FileNode extends React.Component {
     //   so that the state should update after being mounted.
     // 
     this.setState({
+      repository: this.props.repository,
+      filesOpened: this.props.filesOpened,
+      fileActive: this.props.fileActive,
       currentPath: this.props.currentPath
     });
     this._orderNodes(this.props.nodes);
@@ -132,6 +128,9 @@ class FileNode extends React.Component {
     // This event seems to affect the root node's behavior.
     // 
     this.setState({
+      repository: nextProps.repository,
+      filesOpened: nextProps.filesOpened,
+      fileActive: nextProps.fileActive,
       currentPath: nextProps.currentPath
     });
     this._orderNodes(nextProps.nodes);
@@ -155,10 +154,12 @@ class FileNode extends React.Component {
                   <ul id={this._slugify(item.path) + "-list-group"}
                     className="collapse subtree">
                     <FileNode
+                      app={this.props.app}
+                      repository={this.state.repository}
+                      filesOpened={this.state.filesOpened}
+                      fileActive={this.state.fileActive}
                       currentPath={item.path}
-                      nodes={item.nodes}
-                      fileSideBar={this.props.fileSideBar}
-                      app={this.props.app} />
+                      nodes={item.nodes} />
                   </ul>
                 </div>
               );

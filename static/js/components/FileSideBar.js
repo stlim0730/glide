@@ -8,11 +8,11 @@ class FileSideBar extends React.Component {
     super(props);
 
     this.state = {
-      recursiveTree: null,
-      tree: null,
       repository: null,
       branch: null,
       commit: null,
+      recursiveTree: null,
+      tree: null,
       filesOpened: [],
       fileActive: null
     };
@@ -37,7 +37,7 @@ class FileSideBar extends React.Component {
 
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
-    console.info('FileSideBar _ajaxTree', this.state);
+    // console.info('FileSideBar _ajaxTree', this.state);
     let url = '/api/project/tree/'
       + repository.full_name + '/'
       + branch.name + '/' + commit.sha;
@@ -48,7 +48,7 @@ class FileSideBar extends React.Component {
       url: url,
       method: 'GET',
       success: function(response) {
-        console.info('_ajaxTree AJAX success', response);
+        // console.info('_ajaxTree AJAX success', response);
         if('error' in response) {
           // TODO
         }
@@ -72,7 +72,9 @@ class FileSideBar extends React.Component {
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
-      commit: this.props.commit
+      commit: this.props.commit,
+      filesOpened: this.props.filesOpened,
+      fileActive: this.props.fileActive
     }, function() {
       // console.info('FileSideBar CDM', this.state);
       // let repository = self.state.repository;
@@ -108,11 +110,13 @@ class FileSideBar extends React.Component {
     //   return;
     // }
 
-    let self = this;
+    // let self = this;
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
       commit: nextProps.commit,
+      filesOpened: nextProps.filesOpened,
+      fileActive: nextProps.fileActive
     }, function() {
       console.info('FileSideBar WRP', this.state, nextProps);
       // self._ajaxTree(
@@ -145,37 +149,23 @@ class FileSideBar extends React.Component {
     return (
       <div className="col-lg-2 col-md-2 no-padding full-height">
 
-
         <div className="card full-height">
           <h6 className="card-header">Files</h6>
           {
             this.state.recursiveTree &&
-            <div className="auto-scroll height-90 panel-body">
+            <div className="auto-scroll height-90">
               <FileNode
+                app={this.props.app}
+                repository={this.state.repository}
+                // fileSideBar={this}
+                filesOpened={this.state.filesOpened}
+                fileActive={this.state.fileActive}
                 currentPath=''
-                nodes={this.state.recursiveTree.nodes}
-                fileSideBar={this}
-                app={this.props.app} />
+                nodes={this.state.recursiveTree.nodes} />
             </div>
           }
         </div>
 
-
-        {
-          // <div className="panel panel-default full-height">
-          //   <div className="panel-heading">Files</div>
-          //   {
-          //     this.state.recursiveTree &&
-          //     <div className="auto-scroll height-90 panel-body">
-          //       <FileNode
-          //         currentPath=''
-          //         nodes={this.state.recursiveTree.nodes}
-          //         fileSideBar={this}
-          //         app={this.props.app} />
-          //     </div>
-          //   }
-          // </div>
-        }
       </div>
     );
   }
