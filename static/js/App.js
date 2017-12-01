@@ -22,7 +22,7 @@ import GitStatusModalContent from './components/GitStatusModalContent.js';
 import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
 import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
 import GitResetModalContent from './components/GitResetModalContent.js';
-import CreateNewFileModalContent from './components/CreateNewFileModalContent.js';
+import CreateFileModalContent from './components/CreateFileModalContent.js';
 // import CreateProjectModalContent from './components/CreateProjectModalContent.js';
 // import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
@@ -131,23 +131,17 @@ class App extends React.Component {
     let modals = (
       <div>
         {
-          // <Modal id="clone-repository-modal"
+          // <Modal id="create-branch-modal"
           //   modalContent={
-          //     <CloneRepoModalContent
-          //       app={this} />
+          //     <CreateBranchModalContent
+          //       app={this}
+          //       commit={this.state.commit} />
           //   }
           //   large={false} />
         }
-        <Modal id="create-branch-modal"
+        <Modal id="create-file-modal"
           modalContent={
-            <CreateBranchModalContent
-              app={this}
-              commit={this.state.commit} />
-          }
-          large={false} />
-        <Modal id="create-new-file-modal"
-          modalContent={
-            <CreateNewFileModalContent
+            <CreateFileModalContent
               app={this}
               repository={this.state.repository}
               tree={this.state.tree}

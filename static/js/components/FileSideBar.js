@@ -102,7 +102,7 @@ class FileSideBar extends React.Component {
     //   // No need to make _ajaxTree call:
     //   //   This should happen
     //   //   when the recursiveTree structure has changed
-    //   //   outside this component (e.g., CreateNewFileModalContent).
+    //   //   outside this component (e.g., CreateFileModalContent).
     //   console.info('rec tree received');
     //   this.setState({
     //     recursiveTree: nextProps.recursiveTree

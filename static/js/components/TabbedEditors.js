@@ -499,7 +499,7 @@ class TabbedEditors extends React.Component {
       tabs.push(
         <li key={index} className="nav-item">
           <a
-            style={{paddingRight:8}}
+            style={{paddingRight:8}} title={item.path}
             href={"#" + this._getEditorId(item)}
             data-toggle="tab" className={tabClassName}
             onMouseEnter={this.handleTabMouseOver.bind(this)}
@@ -507,10 +507,10 @@ class TabbedEditors extends React.Component {
             onClick={this.handleTabClick.bind(this, item)}>
             {item.name}
             <span
-              style={{paddingTop:2, paddingRight:0}}
+              style={{paddingTop:2, paddingRight:0, paddingLeft:8}}
               onClick={this.handleTabCloseClick.bind(this, item)}
-              className="btn btn-sm btn-link close-tab invisible">
-              <i className="remove icon text-danger"></i>
+              className="btn btn-link close-tab invisible">
+              <strong className="text-danger">&times;</strong>
             </span>
           </a>
         </li>

@@ -105,7 +105,7 @@ class FileNode extends React.Component {
   handleCreateNewFileClick() {
     // Show the path of the new file
     let path = this.state.currentPath + '/';
-    $('#create-new-file-modal input.pathInput').val(path);
+    $('#create-file-modal input.pathInput').val(path);
   }
 
   componentDidMount() {
@@ -186,7 +186,7 @@ class FileNode extends React.Component {
           className="btn btn-link new-file-button block"
           onClick={this.handleCreateNewFileClick.bind(this)}
           data-toggle="modal" type="button"
-          data-target="#create-new-file-modal">
+          data-target="#create-file-modal">
           <i className="add square icon"></i> Create New...
         </button>
       </div>
