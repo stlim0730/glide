@@ -8,6 +8,7 @@
     "npm": "4.2.0"
   },
   "scripts": {
+    "start": "hexo_driver.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "babel": "babel",
     "webpack": "webpack --config ./deployment/webpack.config.js",
