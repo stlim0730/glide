@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # Variables
-PG_VERSION=9.3
+PG_VERSION=9.5
 PROJECT_NAME=glide
-VAGRANT_USERNAME=vagrant
+VAGRANT_USERNAME=ubuntu
 # WS_PORT=8889
 
 
 # Script-based provision
-export DEBIAN_FRONTEND=noninteractive
+# export DEBIAN_FRONTEND=noninteractive
 
 
 # 
@@ -34,22 +34,10 @@ sudo apt-get install -y git
 # Setup Python
 # 
 sudo apt-get install -y python3-pip
-sudo apt-get install -y python-dev python-setuptools python-imaging libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
-# sudo export PYTHONPATH=/usr/local/lib/python3.4/dist-packages:$PYTHONPATH # Don't know why it doesn't work
 sudo pip3 install --upgrade pip
-# sudo cp /$PROJECT_NAME/deployment/aliases ~/.bash_aliases
-# sudo easy_install pip
-
-# Setup newer version of Python: Currently, this project uses the native version of Python on the OS
-# cd /usr/src
-# sudo wget https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz
-# sudo tar xzf Python-$PYTHON_VERSION.tgz
-# cd Python-$PYTHON_VERSION
-# sudo ./configure
-# sudo make install
-
-# sudo pip install --upgrade pip
-# sudo apt-get install -y python-virtualenv # Currently, not using virtualenv
+# sudo apt-get install -y python-dev python-setuptools python-imaging libssl-dev libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python-tk
+# # sudo export PYTHONPATH=/usr/local/lib/python3.4/dist-packages:$PYTHONPATH # Don't know why it doesn't work
+# # sudo cp /$PROJECT_NAME/deployment/aliases ~/.bash_aliases
 
 
 # 
@@ -67,16 +55,17 @@ sudo pip3 install uwsgi
 sudo apt-get install -y redis-server
 
 
-# 
-# Setup Database
-# 
-sudo apt-get install -y postgresql-$PG_VERSION
-sudo apt-get install -y postgresql-contrib
+# # 
+# # Setup Database
+# # 
+sudo apt-get install -y postgresql # Installs the supported version (9.5)
+# sudo apt-get install -y postgresql-contrib # I think the previous command installs contrib-9.5
 sudo apt-get install -y libpq-dev # required for psycopg2
 sudo apt-get install -y python-psycopg2
 sudo cp /$PROJECT_NAME/deployment/pg_hba.conf /etc/postgresql/$PG_VERSION/main/
 sudo service postgresql restart
-sudo createuser -U postgres -d $VAGRANT_USERNAME
+# sudo createuser -U postgres -d $VAGRANT_USERNAME
+sudo -u postgres createuser -s $VAGRANT_USERNAME
 sudo createdb -U $VAGRANT_USERNAME $PROJECT_NAME
 
 
@@ -94,6 +83,7 @@ sudo pip3 install -r /$PROJECT_NAME/requirements.txt
 # 
 # Migrate Django
 # 
+cd /$PROJECT_NAME && python3 manage.py makemigrations
 cd /$PROJECT_NAME && python3 manage.py migrate
 
 
