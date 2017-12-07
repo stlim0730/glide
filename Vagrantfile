@@ -27,9 +27,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network "forwarded_port", guest: 80, host: 8000 # Default public port for NginX
-  config.vm.network "forwarded_port", guest: 8888, host: 8888 # For Django UWSGI
-  config.vm.network "forwarded_port", guest: 8889, host: 8889 # For WebSocket interface by Daphne
-  config.vm.network "forwarded_port", guest: 8890, host: 8890 # Spare
+  config.vm.network "forwarded_port", guest: 8888, host: 8888 # For Django uWSGI
+  config.vm.network "forwarded_port", guest: 8889, host: 8889 # For WebSocket interface by Daphne - Not sure should be open
+  config.vm.network "forwarded_port", guest: 8890, host: 8890 # For Node - Good to be open for testing
   config.vm.network "forwarded_port", guest: 6379, host: 6379 # Reserved for Redis - Not sure should be open
   
   # Create a private network, which allows host-only access to the machine
