@@ -55,7 +55,27 @@ class NavBar extends React.Component {
         }
       ]
     };
+
+    // this.nodetest = this.nodetest.bind(this);
   }
+
+  // nodetest() {
+  //   let url = '/api/project/nodetest';
+
+  //   $.ajax({
+  //     url: url,
+  //     method: 'GET',
+  //     success: function(response) {
+  //       console.log(response, typeof response);
+  //       if('error' in response) {
+  //         // TODO
+  //       }
+  //       else {
+  //         //
+  //       }
+  //     }
+  //   });
+  // }
   
   componentDidMount() {
     let app = this.props.app;
@@ -137,17 +157,27 @@ class NavBar extends React.Component {
               // <GitToolBar />
             }
 
-            <form className="form-inline my-2 my-lg-0">
-              <input
-                className="form-control mr-sm-2"
-                type="search"
-                placeholder="Search" />
-              <button
-                className="btn btn-secondary my-2 my-sm-0"
-                type="submit">
-                Search
-              </button>
-            </form>
+            {
+              <form className="form-inline my-2 my-lg-0">
+                <input
+                  className="form-control mr-sm-2"
+                  type="search"
+                  placeholder="Search" />
+                <button
+                  className="btn btn-secondary my-2 my-sm-0"
+                  type="button" onClick={this.nodetest}>
+                  Search
+                </button>
+              </form>
+            }
+
+            {
+              // <button
+              //   className="btn btn-secondary my-2 my-sm-0"
+              //   type="button" onClick={this.nodetest}>
+              //   Search
+              // </button>
+            }
 
           </div>
 

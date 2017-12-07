@@ -762,3 +762,12 @@ def render(request):
     # Unsupported file type
     pass
   return Response(res)
+
+
+@api_view(['GET'])
+def nodetest(request):
+  glideNodeUrl = 'http://localhost:8890'
+  with urlopen(glideNodeUrl) as glideNodeRes:
+    resStr = glideNodeRes.read().decode('utf-8')
+    # res = json.loads(resStr)
+    return Response({ 'resStr': resStr })
