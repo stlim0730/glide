@@ -1,3 +1,6 @@
+glide/local_settings_digitalocean.py
+nginx_conf_digitalocean
+staticfiles
 node_modules
 .DS_Store
 .vagrant/
