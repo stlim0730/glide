@@ -129,6 +129,7 @@ sudo apt-get install -y npm
 # Install NodeJS Packages
 # 
 cd /$PROJECT_NAME && sudo npm install
+cd /$PROJECT_NAME && sudo npm install pm2 -g
 
 
 # 
@@ -141,3 +142,9 @@ cd /$PROJECT_NAME && ./daphne.sh
 # Daemonize Django worker
 # 
 cd /$PROJECT_NAME && ./runworker.sh
+
+
+# 
+# Daemonize Node server
+# 
+cd /$PROJECT_NAME && sudo pm2 start glide_node.js
