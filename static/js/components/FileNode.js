@@ -50,8 +50,14 @@ class FileNode extends React.Component {
     let fileActive = this.state.fileActive;
 
     if(_.find(filesOpened, {'path': file.path})) {
-      // Already opened
-      // TODO: Change the tab
+      // Already opened: Change the tab
+      this.setState({
+        fileActive: file
+      }, function() {
+        app.setState({
+          fileActive: file
+        });
+      });
     }
     else {
       if(file.originalContent == null) {
