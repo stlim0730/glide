@@ -16,6 +16,7 @@ from jinja2 import Template, Environment, meta
 import traceback
 import re
 from glide import *
+from django.conf import settings
 
 
 # @api_view(['GET'])
@@ -762,3 +763,12 @@ def render(request):
     # Unsupported file type
     pass
   return Response(res)
+
+
+@api_view(['GET'])
+def nodetest(request):
+  glideNodeUrl = 'http://localhost:{}'.format(settings.NODE_PORT)
+  with urlopen(glideNodeUrl) as glideNodeRes:
+    resStr = glideNodeRes.read().decode('utf-8')
+    # res = json.loads(resStr)
+    return Response({ 'resStr': resStr })
