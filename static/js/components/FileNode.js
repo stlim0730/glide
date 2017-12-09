@@ -14,11 +14,11 @@ class FileNode extends React.Component {
     };
 
     this._orderNodes = this._orderNodes.bind(this);
-    this._slugify = this._slugify.bind(this);
+    // this._slugify = this._slugify.bind(this);
     this._getFolderId = this._getFolderId.bind(this);
-    this._getEditorId = this._getEditorId.bind(this);
+    // this._getEditorId = this._getEditorId.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
-    this.handleCreateNewFileClick = this.handleCreateNewFileClick.bind(this);
+    this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
   }
 
   _orderNodes(nodes) {
@@ -30,24 +30,24 @@ class FileNode extends React.Component {
     });
   }
 
-  _slugify(str) {
-    return str.toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-      .replace(/\-\-+/g, '-') // Replace multiple - with single -
-      .replace(/^-+/, '') // Trim - from start of text
-      .replace(/-+$/, '') // Trim - from end of text
-      .trim();
-  }
+  // _slugify(str) {
+  //   return str.toLowerCase()
+  //     .replace(/\s+/g, '-') // Replace spaces with -
+  //     .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+  //     .replace(/\-\-+/g, '-') // Replace multiple - with single -
+  //     .replace(/^-+/, '') // Trim - from start of text
+  //     .replace(/-+$/, '') // Trim - from end of text
+  //     .trim();
+  // }
 
   _getFolderId(folder) {
     return folder.path.replace(/\//g, '-slash-');
   }
 
-  _getEditorId(fileObj) {
-    let suffix = '_editor';
-    return fileObj.sha + suffix;
-  }
+  // _getEditorId(fileObj) {
+  //   let suffix = '_editor';
+  //   return fileObj.sha + suffix;
+  // }
 
   handleFolderClick(e) {
     $(e.target).children('i.folder.icon').toggleClass('open');
@@ -122,7 +122,7 @@ class FileNode extends React.Component {
     }
   }
 
-  handleCreateNewFileClick() {
+  handleCreateNewClick() {
     // Show the path of the new file
     let path = this.state.currentPath + '/';
     $('#create-file-modal input.pathInput').val(path);
@@ -219,7 +219,7 @@ class FileNode extends React.Component {
         }
         <button
           className="btn btn-link new-file-button block"
-          onClick={this.handleCreateNewFileClick.bind(this)}
+          onClick={this.handleCreateNewClick.bind(this)}
           data-toggle="modal" type="button"
           data-target="#create-file-modal">
           <i className="add square icon"></i> Create New...
