@@ -30,6 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 8888, host: 8888 # For Django uWSGI
   config.vm.network "forwarded_port", guest: 8889, host: 8889 # For WebSocket interface by Daphne - Not sure should be open
   config.vm.network "forwarded_port", guest: 8890, host: 8890 # For Node - Good to be open for testing
+  config.vm.network "forwarded_port", guest: 4000, host: 4000 # For Hexo test
   config.vm.network "forwarded_port", guest: 6379, host: 6379 # Reserved for Redis - Not sure should be open
   
   # Create a private network, which allows host-only access to the machine
