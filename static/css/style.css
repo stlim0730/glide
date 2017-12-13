@@ -31,6 +31,7 @@ div.h1 { padding-top: 30px; }
 .block { display: block; }
 .inline-block { display: inline-block; }
 .padding-top-20 { padding-top: 20px; }
+.folder-level-indentation { padding-left: 16px; }
 .margin-top-15 { margin-top: 15px; }
 .margin-top-20 { margin-top: 20px; }
 .margin-top-50 { margin-top: 50px; }

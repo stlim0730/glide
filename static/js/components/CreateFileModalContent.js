@@ -11,16 +11,21 @@ class CreateFileModalContent extends React.Component {
       fileName: '',
       tree: null,
       recursiveTree: null,
-      templates: [],
+      themes: {},
       template: null,
       liveHtmlSrc: null
     };
 
     this._reset = this._reset.bind(this);
     this._validateFileName = this._validateFileName.bind(this);
-    this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
+    // this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
+    this._isTemplateFile = this._isTemplateFile.bind(this);
+    this._isDataFile = this._isDataFile.bind(this);
+    this._loadThemeStructure = this._loadThemeStructure.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this._loadTemplateContent = this._loadTemplateContent.bind(this);
+    this._countLayouts = this._countLayouts.bind(this);
+    this._renderThemeStructure = this._renderThemeStructure.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleLayoutChange = this.handleLayoutChange.bind(this);
@@ -50,6 +55,30 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
+  _isTemplateFile(file) {
+    let templateExtensionsRegex = /(\.ejs|\.swig|\.htm|\.html)$/i;
+    if(templateExtensionsRegex.test(file.name)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  _isDataFile(fileName) {
+    if(this.state.fileOrFolder != 'file') {
+      return false;
+    }
+
+    let dataFileRegex = /(\.md|\.markdown)$/i;
+    if(dataFileRegex.test(fileName)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
     if(folders.length == 1) {
       recursiveTree.nodes.push(newFile);
@@ -60,15 +89,38 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
-  _loadTemplateFiles(tree) {
+  // _loadTemplateFiles(tree) {
+  //   if(!tree) return [];
+
+  //   let templates = _.filter(tree.tree, function(file) {
+  //     let templateFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
+  //     return templateFileRegex.test(file.path);
+  //   });
+
+  //   return templates;
+  // }
+
+  _loadThemeStructure(tree) {
     if(!tree) return [];
 
-    let templates = _.filter(tree.tree, function(file) {
-      let templateFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
-      return templateFileRegex.test(file.path);
+    let themes = _.filter(tree.tree, function(file) {
+      let themeFolderRegex = /themes\/([a-z0-9\s\._-])+$/i;
+      // Include theme folders
+      return themeFolderRegex.test(file.path) && file.type=='tree';
     });
 
-    return templates;
+    let layouts = {};
+    let self = this;
+    _.forEach(themes, function(theme) {
+      layouts[theme.name] = _.filter(tree.tree, function(file) {
+        let layoutFileRegex = /themes\/([a-z0-9\s\._-])+\/layout\/([a-z0-9\s\._-])+$/i;
+        // Include layout files per theme
+        return layoutFileRegex.test(file.path)
+          && file.type=='blob' && self._isTemplateFile(file);
+      });
+    });
+
+    return layouts;
   }
 
   _loadTemplateContent(repository, templateFile, yamlFile) {
@@ -116,6 +168,39 @@ class CreateFileModalContent extends React.Component {
     });
   }
 
+  _countLayouts(themes) {
+    let cnt = 0;
+    for(let theme in themes) {
+      let layouts = themes[theme];
+      cnt += layouts.length;
+    }
+    return cnt;
+  }
+
+  _renderThemeStructure(themeName, layouts, index) {
+    return (
+      <div key={index}>
+        <button
+          className="btn btn-link file-node-folder block theme-structure disabled">
+          <i className="folder icon"></i> {themeName}
+        </button>
+        <ul className="folder-level-indentation">
+          {
+            layouts.map(function(layout, index) {
+              return (
+                <button
+                  type="button" key={index}
+                  className="btn btn-link file-node-file block theme-structure disabled">
+                  <i className="file outline text icon"></i> {layout.name}
+                </button>
+              )
+            })
+          }
+        </ul>
+      </div>
+    );
+  }
+
   handleFileOrFolderChange(e) {
     this.setState({
       fileOrFolder: e.target.value
@@ -134,6 +219,13 @@ class CreateFileModalContent extends React.Component {
       this.setState({
         fileName: ''
       });
+    }
+
+    if(this._isDataFile(fileName)) {
+      $('button.theme-structure').removeClass('disabled');
+    }
+    else {
+      $('button.theme-structure').addClass('disabled');
     }
   }
 
@@ -273,25 +365,25 @@ class CreateFileModalContent extends React.Component {
   }
 
   componentDidMount() {
-    let templates = this._loadTemplateFiles(this.props.tree);
+    let themes = this._loadThemeStructure(this.props.tree);
 
     this.setState({
       repository: this.props.repository,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      templates: templates,
+      themes: themes,
       template: null
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    let templates = this._loadTemplateFiles(nextProps.tree);
+    let themes = this._loadThemeStructure(nextProps.tree);
     
     this.setState({
       repository: nextProps.repository,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      templates: templates,
+      themes: themes,
       template: null
     });
   }
@@ -359,41 +451,23 @@ class CreateFileModalContent extends React.Component {
               </div>
               <div className="form-group">
                 <label className="control-label">
-                  Design Template
+                  Themes & Layouts
                 </label>
                 <button
                   type="button" className="btn btn-sm btn-link"
                   data-container="body" data-toggle="popover"
                   data-placement="bottom" data-original-title="" title=""
-                  data-content="Layout selection is available when you author YAML(.yaml) or HTML(.html) files.">
-                  <span className="glyphicon glyphicon-info-sign"></span>
+                  data-content="Layout selection is available when you create Markdown(.md) files.">
+                  <i className="info circle icon"></i>
                 </button>
                 <br />
                 <span className="help-block">
-                  This repository has {this.state.templates.length} template(s) available.
+                  This repository has {this._countLayouts(this.state.themes)} layout(s)&nbsp;
+                  in {_.keys(this.state.themes).length} theme(s) available.
                 </span>
                 {
-                  this.state.templates.map(function(item, index) {
-                    return (
-                      <div key={index}>
-                        <label className="btn btn-link">
-                          <input
-                            type="radio"
-                            name="pageLayout"
-                            value={item.name}
-                            disabled={
-                              !this.state.fileName
-                              || (!(this.state.fileName.endsWith('.yaml')
-                              || this.state.fileName.endsWith('.yml')
-                              || this.state.fileName.endsWith('.html')
-                              || this.state.fileName.endsWith('.htm')))
-                            }
-                            onClick={this.handleLayoutChange.bind(this, item)}
-                            /> {item.name}
-                          </label>
-                        <br />
-                      </div>
-                    );
+                  _.keys(this.state.themes).map(function(item, index) {
+                    return this._renderThemeStructure(item, this.state.themes[item], index);
                   }.bind(this))
                 }
               </div>
@@ -402,7 +476,7 @@ class CreateFileModalContent extends React.Component {
 
           <div className="col-md-8">
             <label className="control-label">
-              Design Template Preview
+              Theme & Layout Preview
             </label>
             <div className="form-group">
               {
@@ -415,7 +489,7 @@ class CreateFileModalContent extends React.Component {
               }
               {
                 !this.state.liveHtmlSrc &&
-                'Select a design template for preview.'
+                'Select a layout for preview.'
               }
             </div>
           </div>
