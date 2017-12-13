@@ -39,9 +39,10 @@ class CreateFileModalContent extends React.Component {
       fileName: '',
       template: null,
       liveHtmlSrc: null
+    }, function() {
+      this.fileNameInput.value = '';
+      $('button.theme-structure').addClass('disabled');
     });
-
-    this.fileNameInput.value = '';
   }
 
   _validateFileName(fileName) {
