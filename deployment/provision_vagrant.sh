@@ -130,6 +130,7 @@ sudo apt-get install -y npm
 # 
 cd /$PROJECT_NAME && sudo npm install
 cd /$PROJECT_NAME && sudo npm install pm2 -g
+cd /$PROJECT_NAME && sudo npm install hexo-cli -g
 
 
 # 
@@ -147,4 +148,4 @@ cd /$PROJECT_NAME && ./runworker.sh
 # 
 # Daemonize Node server
 # 
-cd /$PROJECT_NAME && sudo pm2 start glide_node.js
+# cd /$PROJECT_NAME && sudo pm2 start glide_node.js --watch

@@ -18,7 +18,7 @@ urlpatterns = [
   url(r'^project/blob/(?P<owner>.+)/(?P<repo>.+)/(?P<sha>.{40})$', views.blob, name='blob'),
   url(r'^project/parse/template$', views.parse, name='parse'),
   url(r'^project/pull/(?P<owner>.+)/(?P<repo>.+)$', views.pull, name='pull'),
-  url(r'^project/render$', views.render, name='render'),
-  url(r'^project/nodetest$', views.nodetest, name='nodetest'),
+  # url(r'^project/render/layout$', views.renderLayout, name='renderLayout'),
+  # url(r'^project/nodetest$', views.nodetest, name='nodetest'),
   # url(r'^project/blob/(?P<owner>.+)/(?P<repo>.+)$', views.blob, name='blob'),
 ]

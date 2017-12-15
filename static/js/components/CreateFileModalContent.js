@@ -8,6 +8,7 @@ class CreateFileModalContent extends React.Component {
     this.state = {
       repository: null,
       fileOrFolder: null,
+      pageOrPost: null,
       fileName: '',
       tree: null,
       recursiveTree: null,
@@ -28,7 +29,8 @@ class CreateFileModalContent extends React.Component {
     this._renderThemeStructure = this._renderThemeStructure.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
-    this.handleLayoutChange = this.handleLayoutChange.bind(this);
+    this.handlePageOrPostChange = this.handlePageOrPostChange.bind(this);
+    // this.handleLayoutChange = this.handleLayoutChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -36,6 +38,7 @@ class CreateFileModalContent extends React.Component {
   _reset() {
     this.setState({
       fileOrFolder: null,
+      pageOrPost: null,
       fileName: '',
       template: null,
       liveHtmlSrc: null
@@ -190,7 +193,7 @@ class CreateFileModalContent extends React.Component {
             layouts.map(function(layout, index) {
               return (
                 <button
-                  type="button" key={index}
+                  type="button" key={index} onClick={this.handleLayoutClick}
                   className="btn btn-link file-node-file block theme-structure disabled">
                   <i className="file outline text icon"></i> {layout.name}
                 </button>
@@ -200,6 +203,12 @@ class CreateFileModalContent extends React.Component {
         </ul>
       </div>
     );
+  }
+
+  handlePageOrPostChange(e) {
+    this.setState({
+      pageOrPost: e.target.value
+    });
   }
 
   handleFileOrFolderChange(e) {
@@ -230,35 +239,35 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
-  handleLayoutChange(file, e) {
-    // Load template file content
-    let url = '/api/project/cdn/' + this.state.repository.full_name;
-    let self = this;
+  // handleLayoutChange(file, e) {
+  //   // Load template file content
+  //   let url = '/api/project/cdn/' + this.state.repository.full_name;
+  //   let self = this;
 
-    $.ajax({
-      url: url,
-      method: 'POST',
-      headers: { 'X-CSRFToken': window.glide.csrfToken },
-      dataType: 'json',
-      data: JSON.stringify({
-        file: file,
-        branch: null
-      }),
-      contentType: 'application/json; charset=utf-8',
-      success: function(response) {
-        console.info(response);
-        if('error' in response) {
-          // TODO
-        }
-        else {
-          self.setState({
-            template: file,
-            liveHtmlSrc: response.cdnUrl
-          });
-        }
-      }
-    });
-  }
+  //   $.ajax({
+  //     url: url,
+  //     method: 'POST',
+  //     headers: { 'X-CSRFToken': window.glide.csrfToken },
+  //     dataType: 'json',
+  //     data: JSON.stringify({
+  //       file: file,
+  //       branch: null
+  //     }),
+  //     contentType: 'application/json; charset=utf-8',
+  //     success: function(response) {
+  //       console.info(response);
+  //       if('error' in response) {
+  //         // TODO
+  //       }
+  //       else {
+  //         self.setState({
+  //           template: file,
+  //           liveHtmlSrc: response.cdnUrl
+  //         });
+  //       }
+  //     }
+  //   });
+  // }
 
   handleKeyUp(e) {
     let keyCode = e.keyCode;
@@ -419,23 +428,21 @@ class CreateFileModalContent extends React.Component {
                 </div>
               </div>
               <div className="form-group margin-top-15">                  
-                
-                  <label>
-                    <input
-                      type="radio"
-                      value="file"
-                      checked={this.state.fileOrFolder=='file'}
-                      onChange={this.handleFileOrFolderChange} /> File
-                  </label>
-                  &emsp;
-                  <label>
-                    <input
-                      type="radio"
-                      value="folder"
-                      checked={this.state.fileOrFolder=='folder'}
-                      onChange={this.handleFileOrFolderChange} /> Folder
-                  </label>
-                
+                <label>
+                  <input
+                    type="radio"
+                    value="file"
+                    checked={this.state.fileOrFolder=='file'}
+                    onChange={this.handleFileOrFolderChange} /> File
+                </label>
+                &emsp;
+                <label>
+                  <input
+                    type="radio"
+                    value="folder"
+                    checked={this.state.fileOrFolder=='folder'}
+                    onChange={this.handleFileOrFolderChange} /> Folder
+                </label>
               </div>
               <div className="form-group">
                 <label className="control-label">
@@ -462,14 +469,37 @@ class CreateFileModalContent extends React.Component {
                   <i className="info circle icon"></i>
                 </button>
                 <br />
-                <span className="help-block">
-                  This repository has {this._countLayouts(this.state.themes)} layout(s)&nbsp;
-                  in {_.keys(this.state.themes).length} theme(s) available.
-                </span>
+                <div className="form-group margin-top-15">
+                  <label className="control-label">
+                    Content Type
+                  </label>
+                  <br />
+                  <label>
+                    <input
+                      type="radio"
+                      value="page"
+                      checked={this.state.pageOrPost=='page'}
+                      onChange={this.handlePageOrPostChange} /> Page
+                  </label>
+                  &emsp;
+                  <label>
+                    <input
+                      type="radio"
+                      value="post"
+                      checked={this.state.pageOrPost=='post'}
+                      onChange={this.handlePageOrPostChange} /> Blog Post
+                  </label>
+                </div>
                 {
-                  _.keys(this.state.themes).map(function(item, index) {
-                    return this._renderThemeStructure(item, this.state.themes[item], index);
-                  }.bind(this))
+                  // <span className="help-block">
+                  //   This repository has {this._countLayouts(this.state.themes)} layout(s)&nbsp;
+                  //   in {_.keys(this.state.themes).length} theme(s) available.
+                  // </span>
+                }
+                {
+                  // _.keys(this.state.themes).map(function(item, index) {
+                  //   return this._renderThemeStructure(item, this.state.themes[item], index);
+                  // }.bind(this))
                 }
               </div>
             </fieldset>
@@ -509,10 +539,6 @@ class CreateFileModalContent extends React.Component {
             data-dismiss="modal" disabled={
               !this.state.fileOrFolder
               || this.state.fileName.trim().length==0
-              || ((this.state.fileName.endsWith('yaml')
-                || this.state.fileName.endsWith('yml')
-                || this.state.fileName.endsWith('html')
-                || this.state.fileName.endsWith('htm')) && !this.state.template)
             }>
             Submit
           </button>
