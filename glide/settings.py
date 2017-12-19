@@ -200,6 +200,9 @@ STATICFILES_DIRS = (
   os.path.join(PROJECT_ROOT, 'static'),
 )
 
+# Media files (Hexo)
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_URL = '/media/'
 
 # OAuth credentials and info
 GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID')

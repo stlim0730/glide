@@ -167,149 +167,149 @@ class TabbedEditors extends React.Component {
     let app = this.props.app;
     let self = this;
 
-    $.ajax({
-      url: url,
-      method: 'POST',
-      headers: { 'X-CSRFToken': window.glide.csrfToken },
-      dataType: 'json',
-      data: JSON.stringify(data),
-      contentType: 'application/json; charset=utf-8',
-      success: function(response) {
-        // console.info(response);
-        if('error' in response) {
-          // TODO: Remove the HTML file in tree and recursive tree if it exists
-          app.setState({
-            liveBugs: response.error,
-            liveYaml: null,
-            liveHtml: null
-          });
-        }
-        else {
+    // $.ajax({
+    //   url: url,
+    //   method: 'POST',
+    //   headers: { 'X-CSRFToken': window.glide.csrfToken },
+    //   dataType: 'json',
+    //   data: JSON.stringify(data),
+    //   contentType: 'application/json; charset=utf-8',
+    //   success: function(response) {
+    //     // console.info(response);
+    //     if('error' in response) {
+    //       // TODO: Remove the HTML file in tree and recursive tree if it exists
+    //       app.setState({
+    //         liveBugs: response.error,
+    //         liveYaml: null,
+    //         liveHtml: null
+    //       });
+    //     }
+    //     else {
 
-          let liveHtml = null;
-          let liveYaml = null;
+    //       let liveHtml = null;
+    //       let liveYaml = null;
 
-          // If the response has html structure
-          if('html' in response) {
-            liveHtml = response.html;
-            // TODO: Create an HTML file in tree and recursive tree
-            //   cf. CreateNewModalContent component
+    //       // If the response has html structure
+    //       if('html' in response) {
+    //         liveHtml = response.html;
+    //         // TODO: Create an HTML file in tree and recursive tree
+    //         //   cf. CreateNewModalContent component
 
-            let htmlFileName = data.fileName.replace(/\.(yaml|yml)$/, '.html');
+    //         let htmlFileName = data.fileName.replace(/\.(yaml|yml)$/, '.html');
 
-            let tree = self.state.tree;
-            let recursiveTree = self.state.recursiveTree;
-            let filesOpened = self.state.filesOpened;
-            let addedFiles = app.state.addedFiles;
-            let changedFiles = app.state.changedFiles;
+    //         let tree = self.state.tree;
+    //         let recursiveTree = self.state.recursiveTree;
+    //         let filesOpened = self.state.filesOpened;
+    //         let addedFiles = app.state.addedFiles;
+    //         let changedFiles = app.state.changedFiles;
 
-            let htmlFile = _.find(tree.tree, function(file) {
-              return _.lowerCase(file.path) === _.lowerCase('docs/' + htmlFileName);
-            });
+    //         let htmlFile = _.find(tree.tree, function(file) {
+    //           return _.lowerCase(file.path) === _.lowerCase('docs/' + htmlFileName);
+    //         });
 
-            if(!htmlFile) {
-              // Create a new HTML file
-              htmlFile = {
-                name: htmlFileName,
-                nodes: [],
-                path: 'docs/' + htmlFileName,
-                added: true,
-                modified: false,
-                originalContent: '',
-                newContent: liveHtml,
-                sha: null,
-                size: liveHtml.length,
-                url: null,
-                type: 'blob',
-                mode: '100644'
-              };
+    //         if(!htmlFile) {
+    //           // Create a new HTML file
+    //           htmlFile = {
+    //             name: htmlFileName,
+    //             nodes: [],
+    //             path: 'docs/' + htmlFileName,
+    //             added: true,
+    //             modified: false,
+    //             originalContent: '',
+    //             newContent: liveHtml,
+    //             sha: null,
+    //             size: liveHtml.length,
+    //             url: null,
+    //             type: 'blob',
+    //             mode: '100644'
+    //           };
 
-              // Push the file into tree
-              tree.tree.push(htmlFile);
+    //           // Push the file into tree
+    //           tree.tree.push(htmlFile);
 
-              // Push the file into recursiveTree
-              let folders = htmlFile.path.split('/');
-              self._addFileToRecursiveTree(recursiveTree, htmlFile, folders);
-              // console.info('see if tree has the new html file', recursiveTree);
+    //           // Push the file into recursiveTree
+    //           let folders = htmlFile.path.split('/');
+    //           self._addFileToRecursiveTree(recursiveTree, htmlFile, folders);
+    //           // console.info('see if tree has the new html file', recursiveTree);
 
-              // Push the file into addedFiles
-              addedFiles.push(htmlFile);
-            }
-            else {
-              // Update the existing HTML file
-              //   in tree and recursiveTree
-              htmlFile.newContent = liveHtml;
-              htmlFile.size = liveHtml.length;
-              htmlFile.modified = true;
+    //           // Push the file into addedFiles
+    //           addedFiles.push(htmlFile);
+    //         }
+    //         else {
+    //           // Update the existing HTML file
+    //           //   in tree and recursiveTree
+    //           htmlFile.newContent = liveHtml;
+    //           htmlFile.size = liveHtml.length;
+    //           htmlFile.modified = true;
               
-              let treeIndex = _.findIndex(tree.tree, function(file) {
-                return file.path === htmlFile.path;
-              });
-              tree.tree[treeIndex] = htmlFile;
-              // Note: Seems that recursiveTree doesn't have to be manually updated
-              //   since it already has the reference to htmlFile.
-              // let folders = htmlFile.path.split('/');
-              // self._updateFileInRecursiveTree(recursiveTree, htmlFile, folders);
-              // console.info('see if tree has the updated html file', recursiveTree);
+    //           let treeIndex = _.findIndex(tree.tree, function(file) {
+    //             return file.path === htmlFile.path;
+    //           });
+    //           tree.tree[treeIndex] = htmlFile;
+    //           // Note: Seems that recursiveTree doesn't have to be manually updated
+    //           //   since it already has the reference to htmlFile.
+    //           // let folders = htmlFile.path.split('/');
+    //           // self._updateFileInRecursiveTree(recursiveTree, htmlFile, folders);
+    //           // console.info('see if tree has the updated html file', recursiveTree);
               
-              // Push the file into changedFiles
-              if(htmlFile.originalContent != htmlFile.newContent) {
-                // This file has been modified.
-                //   CURRENTLY NOT USING file.modified = true;
-                if(!_.find(changedFiles, { path: htmlFile.path })) {
-                  changedFiles.push(htmlFile);
-                }
-              }
-              else {
-                changedFiles = _.remove(changedFiles, function(file) {
-                  return file.path != htmlFile.path;
-                });
-              }
+    //           // Push the file into changedFiles
+    //           if(htmlFile.originalContent != htmlFile.newContent) {
+    //             // This file has been modified.
+    //             //   CURRENTLY NOT USING file.modified = true;
+    //             if(!_.find(changedFiles, { path: htmlFile.path })) {
+    //               changedFiles.push(htmlFile);
+    //             }
+    //           }
+    //           else {
+    //             changedFiles = _.remove(changedFiles, function(file) {
+    //               return file.path != htmlFile.path;
+    //             });
+    //           }
 
-              // Update editor if the HTML file is opened
-              let htmlFileIndex = _.findIndex(filesOpened, function(file) {
-                return file.path == htmlFile.path;
-              });
+    //           // Update editor if the HTML file is opened
+    //           let htmlFileIndex = _.findIndex(filesOpened, function(file) {
+    //             return file.path == htmlFile.path;
+    //           });
 
-              if(htmlFileIndex >= 0) {
-                filesOpened[htmlFileIndex] = htmlFile;
-              }
+    //           if(htmlFileIndex >= 0) {
+    //             filesOpened[htmlFileIndex] = htmlFile;
+    //           }
 
-              // TODO: Refresh CodeMirror elements
-              // TODO
-              console.info($('#cm-' + htmlFile.path.replace('/', '--')));
+    //           // TODO: Refresh CodeMirror elements
+    //           // TODO
+    //           console.info($('#cm-' + htmlFile.path.replace('/', '--')));
 
-            }
+    //         }
 
-            // Update the states
-            self.setState({
-              recursiveTree: recursiveTree,
-              tree: tree,
-              filesOpened: filesOpened
-            }, function() {
-              app.setState({
-                recursiveTree: recursiveTree,
-                tree: tree,
-                addedFiles: addedFiles,
-                changedFiles: changedFiles,
-                filesOpened: filesOpened
-              });
-            });
-          }
+    //         // Update the states
+    //         self.setState({
+    //           recursiveTree: recursiveTree,
+    //           tree: tree,
+    //           filesOpened: filesOpened
+    //         }, function() {
+    //           app.setState({
+    //             recursiveTree: recursiveTree,
+    //             tree: tree,
+    //             addedFiles: addedFiles,
+    //             changedFiles: changedFiles,
+    //             filesOpened: filesOpened
+    //           });
+    //         });
+    //       }
 
-          // If the response has yaml structure
-          if('yaml' in response) {
-            liveYaml = response.yaml;
-          }
+    //       // If the response has yaml structure
+    //       if('yaml' in response) {
+    //         liveYaml = response.yaml;
+    //       }
 
-          app.setState({
-            liveHtml: liveHtml,
-            liveYaml: liveYaml,
-            liveBugs: []
-          });
-        }
-      }
-    });
+    //       app.setState({
+    //         liveHtml: liveHtml,
+    //         liveYaml: liveYaml,
+    //         liveBugs: []
+    //       });
+    //     }
+    //   }
+    // });
   }
 
   handleTabMouseOver(e) {

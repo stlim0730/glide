@@ -1,6 +1,5 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-# from rest_framework.renderers import JSONRenderer
 from .serializers import *
 import json
 from urllib.parse import urlencode
@@ -15,8 +14,11 @@ import yaml
 from jinja2 import Template, Environment, meta
 import traceback
 import re
+import os
 from glide import *
 from django.conf import settings
+# from django.core.files import File
+import pathlib, shutil, subprocess
 
 
 # @api_view(['GET'])
@@ -772,3 +774,79 @@ def nodetest(request):
     resStr = glideNodeRes.read().decode('utf-8')
     # res = json.loads(resStr)
     return Response({ 'resStr': resStr })
+
+
+@api_view(['POST'])
+def hardclone(request):
+  cloneUrl = request.data['cloneUrl']
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  username = request.session['username'].split('@')[0]
+  # Create dirs
+  hexoBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  hexoBasePath = pathlib.Path(hexoBasePathStr)
+  if hexoBasePath.exists():
+    if hexoBasePath.is_file():
+      hexoBasePath.unlink()
+    elif hexoBasePath.is_dir():
+      shutil.rmtree(hexoBasePathStr, ignore_errors=True)
+  hexoBasePath.mkdir(mode=0o777, parents=True)
+  # Clone project
+  cloneCommand = 'git clone {} {}'.format(cloneUrl, hexoBasePathStr)
+  cloneCompProc = subprocess.run(
+    cloneCommand.split(), stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  return Response({
+    'args': cloneCompProc.args,
+    'returncode': cloneCompProc.returncode,
+    'stdout': cloneCompProc.stdout,
+    'stderr': cloneCompProc.stderr
+  })
+
+@api_view(['POST'])
+def hexoNew(request):
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  scaffold = request.data['scaffold']
+  newContentName = request.data['newContentName']
+  username = request.session['username'].split('@')[0]
+  hexoBaseDir = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  hexoNewCommand = 'cd {} && hexo new {} {}'.format(hexoBaseDir, scaffold, newContentName)
+  # If shell is True, it is recommended to pass args as a string rather than as a sequence.
+  hexoNewCompProc = subprocess.run(
+    hexoNewCommand, shell=True, stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  # if hexoNewCompProc.returncode == 0:
+  createdFilePaths = re.findall('INFO\s+Created:\s+[a-z0-9\s\._-]+/source/[a-z0-9\s\._-]+\.[a-z0-9\s\._-]$', hexoNewCompProc.stdout.decode('utf-8'))
+  return Response({
+    'paths': createdFilePaths,
+    'args': hexoNewCompProc.args,
+    'returncode': hexoNewCompProc.returncode,
+    'stdout': hexoNewCompProc.stdout.decode('utf-8'),
+    'stderr': hexoNewCompProc.stderr
+  })
+
+@api_view(['POST'])
+def generate(request):
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  addedFiles = request.data['addedFiles']
+  # changedFiles = request.data['changedFiles']
+  username = request.session['username'].split('@')[0]
+  hexoBaseDir = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  # hexoBasePath = pathlib.Path(hexoBaseDir)
+  for file in addedFiles:
+    # TODO: Check binary or text
+    filePath = os.path.join(hexoBaseDir, file['path'])
+    with open(filePath, 'w') as fo:
+      content = None
+      if file['newContent']:
+        content = file['newContent']
+      else:
+        content = file['originalContent']
+      fo.write(content)
+  return Response({
+    'res': 'res'
+  })

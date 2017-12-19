@@ -53,12 +53,15 @@ class App extends React.Component {
       phase: 'clean_slate',
       repositories: [],
       repository: null,
+      isHexoPrj: true, // TODO: Dynamically detect Hexo projects
       branches: [],
       branch: null,
       commits: [],
       commit: null,
       tree: null,
       recursiveTree: null,
+      scaffolds: [],
+      scaffold: null,
       filesOpened: [],
       fileActive: null,
       changedFiles: [],
@@ -144,10 +147,13 @@ class App extends React.Component {
             <CreateFileModalContent
               app={this}
               repository={this.state.repository}
+              branch={this.state.branch}
               tree={this.state.tree}
-              recursiveTree={this.state.recursiveTree} />
+              recursiveTree={this.state.recursiveTree}
+              scaffolds={this.state.scaffolds}
+              scaffold={this.state.scaffold} />
           }
-          large={true} />
+          large={false} />
         <Modal id="git-status-modal"
           modalContent={
             <GitStatusModalContent
@@ -268,6 +274,10 @@ class App extends React.Component {
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
+              // scaffolds={this.state.scaffolds}
+              // scaffold={this.state.scaffold}
+              changedFiles={this.state.changedFiles}
+              addedFiles={this.state.addedFiles}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened}
               liveYaml={this.state.liveYaml}

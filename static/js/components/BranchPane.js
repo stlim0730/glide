@@ -17,6 +17,8 @@ class BranchPane extends React.Component {
 
     this._reset = this._reset.bind(this);
     this._ajaxBranches = this._ajaxBranches.bind(this);
+    this._openCommit = this._openCommit.bind(this);
+    this._hardClone = this._hardClone.bind(this);
     this._validateBranchName = this._validateBranchName.bind(this);
     this.handlePreviousClick = this.handlePreviousClick.bind(this);
     this.handleRefreshClick = this.handleRefreshClick.bind(this);
@@ -144,12 +146,44 @@ class BranchPane extends React.Component {
             commits: commits,
             commit: latestCommit
           }, function() {
+            self._hardClone(
+              this.state.repository,
+              branch
+            );
             // self._reset();
             // console.info(app.state, commits, latestCommit);
             // app.setState({
             //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
             // });
           });
+        }
+      }
+    });
+  }
+
+  _hardClone(repository, branch) {
+    // POST request for Hexo initialization
+    let url = '/api/project/hardclone';
+    let self = this;
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        cloneUrl: repository.clone_url,
+        repository: repository.full_name,
+        branch: branch.name
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          // TODO: Duplicated branch name is used
+        }
+        else {
+          //
         }
       }
     });
@@ -228,8 +262,9 @@ class BranchPane extends React.Component {
         }
         else {
           let branch = response.branch;
-          let committer = branch.commit.committer.login!='web-flow'
-            ? branch.commit.committer : branch.commit.author;
+          let committer = branch.commit.committer.login != 'web-flow' ?
+            branch.commit.committer :
+            branch.commit.author;
           let committerUrl = 'https://github.com/' + committer.login;
           let date = branch.commit.commit.committer.date || branch.commit.commit.author.date;
           let branchDesc = {
@@ -265,6 +300,7 @@ class BranchPane extends React.Component {
       let masterBranch = _.find(this.state.branches, function(branch) {
         return branch.name === 'master';
       });
+      // Branch only from the latest commit on master branch
       let shaBranchFrom = masterBranch.commit.sha;
       let self = this;
 
@@ -352,7 +388,7 @@ class BranchPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-3 col-md-3">
+          <div className="col-lg-3 col-md-3 offset-lg-1 offset-md-1">
 
             {
               this.state.repository &&

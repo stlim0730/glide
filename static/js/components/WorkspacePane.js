@@ -15,6 +15,10 @@ class WorkspacePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
+      // scaffolds: [],
+      // scaffold: null,
+      changedFiles: [],
+      addedFiles: [],
       fileActive: null,
       filesOpened: [],
       liveYaml: null,
@@ -27,9 +31,9 @@ class WorkspacePane extends React.Component {
   }
 
   _reset() {
-    this.setState({
-      //
-    });
+    // this.setState({
+      // 
+    // });
   }
 
   handlePreviousClick() {
@@ -48,6 +52,10 @@ class WorkspacePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      // scaffolds: this.props.scaffolds,
+      // scaffold: this.props.scaffold,
+      changedFiles: this.props.changedFiles,
+      addedFiles: this.props.addedFiles,
       fileActive: this.props.fileActive,
       filesOpened: this.props.filesOpened,
       liveYaml: this.props.liveYaml,
@@ -63,6 +71,10 @@ class WorkspacePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      // scaffolds: nextProps.scaffolds,
+      // scaffold: nextProps.scaffold,
+      changedFiles: nextProps.changedFiles,
+      addedFiles: nextProps.addedFiles,
       fileActive: nextProps.fileActive,
       filesOpened: nextProps.filesOpened,
       liveYaml: nextProps.liveYaml,
@@ -85,8 +97,12 @@ class WorkspacePane extends React.Component {
             fileActive={this.state.fileActive} />
           <EditorPane
             app={this.props.app}
+            repository={this.state.repository}
+            branch={this.state.branch}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}
+            changedFiles={this.state.changedFiles}
+            addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
             fileActive={this.state.fileActive} />
           <RuntimePane

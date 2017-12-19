@@ -7,6 +7,7 @@ class FileNode extends React.Component {
 
     this.state = {
       repository: null,
+      tree: null,
       filesOpened: [],
       fileActive: null,
       currentPath: '',
@@ -17,6 +18,7 @@ class FileNode extends React.Component {
     // this._slugify = this._slugify.bind(this);
     this._getFolderId = this._getFolderId.bind(this);
     // this._getEditorId = this._getEditorId.bind(this);
+    this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
     this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
   }
@@ -48,6 +50,20 @@ class FileNode extends React.Component {
   //   let suffix = '_editor';
   //   return fileObj.sha + suffix;
   // }
+
+  _loadScaffoldsFiles(tree) {
+    if(!tree) return [];
+
+    let scaffolds = _.filter(tree.tree, function(file) {
+      let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
+      return scaffoldsPathRegex.test(file.path);
+    });
+    
+    let app = this.props.app;
+    app.setState({
+      scaffolds: scaffolds
+    });
+  }
 
   handleFolderClick(e) {
     $(e.target).children('i.folder.icon').toggleClass('open');
@@ -126,6 +142,9 @@ class FileNode extends React.Component {
     // Show the path of the new file
     let path = this.state.currentPath + '/';
     $('#create-file-modal input.pathInput').val(path);
+
+    // Load Hexo-provided scaffolds
+    let scaffolds = this._loadScaffoldsFiles(this.state.tree);
   }
 
   componentDidMount() {
@@ -137,6 +156,7 @@ class FileNode extends React.Component {
     let self = this;
     this.setState({
       repository: this.props.repository,
+      tree: this.props.tree,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive,
       currentPath: this.props.currentPath
@@ -155,6 +175,7 @@ class FileNode extends React.Component {
     let self = this;
     this.setState({
       repository: nextProps.repository,
+      tree: nextProps.tree,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive,
       currentPath: nextProps.currentPath
