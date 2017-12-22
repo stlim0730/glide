@@ -58,7 +58,7 @@ class FileNode extends React.Component {
       let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
       return scaffoldsPathRegex.test(file.path);
     });
-    
+        
     let app = this.props.app;
     app.setState({
       scaffolds: scaffolds
@@ -144,7 +144,7 @@ class FileNode extends React.Component {
     $('#create-file-modal input.pathInput').val(path);
 
     // Load Hexo-provided scaffolds
-    let scaffolds = this._loadScaffoldsFiles(this.state.tree);
+    this._loadScaffoldsFiles(this.state.tree);
   }
 
   componentDidMount() {
@@ -207,6 +207,7 @@ class FileNode extends React.Component {
                     <FileNode
                       app={this.props.app}
                       repository={this.state.repository}
+                      tree={this.state.tree}
                       filesOpened={this.state.filesOpened}
                       fileActive={this.state.fileActive}
                       currentPath={item.path}
