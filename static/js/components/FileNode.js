@@ -43,7 +43,7 @@ class FileNode extends React.Component {
   // }
 
   _getFolderId(folder) {
-    return folder.path.replace(/\//g, '-slash-');
+    return folder.path.replace(/\//g, '-slash-').replace(/\s/g, '-ws-');
   }
 
   // _getEditorId(fileObj) {
@@ -58,7 +58,8 @@ class FileNode extends React.Component {
       let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
       return scaffoldsPathRegex.test(file.path);
     });
-        
+    scaffolds.push(null);
+
     let app = this.props.app;
     app.setState({
       scaffolds: scaffolds

@@ -9,15 +9,11 @@ class CreateFileModalContent extends React.Component {
       repository: null,
       branch: null,
       fileOrFolder: null,
-      // pageOrPost: null,
       fileName: '',
       tree: null,
       recursiveTree: null,
-      // themes: {},
       scaffold: null,
-      scaffolds: [],
-      // template: null,
-      // liveHtmlSrc: null
+      scaffolds: []
     };
 
     this._reset = this._reset.bind(this);
@@ -35,8 +31,6 @@ class CreateFileModalContent extends React.Component {
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleScaffoldChange = this.handleScaffoldChange.bind(this);
-    // this.handlePageOrPostChange = this.handlePageOrPostChange.bind(this);
-    // this.handleLayoutChange = this.handleLayoutChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
@@ -68,7 +62,8 @@ class CreateFileModalContent extends React.Component {
 
   _validateFileName(fileName) {
     // Validate the file name
-    let fileNameRegex = /^([a-z0-9\s\._-]+)$/i;
+    // TODO: Allow unicode word characters
+    let fileNameRegex = /^([\w\s\.-]+)$/i;
     if(fileNameRegex.test(fileName)) {
       return true;
     }
@@ -112,8 +107,27 @@ class CreateFileModalContent extends React.Component {
       recursiveTree.nodes.push(newFile);
     }
     else {
-      let targetFolder = _.find(recursiveTree.nodes, {name: folders.shift(), type: 'tree'});
-      this._addFileToRecursiveTree(targetFolder, newFile, folders);
+      let folderName = folders.shift();
+      let targetFolder = _.find(recursiveTree.nodes, {name: folderName, type: 'tree'});
+      if(targetFolder) {
+        this._addFileToRecursiveTree(targetFolder, newFile, folders);
+      }
+      else {
+        // console.log('_add', newFile, folders);
+        let subdirs = '/' + folders.join('/');
+        let path  = '/' + newFile.path.replace(subdirs, '');
+        // Create a folder
+        let newFolder = {
+          name: folderName,
+          nodes: [],
+          path: path,
+          type: 'tree',
+          mode: '040000'
+        };
+
+        recursiveTree.nodes.push(newFolder);
+        this._addFileToRecursiveTree(newFolder, newFile, folders);
+      }
     }
   }
 
@@ -274,25 +288,20 @@ class CreateFileModalContent extends React.Component {
   //   );
   // }
 
-  // handlePageOrPostChange(e) {
-  //   this.setState({
-  //     pageOrPost: e.target.value
-  //   });
-  // }
-
   handleFileOrFolderChange(e) {
     this.setState({
-      fileOrFolder: e.target.value
+      fileOrFolder: e.target.value,
+      scaffold: null
     });
   }
 
   handleScaffoldChange(e) {
-    let self = this;
-
+    let scaffold = e.target.value;
+    if(scaffold == '') {
+      scaffold = null;
+    }
     this.setState({
-      scaffold: e.target.value
-    }, function() {
-      console.log(self.state.scaffold);
+      scaffold: scaffold
     });
   }
 
@@ -309,13 +318,6 @@ class CreateFileModalContent extends React.Component {
         fileName: ''
       });
     }
-
-    // if(this._isDataFile(fileName)) {
-    //   $('button.theme-structure').removeClass('disabled');
-    // }
-    // else {
-    //   $('button.theme-structure').addClass('disabled');
-    // }
   }
 
   // handleLayoutChange(file, e) {
@@ -356,14 +358,18 @@ class CreateFileModalContent extends React.Component {
   }
 
   handleSubmit() {
-    let app = this.props.app;
-    let path = this.pathInput.value.trim();
-    // Must remove leading '/'
-    path = (path.startsWith('/') ? path.substring(1) : path);
+    let tree = this.state.tree;
+    let recursiveTree = this.state.recursiveTree;
     let fileName = this.state.fileName;
+    if(this.state.scaffold) {
+      fileName = this._slugify(fileName);
+    }
+
+    // Must remove leading '/'
+    let path = this.pathInput.value.trim();
+    path = (path.startsWith('/') ? path.substring(1) : path);
     
     // Duplicate check
-    let tree = this.state.tree;
     let exists = _.find(tree.tree, function(file) {
       return _.lowerCase(file.path) === _.lowerCase(path + fileName);
     });
@@ -374,9 +380,11 @@ class CreateFileModalContent extends React.Component {
       // TODO: Error message for duplicated file.
       return;
     }
-
+    
+    // Use Hexo scaffolds on GLIDE server
     let self = this;
-    let url = '/api/project/hexo/new';
+    let app = this.props.app;
+    let url = '/api/project/file/new';
 
     $.ajax({
       url: url,
@@ -384,12 +392,12 @@ class CreateFileModalContent extends React.Component {
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
       data: JSON.stringify({
-        // addedFiles: this.state.addedFiles,
-        // changedFiles: this.state.changedFiles,
-        repository: self.state.repository.full_name,
-        branch: self.state.branch.name,
-        scaffold: self.state.scaffold,
-        newContentName: self._fileNameOnly(newFile)
+        repository: this.state.repository.full_name,
+        branch: this.state.branch.name,
+        scaffold: this.state.scaffold,
+        fileName: fileName,
+        fileOrFolder: this.state.fileOrFolder,
+        path: path
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
@@ -399,56 +407,21 @@ class CreateFileModalContent extends React.Component {
         }
         else {
 
-          // TODO: Create the new file object specified by user
-          // TODO: Create the new file objects generated by Hexo if needed
-
-          let newFile = {
-            name: fileName,
-            nodes: [],
-            path: path + fileName,
-          };
-
-          if(this.state.fileOrFolder == 'file') {
-            newFile.added = true,
-            newFile.modified = false,
-            newFile.originalContent = '',
-            newFile.sha = null,
-            newFile.size = 0,
-            newFile.url = null
-            newFile.type = 'blob';
-            newFile.mode = '100644';
-          }
-          else if(this.state.fileOrFolder == 'folder') {
-            newFile.type = 'tree';
-            newFile.mode = '040000';
-          }
-          else {
-            // Not expected..
-            console.error(newFile, 'GLIDE: Unexpected type');
-            this._reset();
-            return;
-          }
-
-          // Add associated files if the file is datafile
-          // TODO: check if the project is Hexo project
-          if(this._isDataFile(newFile)) {
-            // TODO
-          }
-
-          // Push the file into tree
-          tree.tree.push(newFile);
-
-          // Push the file into recursiveTree
-          let recursiveTree = this.state.recursiveTree;
-          let folders = newFile.path.split('/');
-          this._addFileToRecursiveTree(recursiveTree, newFile, folders);
-
-          // Update the states
-          //   TODO: Should I do this only for files
-          //   TODO: because an empty folder can't be pushed to GitHub anyway?
-          //   TODO: I'm Thinking... More tests required.
+          // Create the new file objects created on the server
+          let createdFiles = response.createdFiles;
           let addedFiles = app.state.addedFiles;
-          addedFiles.push(newFile);
+
+          _.forEach(createdFiles, function(createdFile) {
+            // Push the file into tree
+            tree.tree.push(createdFile);
+
+            // Push the file into recursiveTree
+            let folders = createdFile.path.split('/');
+            self._addFileToRecursiveTree(recursiveTree, createdFile, folders);
+            
+            // Update the states
+            addedFiles.push(createdFile);
+          });
 
           self.setState({
             recursiveTree: recursiveTree,
@@ -577,19 +550,35 @@ class CreateFileModalContent extends React.Component {
                   <br />
                   {
                     this.state.scaffolds.map(function(item, index) {
-                      return (
-                        <div key={index} className="inline-block">
-                          <label>
-                            <input
-                              type="radio" value={this._fileNameOnly(item)}
-                              disabled={!this._isDataFile(this.state.fileName)}
-                              checked={this.state.scaffold==this._fileNameOnly(item)}
-                              onChange={this.handleScaffoldChange} />
-                              &nbsp;{this._fileNameOnly(item)}
-                          </label>
-                          &emsp;
-                        </div>
-                      );
+                      if(item) {
+                        return (
+                          <div key={index} className="inline-block">
+                            <label>
+                              <input
+                                type="radio" value={this._fileNameOnly(item)}
+                                disabled={this.state.fileOrFolder=='folder'}
+                                checked={this.state.scaffold==this._fileNameOnly(item)}
+                                onChange={this.handleScaffoldChange} />
+                                &nbsp;{this._fileNameOnly(item)}
+                            </label>
+                            &emsp;
+                          </div>
+                        );
+                      }
+                      else {
+                        return (
+                          <div key={index} className="inline-block">
+                            <label>
+                              <input
+                                type="radio" value={''}
+                                disabled={this.state.fileOrFolder=='folder'}
+                                checked={this.state.scaffold==null}
+                                onChange={this.handleScaffoldChange} />
+                                &nbsp;Do not use Hexo scaffolds
+                            </label>
+                          </div>
+                        );
+                      }
                     }.bind(this))
                   }
                   {

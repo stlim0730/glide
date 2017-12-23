@@ -53,7 +53,7 @@ class App extends React.Component {
       phase: 'clean_slate',
       repositories: [],
       repository: null,
-      isHexoPrj: true, // TODO: Dynamically detect Hexo projects
+      // isHexoPrj: true, // TODO: Dynamically detect Hexo projects
       branches: [],
       branch: null,
       commits: [],
