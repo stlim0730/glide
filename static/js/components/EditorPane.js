@@ -91,8 +91,12 @@ class EditorPane extends React.Component {
           
           <TabbedEditors
             app={this.props.app}
+            repository={this.state.repository}
+            branch={this.state.branch}
             tree={this.props.tree}
             recursiveTree={this.props.recursiveTree}
+            changedFiles={this.state.changedFiles}
+            addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
             fileActive={this.state.fileActive} />
         </div>

@@ -917,6 +917,23 @@ def newFile(request):
 
 
 @api_view(['POST'])
+def updateFile(request):
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  filePath = request.data['filePath']
+  newVal = request.data['newVal']
+  username = request.session['username'].split('@')[0]
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  actualPath = pathlib.Path(userBasePathStr) / filePath
+  with open(str(actualPath), 'w') as fo:
+    fo.write(newVal)
+  return Response({
+    'res': actualPath.exists(),
+    'size': os.stat(str(actualPath)).st_size
+  })
+
+
+@api_view(['POST'])
 def generate(request):
   repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
   branch = request.data['branch']

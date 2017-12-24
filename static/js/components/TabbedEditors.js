@@ -23,11 +23,14 @@ class TabbedEditors extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
       tree: null,
       recursiveTree: null,
       filesOpened: [],
       fileActive: null,
-      editors: {}
+      changedFiles: []
+      // editors: {}
     };
 
     this._getTabId = this._getTabId.bind(this);
@@ -347,9 +350,6 @@ class TabbedEditors extends React.Component {
     let fileActive = this.state.fileActive;
     let app = this.props.app;
 
-    // TODO: Should manually handle codemirror component
-    //   remove one of them and show the others
-
     _.remove(filesOpened, function (f) {
       return f.path == file.path;
     });
@@ -362,8 +362,6 @@ class TabbedEditors extends React.Component {
       // Closing one of the other tabs
       // Do nothing on fileActive
     }
-
-    // let self = this;
 
     this.setState({
       filesOpened: filesOpened,
@@ -400,42 +398,85 @@ class TabbedEditors extends React.Component {
     });
   }
 
-  handleEditorChange(file, newVal) {
+  handleEditorChange(file, newVal, aceEvent) {
     file.newContent = newVal;
     let app = this.props.app;
+    let self = this;
+    let changedFiles = this.state.changedFiles;
     
     if(file.originalContent != file.newContent) {
       // This file has been modified.
-      //   CURRENTLY NOT USING file.modified = true;
-      if(!_.find(app.state.changedFiles, { path: file.path })) {
-        let changedFiles = app.state.changedFiles;
-        changedFiles.push(file);
-        app.setState({
-          changedFiles: changedFiles
-        });
-      }
+      file.modified = true;
     }
     else {
       // This file hasn't been modified:
-      //   Take out this file from staged area
-      
-      // Returns a new array with non-target elements
-      let changedFiles = _.remove(app.state.changedFiles, function(item) {
-        return item.path != file.path;
-      });
-      app.setState({
-        changedFiles: changedFiles
-      });
+      file.modified = false;
+      delete file.newContent;
     }
 
-    let data = this._prepareRenderingReq(file.newContent, file);
-    this._requestRendering(data);
+    // POST the change
+    let url = '/api/project/file/update';
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        repository: this.state.repository.full_name,
+        branch: this.state.branch.name,
+        filePath: file.path,
+        newVal: newVal
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.info(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          // Set state for changed files
+          file.size = response.size;
+
+          let staged = true && _.find(changedFiles, { path: file.path });
+          let updateState = false;
+                    
+          if(file.modified && !staged) {
+            changedFiles.push(file);
+            updateState = true;
+          }
+          else if(!file.modified && staged) {
+            _.remove(changedFiles, function(f) {
+              return f.path == file.path;
+            });
+            updateState = true;
+          }
+
+          if(updateState) {
+            self.setState({
+              changedFiles: changedFiles
+            }, function() {
+              app.setState({
+                changedFiles: changedFiles
+              });
+            });
+          }
+        }
+      }
+    });
+
+    // let data = this._prepareRenderingReq(file.newContent, file);
+    // this._requestRendering(data);
   }
 
   componentDidMount() {
     this.setState({
+      repository: this.props.repository,
+      branch: this.props.branch,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      changedFiles: this.props.changedFiles,
+      addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive
     });
@@ -446,8 +487,12 @@ class TabbedEditors extends React.Component {
     let prevFileActive = this.state.fileActive;
 
     this.setState({
+      repository: nextProps.repository,
+      branch: nextProps.branch,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      changedFiles: nextProps.changedFiles,
+      addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
@@ -469,40 +514,10 @@ class TabbedEditors extends React.Component {
         // let data = self._prepareRenderingReq(content, fileActive);
         // self._requestRendering(data);
       }
-      // $('.CodeMirror').each(function(i, el){
-      //   el.CodeMirror.refresh();
-      //   console.info(el);
-      // });
-      // let file = this.state.fileActive;
-      // if(file) {
-        // let editorId = this._getEditorId(file);
-        // let editor = ace.edit(editorId);
-        // let editors = this.state.editors;
-        // editors[editorId] = editor;
-        // this.setState({
-        //   editors: editors
-        // }, function() {
-          // Default editor settings
-          // editor.getSession().setTabSize(2);
-          // editor.getSession().setUseSoftTabs(true);
-          // editor.$blockScrolling = Infinity;
-          // editor.setValue(file.content);
-          // 
-          // TODO: Editor mode according to file types
-          // 
-          // editor.setMode('ace/mode/yaml');
-          // 
-          // editor.gotoLine(1);
-          // editor.focus();
-          // console.info(this.state.editors);
-        // });
-      // }
     });
   }
 
   render () {
-
-    
     let tabs = [];
     let tabbedEditors = [];
 
@@ -544,29 +559,15 @@ class TabbedEditors extends React.Component {
       };
       let idStr = this._getEditorId(item);
       tabbedEditors.push(
-        // <CodeMirror
-        //   id={idStr}
-        //   key={index}
-        //   value={
-        //     item.newContent ?
-        //     item.newContent :
-        //     item.originalContent
-        //   }
-        //   className={editorClassName}
-        //   autoFocus={true}
-        //   options={options}
-        //   onChange={this.handleEditorChange.bind(this, item)} />
         <div className={editorClassName} name={idStr} key={index}>
           <AceEditor
             tabSize={2} mode="markdown" theme="github"
-            value={
-              item.newContent ?
-              item.newContent :
-              item.originalContent
-            }
+            onChange={this.handleEditorChange.bind(this, item)}
+            value={item.newContent ? item.newContent : item.originalContent}
+            name={"ace_" + idStr} enableBasicAutocompletion={false}
+            enableSnippets={false} enableLiveAutocompletion={false}
             editorProps={{$blockScrolling: Infinity}} />
         </div>
-
       );
     }.bind(this))
 
