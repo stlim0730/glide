@@ -1,8 +1,19 @@
-import '../../css/codemirror/codemirror.css';
-var CodeMirror = require('react-codemirror');
-// Tried 'react-ace' package.
-// Didn't work well because there seemed to be conflicts in switching tabs.
-// Another alternative might be 'react-ace-editor' if things go wrong with 'react-codemirror'
+import brace from 'brace';
+import AceEditor from 'react-ace';
+import 'brace/mode/markdown';
+import 'brace/theme/github';
+
+// Tried
+//   'react-ace'
+//   'react-ace-editor'
+//   'react-codemirror'
+//   'react-codemirror2'
+
+// Current
+//   'react-ace-2'
+
+// Potential alternatives if things go wrong with the editor library
+//   'react-ace-wrapper'
 
 // 
 // TabbedEditors component
@@ -19,6 +30,7 @@ class TabbedEditors extends React.Component {
       editors: {}
     };
 
+    this._getTabId = this._getTabId.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this._updateFileInRecursiveTree = this._updateFileInRecursiveTree.bind(this);
@@ -31,9 +43,14 @@ class TabbedEditors extends React.Component {
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
 
+  _getTabId(fileObj) {
+    let prefix = 'tab_';
+    return prefix + fileObj.sha;
+  }
+
   _getEditorId(fileObj) {
-    let suffix = '_editor';
-    return fileObj.sha + suffix;
+    let prefix = 'editor_';
+    return prefix + fileObj.sha;
   }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
@@ -527,18 +544,29 @@ class TabbedEditors extends React.Component {
       };
       let idStr = this._getEditorId(item);
       tabbedEditors.push(
-        <CodeMirror
-          id={idStr}
-          key={index}
-          value={
-            item.newContent ?
-            item.newContent :
-            item.originalContent
-          }
-          className={editorClassName}
-          autoFocus={true}
-          options={options}
-          onChange={this.handleEditorChange.bind(this, item)} />
+        // <CodeMirror
+        //   id={idStr}
+        //   key={index}
+        //   value={
+        //     item.newContent ?
+        //     item.newContent :
+        //     item.originalContent
+        //   }
+        //   className={editorClassName}
+        //   autoFocus={true}
+        //   options={options}
+        //   onChange={this.handleEditorChange.bind(this, item)} />
+        <div className={editorClassName} name={idStr} key={index}>
+          <AceEditor
+            tabSize={2} mode="markdown" theme="github"
+            value={
+              item.newContent ?
+              item.newContent :
+              item.originalContent
+            }
+            editorProps={{$blockScrolling: Infinity}} />
+        </div>
+
       );
     }.bind(this))
 

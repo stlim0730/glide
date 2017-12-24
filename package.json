@@ -39,6 +39,7 @@
     "pm2": "^2.8.0",
     "popper.js": "^1.12.9",
     "react": "^15.5.4",
+    "react-ace-2": "^3.5.2",
     "react-codemirror": "^1.0.0",
     "react-dom": "^15.5.4",
     "restify": "^6.3.4",
