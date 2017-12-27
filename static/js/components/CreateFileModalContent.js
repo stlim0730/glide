@@ -12,8 +12,10 @@ class CreateFileModalContent extends React.Component {
       fileName: '',
       tree: null,
       recursiveTree: null,
+      fileCreationMode: null,
       scaffold: null,
-      scaffolds: []
+      scaffolds: [],
+      filesToUpload: []
     };
 
     this._reset = this._reset.bind(this);
@@ -28,6 +30,7 @@ class CreateFileModalContent extends React.Component {
     // this._loadTemplateContent = this._loadTemplateContent.bind(this);
     // this._countLayouts = this._countLayouts.bind(this);
     // this._renderThemeStructure = this._renderThemeStructure.bind(this);
+    this.handleFileCreationModeChange = this.handleFileCreationModeChange.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleScaffoldChange = this.handleScaffoldChange.bind(this);
@@ -38,14 +41,14 @@ class CreateFileModalContent extends React.Component {
   _reset() {
     this.setState({
       fileOrFolder: null,
-      // pageOrPost: null,
       fileName: '',
+      fileCreationMode: null,
       scaffold: null,
       scaffolds: [],
-      // template: null,
-      // liveHtmlSrc: null
+      filesToUpload: []
     }, function() {
-      this.fileNameInput.value = '';
+      this.fileNameInput1.value = '';
+      this.fileNameInput2.value = '';
       // $('button.theme-structure').addClass('disabled');
     });
   }
@@ -288,6 +291,12 @@ class CreateFileModalContent extends React.Component {
   //   );
   // }
 
+  handleFileCreationModeChange(e) {
+    this.setState({
+      fileCreationMode: $(e.target).data('mode')
+    });
+  }
+
   handleFileOrFolderChange(e) {
     this.setState({
       fileOrFolder: e.target.value,
@@ -361,7 +370,7 @@ class CreateFileModalContent extends React.Component {
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let fileName = this.state.fileName;
-    if(this.state.scaffold) {
+    if(this.state.fileCreationMode == 'source') {
       fileName = this._slugify(fileName);
     }
 
@@ -381,7 +390,7 @@ class CreateFileModalContent extends React.Component {
       return;
     }
     
-    // Use Hexo scaffolds on GLIDE server
+    // POST new file to GLIDE server
     let self = this;
     let app = this.props.app;
     let url = '/api/project/file/new';
@@ -473,6 +482,15 @@ class CreateFileModalContent extends React.Component {
   }
 
   render() {
+    let sourceDisabled = false;
+    if(this.pathInput &&
+      this.pathInput.value.startsWith('/source/')) {
+      //
+    }
+    else {
+      sourceDisabled = true;
+    }
+
     return (
       <div className="modal-content">
         <div className="modal-header">
@@ -485,23 +503,97 @@ class CreateFileModalContent extends React.Component {
           </button>
         </div>
         
-        <div className="modal-body rrow">
-          <div className="ccol-md-4 rright-border">
-            <fieldset>
-              <div className="form-group">
-                <label className="control-label">
-                  Path
-                </label>
-                <div className="">
-                  <input
-                    type="text"
-                    ref={(c) => this.pathInput = c}
-                    className="form-control pathInput"
-                    maxLength="255"
-                    disabled />
-                </div>
+        <div className="modal-body">
+          
+          <fieldset>
+            <div className="form-group">
+              <label className="control-label">
+                Path
+              </label>
+              <div className="">
+                <input
+                  type="text"
+                  ref={(c) => this.pathInput = c}
+                  className="form-control pathInput"
+                  maxLength="255"
+                  disabled />
               </div>
-              <div className="form-group margin-top-15">                  
+            </div>
+          </fieldset>
+
+          <ul className="nav nav-tabs">
+            <li className="nav-item">
+              <a
+                data-mode="source"
+                title="You may create a Hexo-generated web page by creating a source file under /source/ folder."
+                href="#file-creation-source" onClick={this.handleFileCreationModeChange}
+                data-toggle="tab" className={
+                  sourceDisabled ? "nav-link disabled" : "nav-link"}>
+                Web Page (Hexo Source)
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                data-mode="file"
+                title=""
+                href="#file-creation-file" onClick={this.handleFileCreationModeChange}
+                data-toggle="tab" className="nav-link">
+                File or Folder
+              </a>
+            </li>
+            <li className="nav-item">
+              <a
+                data-mode="upload"
+                title=""
+                href="#file-creation-upload" onClick={this.handleFileCreationModeChange}
+                data-toggle="tab" className="nav-link">
+                Upload
+              </a>
+            </li>
+          </ul>
+
+          <div className="tab-content">
+
+            <div id="file-creation-source"
+              className="form-group tab-pane fade margin-top-15">
+              <fieldset>
+                <label className="control-label">
+                  Content Type (Hexo Scaffolds)
+                </label>
+                <br />
+                {
+                  this.state.scaffolds.map(function(item, index) {
+                    return (
+                      <div key={index} className="inline-block">
+                        <label>
+                          <input
+                            type="radio" value={this._fileNameOnly(item)}
+                            checked={this.state.scaffold==this._fileNameOnly(item)}
+                            onChange={this.handleScaffoldChange} />
+                            &nbsp;{this._fileNameOnly(item)}
+                        </label>
+                        &emsp;
+                      </div>
+                    );
+                  }.bind(this))
+                }
+                <br />
+                <label className="control-label">
+                  Page Name
+                </label>
+                <div>
+                  <input
+                    type="text" ref={(c) => this.fileNameInput1 = c}
+                    onChange={this.handleFileNameChange}
+                    onKeyUp={this.handleKeyUp}
+                    className="form-control" maxLength="255" />
+                </div>
+              </fieldset>
+            </div>
+              
+            <div id="file-creation-file"
+              className="form-group tab-pane fade margin-top-15">
+              <fieldset>
                 <label>
                   <input
                     type="radio" value="file"
@@ -515,126 +607,33 @@ class CreateFileModalContent extends React.Component {
                     checked={this.state.fileOrFolder=='folder'}
                     onChange={this.handleFileOrFolderChange} />&nbsp;Folder
                 </label>
-              </div>
-              <div className="form-group">
+                <br />
                 <label className="control-label">
                   {this.state.fileOrFolder == 'folder' ? 'Folder' : 'File'} Name
                 </label>
-                <div className="">
+                <div>
                   <input
                     type="text" disabled={!this.state.fileOrFolder}
                     onChange={this.handleFileNameChange}
                     onKeyUp={this.handleKeyUp}
-                    ref={(c) => this.fileNameInput = c}
+                    ref={(c) => this.fileNameInput2 = c}
                     className="form-control" maxLength="255" />
                 </div>
-              </div>
-              <div className="form-group">
-                {
-                  // <label className="control-label">
-                  //   Themes & Layouts
-                  // </label>
-                  // <button
-                  //   type="button" className="btn btn-sm btn-link"
-                  //   data-container="body" data-toggle="popover"
-                  //   data-placement="bottom" data-original-title="" title=""
-                  //   data-content="Layout selection is available when you create Markdown(.md) files.">
-                  //   <i className="info circle icon"></i>
-                  // </button>
-                  // <br />
-                }
-                <div className="form-group margin-top-15">
-                  <label className="control-label">
-                    Content Type (Hexo Scaffolds)
-                  </label>
-                  <br />
-                  {
-                    this.state.scaffolds.map(function(item, index) {
-                      if(item) {
-                        return (
-                          <div key={index} className="inline-block">
-                            <label>
-                              <input
-                                type="radio" value={this._fileNameOnly(item)}
-                                disabled={this.state.fileOrFolder=='folder'}
-                                checked={this.state.scaffold==this._fileNameOnly(item)}
-                                onChange={this.handleScaffoldChange} />
-                                &nbsp;{this._fileNameOnly(item)}
-                            </label>
-                            &emsp;
-                          </div>
-                        );
-                      }
-                      else {
-                        return (
-                          <div key={index} className="inline-block">
-                            <label>
-                              <input
-                                type="radio" value={''}
-                                disabled={this.state.fileOrFolder=='folder'}
-                                checked={this.state.scaffold==null}
-                                onChange={this.handleScaffoldChange} />
-                                &nbsp;Do not use Hexo scaffolds
-                            </label>
-                          </div>
-                        );
-                      }
-                    }.bind(this))
-                  }
-                  {
-                    // <label>
-                    //   <input
-                    //     type="radio" value="page"
-                    //     disabled={!this._isDataFile(this.state.fileName)}
-                    //     checked={this.state.pageOrPost=='page'}
-                    //     onChange={this.handlePageOrPostChange} /> Page
-                    // </label>
-                    // &emsp;
-                    // <label>
-                    //   <input
-                    //     type="radio" value="post"
-                    //     disabled={!this._isDataFile(this.state.fileName)}
-                    //     checked={this.state.pageOrPost=='post'}
-                    //     onChange={this.handlePageOrPostChange} /> Blog Post
-                    // </label>
-                  }
-                </div>
-                {
-                  // <span className="help-block">
-                  //   This repository has {this._countLayouts(this.state.themes)} layout(s)&nbsp;
-                  //   in {_.keys(this.state.themes).length} theme(s) available.
-                  // </span>
-                }
-                {
-                  // _.keys(this.state.themes).map(function(item, index) {
-                  //   return this._renderThemeStructure(item, this.state.themes[item], index);
-                  // }.bind(this))
-                }
-              </div>
-            </fieldset>
-          </div>
+              </fieldset>
+            </div>
 
-          {
-            // <div className="col-md-8">
-            //   <label className="control-label">
-            //     Theme & Layout Preview
-            //   </label>
-            //   <div className="form-group">
-            //     {
-            //       this.state.liveHtmlSrc &&
-            //       <iframe
-            //         width="100%"
-            //         height="350px"
-            //         src={this.state.liveHtmlSrc}>
-            //       </iframe>
-            //     }
-            //     {
-            //       !this.state.liveHtmlSrc &&
-            //       'Select a layout for preview.'
-            //     }
-            //   </div>
-            // </div>
-          }
+            <div id="file-creation-upload"
+              className="form-group tab-pane fade margin-top-15">
+              <fieldset>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-block">
+                  Browse Files to Upload
+                </button>
+              </fieldset>
+            </div>
+
+          </div>
 
         </div>
         
@@ -648,9 +647,20 @@ class CreateFileModalContent extends React.Component {
             type="button" ref={(c) => this.submitButton = c}
             className="btn btn-primary" onClick={this.handleSubmit}
             data-dismiss="modal" disabled={
-              !this.state.fileOrFolder
-              // || this.state.fileName.trim().length==0
-              || !this._validateFileName(this.state.fileName)
+              !this.state.fileCreationMode ||
+              (
+                this.state.fileCreationMode == 'source' &&
+                !this.state.scaffold
+              ) ||
+              (
+                this.state.fileCreationMode == 'file' &&
+                !this.state.fileOrFolder
+              ) ||
+              (
+                this.state.fileCreationMode == 'upload' &&
+                !this.state.filesToUpload
+              ) ||
+              !this._validateFileName(this.state.fileName)
             }>
             Submit
           </button>
