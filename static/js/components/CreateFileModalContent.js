@@ -1,3 +1,6 @@
+import Files from 'react-files';
+import FileUploadThumbnail from './FileUploadThumbnail.js';
+
 // 
 // CreateFileModalContent component
 // 
@@ -15,7 +18,8 @@ class CreateFileModalContent extends React.Component {
       fileCreationMode: null,
       scaffold: null,
       scaffolds: [],
-      filesToUpload: []
+      filesToUpload: [],
+      filesFailedToUpload: []
     };
 
     this._reset = this._reset.bind(this);
@@ -35,6 +39,8 @@ class CreateFileModalContent extends React.Component {
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
     this.handleScaffoldChange = this.handleScaffoldChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
+    this.handleUploadFilesError = this.handleUploadFilesError.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -45,7 +51,8 @@ class CreateFileModalContent extends React.Component {
       fileCreationMode: null,
       scaffold: null,
       scaffolds: [],
-      filesToUpload: []
+      filesToUpload: [],
+      filesFailedToUpload: []
     }, function() {
       this.fileNameInput1.value = '';
       this.fileNameInput2.value = '';
@@ -366,6 +373,31 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
+  handleUploadFilesChange(files) {
+    let self = this;
+    this.setState({
+      filesToUpload: files
+    }, function() {
+      console.log(self.state.filesToUpload);
+    });
+  }
+
+  handleUploadFilesError(error, file) {
+    console.log('file error', error, file);
+    
+    let filesFailedToUpload = this.state.filesFailedToUpload;
+    filesFailedToUpload.push(file);
+    this.setState({
+      filesFailedToUpload: filesFailedToUpload
+    });
+
+    // error.code:
+    //   1. Invalid file type
+    //   2. File too large
+    //   3. File too small
+    //   4. Maximum file count reached
+  }
+
   handleSubmit() {
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
@@ -555,7 +587,7 @@ class CreateFileModalContent extends React.Component {
           <div className="tab-content">
 
             <div id="file-creation-source"
-              className="form-group tab-pane fade margin-top-15">
+              className="form-group tab-pane fade padding-20 no-margin">
               <fieldset>
                 <label className="control-label">
                   Content Type (Hexo Scaffolds)
@@ -592,7 +624,7 @@ class CreateFileModalContent extends React.Component {
             </div>
               
             <div id="file-creation-file"
-              className="form-group tab-pane fade margin-top-15">
+              className="form-group tab-pane fade padding-20 no-margin">
               <fieldset>
                 <label>
                   <input
@@ -623,14 +655,66 @@ class CreateFileModalContent extends React.Component {
             </div>
 
             <div id="file-creation-upload"
-              className="form-group tab-pane fade margin-top-15">
-              <fieldset>
-                <button
-                  type="button"
-                  className="btn btn-outline-primary btn-block">
-                  Browse Files to Upload
-                </button>
-              </fieldset>
+              className="form-group tab-pane fade padding-20 no-margin">
+              <div className="card border-light mb-3">
+                <div className="card-body pointer files">
+                  <Files
+                    className='files-dropzone'
+                    onChange={this.handleUploadFilesChange}
+                    onError={this.handleUploadFilesError}
+                    accepts={
+                      ['audio/*','font/*', 'image/*', 'text/*', 'video/*']
+                    }
+                    multiple
+                    maxFiles={10}
+                    maxFileSize={1024 * 1024 * 5}
+                    minFileSize={0}
+                    clickable>
+                    <h4 className="card-title text-center">
+                      Drag & drop files<br />
+                      or click to browse
+                    </h4>
+                    {
+                      this.state.filesToUpload.length == 0 &&
+                      <p className="card-text text-muted text-center">
+                        A file should be smaller than <strong>5MB</strong>.<br />
+                        You may upload <strong>10 or less</strong> files per upload.
+                      </p>
+                    }
+                    <ul className="list-group">
+                    {
+                      this.state.filesToUpload.map(function(file, index) {
+                        return (
+                          <FileUploadThumbnail
+                            key={index} file={file}
+                            CreateFileModalContent={this} />
+                        );
+                      }.bind(this))
+                    }
+                    </ul>
+                    {
+                      this.state.filesFailedToUpload.length > 0 &&
+                      <p className="card-text text-muted text-center">
+                        <br />
+                        File(s) below can't be uploaded.<br />
+                        <small>A file should be smaller than <strong>5MB</strong>.<br />
+                        You may upload <strong>10 or less</strong> files per upload.</small>
+                      </p>
+                    }
+                    <ul className="list-group">
+                    {
+                      this.state.filesFailedToUpload.map(function(file, index) {
+                        return (
+                          <FileUploadThumbnail
+                            key={index} file={file} error={true}
+                            CreateFileModalContent={this} />
+                        );
+                      }.bind(this))
+                    }
+                    </ul>
+                  </Files>
+                </div>
+              </div>
             </div>
 
           </div>
