@@ -19,7 +19,8 @@ class CreateFileModalContent extends React.Component {
       scaffold: null,
       scaffolds: [],
       filesToUpload: [],
-      filesFailedToUpload: []
+      filesFailedToUpload: [],
+      tempFileInput: null
     };
 
     this._reset = this._reset.bind(this);
@@ -45,6 +46,8 @@ class CreateFileModalContent extends React.Component {
   }
 
   _reset() {
+    let self = this;
+
     this.setState({
       fileOrFolder: null,
       fileName: '',
@@ -54,10 +57,11 @@ class CreateFileModalContent extends React.Component {
       filesToUpload: [],
       filesFailedToUpload: []
     }, function() {
-      this.fileNameInput1.value = '';
-      this.fileNameInput2.value = '';
+      self.fileNameInput1.value = '';
+      self.fileNameInput2.value = '';
       $('.file-creation-tabs').removeClass('active');
       $('.file-creation-panes').removeClass('active show in');
+      document.getElementById('fileFormToReset').reset();
     });
   }
 
@@ -379,7 +383,7 @@ class CreateFileModalContent extends React.Component {
     this.setState({
       filesToUpload: files
     }, function() {
-      console.log(self.state.filesToUpload);
+      console.log(self.state.filesToUpload.length, self.state.filesToUpload);
     });
   }
 
@@ -400,6 +404,7 @@ class CreateFileModalContent extends React.Component {
   }
 
   handleSubmit() {
+    let self = this;
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let fileName = this.state.fileName;
@@ -412,9 +417,19 @@ class CreateFileModalContent extends React.Component {
     path = (path.startsWith('/') ? path.substring(1) : path);
     
     // Duplicate check
-    let exists = _.find(tree.tree, function(file) {
-      return _.lowerCase(file.path) === _.lowerCase(path + fileName);
-    });
+    let exists = false;
+    if(self.state.fileCreationMode=='upload') {
+      _.forEach(self.state.filesToUpload, function(fileToUpload) {
+        exists = exists || _.find(tree.tree, function(file) {
+          return _.lowerCase(file.path) === _.lowerCase(path + fileToUpload.name);
+        });
+      });
+    }
+    else {
+      exists = _.find(tree.tree, function(file) {
+        return _.lowerCase(file.path) === _.lowerCase(path + fileName);
+      });
+    }
 
     if(exists) {
       console.error('GLIDE: File already exists!');
@@ -430,29 +445,33 @@ class CreateFileModalContent extends React.Component {
       branch: this.state.branch.name,
       path: path
     };
-    // data.set('mode', this.state.fileCreationMode);
-    // data.set('repository', this.state.repository.full_name);
-    // data.set('branch', this.state.branch.name);
-    // data.set('path', path);
-
-    let contentType;// = 'multipart/form-data';
+    
+    let contentType = 'application/json; charset=utf-8';
     let processData = true;
 
     switch(this.state.fileCreationMode) {
       case 'source':
-        contentType = 'application/json; charset=utf-8';
         data.scaffold = this.state.scaffold;
-        data.files = [fileName];
+        data.file = fileName;
+        data = JSON.stringify(data);
         break;
       case 'file':
-        contentType = 'application/json; charset=utf-8';
         data.fileOrFolder = this.state.fileOrFolder;
-        data.files = [fileName];
+        data.file = fileName;
+        data = JSON.stringify(data);
         break;
       case 'upload':
-        // processData = false;
-        // contentType = false;
-        // data.files = filesToUpload;
+        let formData = new FormData();
+        processData = false;
+        contentType = false;
+        _.forEach(this.state.filesToUpload, function(f) {
+          formData.append('files', f, f.name);
+          formData.append(f.name + '-type', f.type);
+        });
+        formData.append('repository', data.repository);
+        formData.append('branch', data.branch);
+        formData.append('path', data.path);
+        data = formData;
         break;
       default:
         // Unexpected case
@@ -460,11 +479,12 @@ class CreateFileModalContent extends React.Component {
         return;
         break;
     }
-    
+
     // POST new file to GLIDE server
-    let self = this;
     let app = this.props.app;
-    let url = '/api/project/file/new';
+    let url = this.state.fileCreationMode == 'upload' ?
+      '/api/project/file/upload' :
+      '/api/project/file/new';
 
     $.ajax({
       url: url,
@@ -473,7 +493,7 @@ class CreateFileModalContent extends React.Component {
       dataType: 'json',
       processData: processData,
       contentType: contentType,
-      data: JSON.stringify(data),
+      data: data,
       success: function(response) {
         console.log(response);
         if('error' in response) {
@@ -521,8 +541,6 @@ class CreateFileModalContent extends React.Component {
   }
 
   componentDidMount() {
-    // let scaffolds = this._loadScaffoldsFiles(this.props.tree);
-
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
@@ -534,8 +552,6 @@ class CreateFileModalContent extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // let scaffolds = this._loadScaffoldsFiles(nextProps.tree);
-    
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
@@ -689,63 +705,70 @@ class CreateFileModalContent extends React.Component {
 
             <div id="file-creation-upload"
               className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
-              <div className="card border-light mb-3 no-margin">
+              <div className="card border-light mb-3" style={{marginBottom: 0}}>
                 <div className="card-body pointer files">
-                  <Files
-                    className='files-dropzone'
-                    onChange={this.handleUploadFilesChange}
-                    onError={this.handleUploadFilesError}
-                    accepts={
-                      ['audio/*','font/*', 'image/*', 'text/*', 'video/*']
-                    }
-                    multiple
-                    maxFiles={10}
-                    maxFileSize={1024 * 1024 * 5}
-                    minFileSize={0}
-                    clickable>
-                    <h4 className="card-title text-center">
-                      Drag & drop files<br />
-                      or click to browse
-                    </h4>
-                    {
-                      this.state.filesToUpload.length == 0 &&
-                      <p className="card-text text-muted text-center">
-                        A file should be smaller than <strong>5MB</strong>.<br />
-                        You may upload <strong>10 or less</strong> files per upload.
-                      </p>
-                    }
-                    <ul className="list-group">
-                    {
-                      this.state.filesToUpload.map(function(file, index) {
-                        return (
-                          <FileUploadThumbnail
-                            key={index} file={file}
-                            CreateFileModalContent={this} />
-                        );
-                      }.bind(this))
-                    }
-                    </ul>
-                    {
-                      this.state.filesFailedToUpload.length > 0 &&
-                      <p className="card-text text-muted text-center">
-                        <br />
-                        File(s) below can't be uploaded.<br />
-                        <small>A file should be smaller than <strong>5MB</strong>.<br />
-                        You may upload <strong>10 or less</strong> files per upload.</small>
-                      </p>
-                    }
-                    <ul className="list-group">
-                    {
-                      this.state.filesFailedToUpload.map(function(file, index) {
-                        return (
-                          <FileUploadThumbnail
-                            key={index} file={file} error={true}
-                            CreateFileModalContent={this} />
-                        );
-                      }.bind(this))
-                    }
-                    </ul>
-                  </Files>
+                  <form id="fileFormToReset">
+                    <Files
+                      ref={(c) => this.filesComponent = c}
+                      className='files-dropzone'
+                      onChange={this.handleUploadFilesChange}
+                      onError={this.handleUploadFilesError}
+                      accepts={
+                        [
+                          'audio/*',
+                          'font/*',
+                          'image/*',
+                          'text/*',
+                          'video/*',
+                          'application/json',
+                          'application/yaml'
+                        ]
+                      }
+                      multiple={false} maxFileSize={1024 * 1024 * 5}
+                      minFileSize={0} clickable={true}>
+                      <h4 className="card-title text-center">
+                        Drag & drop files<br />
+                        or click to browse
+                      </h4>
+                      {
+                        this.state.filesToUpload.length == 0 &&
+                        <p className="card-text text-muted text-center">
+                          A file should be smaller than <strong>5MB</strong>.<br />
+                          You may upload <strong>1</strong> file per upload.
+                        </p>
+                      }
+                      <ul className="list-group">
+                      {
+                        this.state.filesToUpload.length > 0 &&
+                        this.state.filesToUpload.map(function(file, index) {
+                          return (
+                            <FileUploadThumbnail
+                              key={index} file={file}
+                              CreateFileModalContent={this} />
+                          );
+                        }.bind(this))
+                      }
+                      </ul>
+                      {
+                        this.state.filesFailedToUpload.length > 0 &&
+                        <p className="card-text text-muted text-center">
+                          <br />
+                          This file can't be uploaded.<br />
+                        </p>
+                      }
+                      <ul className="list-group">
+                      {
+                        this.state.filesFailedToUpload.map(function(file, index) {
+                          return (
+                            <FileUploadThumbnail
+                              key={index} file={file} error={true}
+                              CreateFileModalContent={this} />
+                          );
+                        }.bind(this))
+                      }
+                      </ul>
+                    </Files>
+                  </form>
                 </div>
               </div>
             </div>
@@ -775,9 +798,12 @@ class CreateFileModalContent extends React.Component {
               ) ||
               (
                 this.state.fileCreationMode == 'upload' &&
-                !this.state.filesToUpload
+                this.state.filesToUpload.length == 0
               ) ||
-              !this._validateFileName(this.state.fileName)
+              (
+                this.state.fileCreationMode != 'upload' &&
+                !this._validateFileName(this.state.fileName)
+              )
             }>
             Submit
           </button>

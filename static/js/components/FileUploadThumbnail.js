@@ -7,7 +7,8 @@ class FileUploadThumbnail extends React.Component {
 
     this.state = {
       file: null,
-      error: null
+      error: null,
+      parent: null
     };
 
     this.handleUploadFileMouseOver = this.handleUploadFileMouseOver.bind(this);
@@ -28,7 +29,7 @@ class FileUploadThumbnail extends React.Component {
   handleUploadFileRemove(e) {
     e.stopPropagation();
 
-    let parent = this.props.CreateFileModalContent;
+    let parent = this.state.parent;
     let self = this;
 
     if(!this.state.error) {
@@ -54,14 +55,16 @@ class FileUploadThumbnail extends React.Component {
   componentDidMount() {
     this.setState({
       file: this.props.file,
-      error: this.props.error
+      error: this.props.error,
+      parent: this.props.CreateFileModalContent
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       file: nextProps.file,
-      error: nextProps.error
+      error: nextProps.error,
+      parent: nextProps.CreateFileModalContent
     });
   }
 

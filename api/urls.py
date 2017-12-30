@@ -20,6 +20,7 @@ urlpatterns = [
   url(r'^project/pull/(?P<owner>.+)/(?P<repo>.+)$', views.pull, name='pull'),
   url(r'^project/hardclone$', views.hardclone, name='hardclone'),
   url(r'^project/file/new$', views.newFile, name='newFile'),
+  url(r'^project/file/upload$', views.uploadFile, name='uploadFile'),
   url(r'^project/file/update$', views.updateFile, name='updateFile'),
   url(r'^project/generate$', views.generate, name='generate'),
   # url(r'^project/render/layout$', views.renderLayout, name='renderLayout'),
