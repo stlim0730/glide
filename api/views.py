@@ -793,7 +793,7 @@ def hardclone(request):
       shutil.rmtree(userBasePathStr, ignore_errors=True)
   userBasePath.mkdir(mode=0o777, parents=True)
   # Clone project
-  cloneCommand = 'git clone {} {}'.format(cloneUrl, userBasePathStr)
+  cloneCommand = 'git clone -b {} {} {}'.format(branch, cloneUrl, userBasePathStr)
   cloneCompProc = subprocess.run(
     cloneCommand.split(), stdin=subprocess.PIPE,
     input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT

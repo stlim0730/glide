@@ -27,8 +27,8 @@ class CreateFileModalContent extends React.Component {
     this._slugify = this._slugify.bind(this);
     this._validateFileName = this._validateFileName.bind(this);
     // this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
-    this._isTemplateFile = this._isTemplateFile.bind(this);
-    this._isDataFile = this._isDataFile.bind(this);
+    // this._isTemplateFile = this._isTemplateFile.bind(this);
+    // this._isDataFile = this._isDataFile.bind(this);
     this._fileNameOnly = this._fileNameOnly.bind(this);
     // this._loadThemeStructure = this._loadThemeStructure.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
@@ -87,29 +87,29 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
-  _isTemplateFile(file) {
-    let templateExtensionsRegex = /\.(ejs|swig|htm|html)$/i;
-    if(templateExtensionsRegex.test(file.name)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
+  // _isTemplateFile(file) {
+  //   let templateExtensionsRegex = /\.(ejs|swig|htm|html)$/i;
+  //   if(templateExtensionsRegex.test(file.name)) {
+  //     return true;
+  //   }
+  //   else {
+  //     return false;
+  //   }
+  // }
 
-  _isDataFile(fileName) {
-    if(this.state.fileOrFolder != 'file') {
-      return false;
-    }
+  // _isDataFile(fileName) {
+  //   if(this.state.fileOrFolder != 'file') {
+  //     return false;
+  //   }
 
-    let markdownRegex = /\.(md|markdown|mdown|mkdn|mkd)$/i;
-    if(markdownRegex.test(fileName)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
+  //   let markdownRegex = /\.(md|markdown|mdown|mkdn|mkd)$/i;
+  //   if(markdownRegex.test(fileName)) {
+  //     return true;
+  //   }
+  //   else {
+  //     return false;
+  //   }
+  // }
 
   _fileNameOnly(file) {
     let fileNameArr = file.name.split('.');
@@ -721,7 +721,8 @@ class CreateFileModalContent extends React.Component {
                           'text/*',
                           'video/*',
                           'application/json',
-                          'application/yaml'
+                          'application/yaml',
+                          'application/javascript'
                         ]
                       }
                       multiple={false} maxFileSize={1024 * 1024 * 5}

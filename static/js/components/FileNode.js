@@ -75,7 +75,6 @@ class FileNode extends React.Component {
     let self = this;
     let filesOpened = this.state.filesOpened;
     let fileActive = this.state.fileActive;
-    // let openToggle = this.state.openToggle;
 
     if(_.find(filesOpened, {'path': file.path})) {
       // Already opened: Change the tab
@@ -88,7 +87,7 @@ class FileNode extends React.Component {
       });
     }
     else {
-      // Toggle the file icon
+      // Toggle the file icon of this FileNode
       $(e.target).children('i.file.icon').toggleClass('outline');
 
       if(file.originalContent == null) {
@@ -106,6 +105,9 @@ class FileNode extends React.Component {
               // TODO
             }
             else {
+              // response.blob.content is always encoded in base64
+              //   https://developer.github.com/v3/git/blobs/#get-a-blob
+              // atob() decodes
               file.originalContent = atob(response.blob.content);
               
               filesOpened.push(file);
@@ -123,7 +125,8 @@ class FileNode extends React.Component {
         });
       }
       else {
-        // Use local content
+        // Use local content:
+        //   Just set the state
         filesOpened.push(file);
         self.setState({
           filesOpened: filesOpened,

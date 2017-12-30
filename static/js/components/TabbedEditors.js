@@ -3,19 +3,24 @@ import AceEditor from 'react-ace';
 import 'brace/mode/markdown';
 import 'brace/theme/github';
 
-// Tried
+// Many code editor libraries are problematic, or not state-responsive,
+//   since they weren't originally made to work with React.
+// 
+// Tried - didn't work well enough
 //   'react-ace'
 //   'react-ace-editor'
 //   'react-codemirror'
 //   'react-codemirror2'
-
-// Current
-//   'react-ace-2'
-
+// 
+// Currently using
+//   'react-ace-2' // the module name is still 'react-ace'
+//   Be aware of the potential conflicts with 'react-ace'
+// 
 // Potential alternatives if things go wrong with the editor library
 //   'react-ace-wrapper'
+//   // To be added
 
-// 
+//
 // TabbedEditors component
 // 
 class TabbedEditors extends React.Component {
@@ -30,9 +35,11 @@ class TabbedEditors extends React.Component {
       filesOpened: [],
       fileActive: null,
       changedFiles: []
-      // editors: {}
     };
 
+    this._isTextFile = this._isTextFile.bind(this);
+    this._isImageFile = this._isImageFile.bind(this);
+    this._getObjUrl = this._getObjUrl.bind(this);
     this._getTabId = this._getTabId.bind(this);
     this._getEditorId = this._getEditorId.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
@@ -44,6 +51,30 @@ class TabbedEditors extends React.Component {
     this.handleTabCloseClick = this.handleTabCloseClick.bind(this);
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
+  }
+
+  _isTextFile(fileObj) {
+    let textFileRegex = /\.(txt|text|html|htm|yaml|yml|json|css|sass|less|js|csv|latex|log|md|markdown|mdown|mkdn|mkd)$/i;
+    if(textFileRegex.test(fileObj.name)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  _isImageFile(fileObj) {
+    let imgFileRegex = /\.(jpg|jpeg|gif|png|svg|bmp|ico)$/i;
+    if(imgFileRegex.test(fileObj.name)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  _getObjUrl(fileObj) {
+    return 'data:image/png;base64,' + btoa(fileObj.originalContent);
   }
 
   _getTabId(fileObj) {
@@ -560,13 +591,23 @@ class TabbedEditors extends React.Component {
       let idStr = this._getEditorId(item);
       tabbedEditors.push(
         <div className={editorClassName} name={idStr} key={index}>
-          <AceEditor
-            tabSize={2} mode="markdown" theme="github"
-            onChange={this.handleEditorChange.bind(this, item)}
-            value={item.newContent ? item.newContent : item.originalContent}
-            name={"ace_" + idStr} enableBasicAutocompletion={false}
-            enableSnippets={false} enableLiveAutocompletion={false}
-            editorProps={{$blockScrolling: Infinity}} />
+          {
+            this._isTextFile(item) ?
+            <AceEditor
+              tabSize={2} mode="markdown" theme="github"
+              onChange={this.handleEditorChange.bind(this, item)}
+              value={item.newContent ? item.newContent : item.originalContent}
+              name={"ace_" + idStr} enableBasicAutocompletion={false}
+              enableSnippets={false} enableLiveAutocompletion={false}
+              editorProps={{$blockScrolling: Infinity}} /> :
+            (
+              this._isImageFile(item) ?
+              <div>
+                <img src={this._getObjUrl(item)} />
+              </div>:
+              null
+            )
+          }
         </div>
       );
     }.bind(this))
