@@ -56,7 +56,8 @@ class CreateFileModalContent extends React.Component {
     }, function() {
       this.fileNameInput1.value = '';
       this.fileNameInput2.value = '';
-      // $('button.theme-structure').addClass('disabled');
+      $('.file-creation-tabs').removeClass('active');
+      $('.file-creation-panes').removeClass('active show in');
     });
   }
 
@@ -421,6 +422,44 @@ class CreateFileModalContent extends React.Component {
       // TODO: Error message for duplicated file.
       return;
     }
+
+    // Upload the data
+    let data = {
+      mode: this.state.fileCreationMode,
+      repository: this.state.repository.full_name,
+      branch: this.state.branch.name,
+      path: path
+    };
+    // data.set('mode', this.state.fileCreationMode);
+    // data.set('repository', this.state.repository.full_name);
+    // data.set('branch', this.state.branch.name);
+    // data.set('path', path);
+
+    let contentType;// = 'multipart/form-data';
+    let processData = true;
+
+    switch(this.state.fileCreationMode) {
+      case 'source':
+        contentType = 'application/json; charset=utf-8';
+        data.scaffold = this.state.scaffold;
+        data.files = [fileName];
+        break;
+      case 'file':
+        contentType = 'application/json; charset=utf-8';
+        data.fileOrFolder = this.state.fileOrFolder;
+        data.files = [fileName];
+        break;
+      case 'upload':
+        // processData = false;
+        // contentType = false;
+        // data.files = filesToUpload;
+        break;
+      default:
+        // Unexpected case
+        console.error('Unknown file creation mode');
+        return;
+        break;
+    }
     
     // POST new file to GLIDE server
     let self = this;
@@ -432,15 +471,9 @@ class CreateFileModalContent extends React.Component {
       method: 'POST',
       headers: { 'X-CSRFToken': window.glide.csrfToken },
       dataType: 'json',
-      data: JSON.stringify({
-        repository: this.state.repository.full_name,
-        branch: this.state.branch.name,
-        scaffold: this.state.scaffold,
-        fileName: fileName,
-        fileOrFolder: this.state.fileOrFolder,
-        path: path
-      }),
-      contentType: 'application/json; charset=utf-8',
+      processData: processData,
+      contentType: contentType,
+      data: JSON.stringify(data),
       success: function(response) {
         console.log(response);
         if('error' in response) {
@@ -560,7 +593,7 @@ class CreateFileModalContent extends React.Component {
                 title="You may create a Hexo-generated web page by creating a source file under /source/ folder."
                 href="#file-creation-source" onClick={this.handleFileCreationModeChange}
                 data-toggle="tab" className={
-                  sourceDisabled ? "nav-link disabled" : "nav-link"}>
+                  sourceDisabled ? "nav-link disabled file-creation-tabs" : "nav-link file-creation-tabs"}>
                 Web Page (Hexo Source)
               </a>
             </li>
@@ -569,7 +602,7 @@ class CreateFileModalContent extends React.Component {
                 data-mode="file"
                 title=""
                 href="#file-creation-file" onClick={this.handleFileCreationModeChange}
-                data-toggle="tab" className="nav-link">
+                data-toggle="tab" className="nav-link file-creation-tabs">
                 File or Folder
               </a>
             </li>
@@ -578,7 +611,7 @@ class CreateFileModalContent extends React.Component {
                 data-mode="upload"
                 title=""
                 href="#file-creation-upload" onClick={this.handleFileCreationModeChange}
-                data-toggle="tab" className="nav-link">
+                data-toggle="tab" className="nav-link file-creation-tabs">
                 Upload
               </a>
             </li>
@@ -587,7 +620,7 @@ class CreateFileModalContent extends React.Component {
           <div className="tab-content">
 
             <div id="file-creation-source"
-              className="form-group tab-pane fade padding-20 no-margin">
+              className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
               <fieldset>
                 <label className="control-label">
                   Content Type (Hexo Scaffolds)
@@ -624,7 +657,7 @@ class CreateFileModalContent extends React.Component {
             </div>
               
             <div id="file-creation-file"
-              className="form-group tab-pane fade padding-20 no-margin">
+              className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
               <fieldset>
                 <label>
                   <input
@@ -655,8 +688,8 @@ class CreateFileModalContent extends React.Component {
             </div>
 
             <div id="file-creation-upload"
-              className="form-group tab-pane fade padding-20 no-margin">
-              <div className="card border-light mb-3">
+              className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
+              <div className="card border-light mb-3 no-margin">
                 <div className="card-body pointer files">
                   <Files
                     className='files-dropzone'

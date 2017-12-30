@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from rest_framework.response import Response
 from .serializers import *
 import json
@@ -806,34 +807,28 @@ def hardclone(request):
 
 
 @api_view(['POST'])
+# @parser_classes((FormParser, MultiPartParser, ))
 def newFile(request):
   repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
   branch = request.data['branch']
-  scaffold = request.data['scaffold']
-  fileName = request.data['fileName']
-  fileOrFolder = request.data['fileOrFolder']
+  mode = request.data['mode']
   path = request.data['path']
+  files = request.data['files']
   username = request.session['username'].split('@')[0]
   userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  # return Response({
+  #   'mode': mode,
+  #   'repositoryFullName': repositoryFullName,
+  #   'branch': branch,
+  #   'path': path,
+  #   'files': files,
+  #   'username': username
+  # })
 
-  if fileOrFolder == 'folder':
-    # Create a folder
-    newFolderPath = pathlib.Path(userBasePathStr) / path / fileName
-    newFolderPath.mkdir(mode=0o777, parents=True)
-    newFolder = {
-      'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
-      'name': fileName,
-      'nodes': [],
-      'type': 'tree',
-      'mode': '040000'
-    }
-    return Response({
-      'res': newFolderPath.exists(),
-      'createdFiles': [newFolder]
-    })
-  elif scaffold:
+  if mode == 'source':
+    scaffold = request.data['scaffold']
     # Hexo source file: Hexo new
-    hexoNewCommand = 'cd {} && hexo new {} {}'.format(userBasePathStr, scaffold, fileName)
+    hexoNewCommand = 'cd {} && hexo new {} {}'.format(userBasePathStr, scaffold, files[0])
     # If shell is True, it is recommended to pass args as a string rather than as a sequence.
     hexoNewCompProc = subprocess.run(
       hexoNewCommand, shell=True, stdin=subprocess.PIPE,
@@ -887,33 +882,156 @@ def newFile(request):
           'stderr': hexoNewCompProc.stderr
         }
       })
-  elif fileOrFolder == 'file':
-    # Create a text file
-    newFilePath = pathlib.Path(userBasePathStr) / path / fileName
-    newFile = {}
-    newFile['path'] = str(newFilePath)
-    newFile['path'] = newFile['path'].replace(userBasePathStr, '')
-    newFile['path'] = newFile['path'][1:] # To remove the leading /
-    newFile['name'] = os.path.basename(newFile['path'])
-    newFile['nodes'] = []
-    newFile['added'] = True
-    newFile['modified'] = False
-    newFile['sha'] = None
-    newFile['url'] = None
-    newFile['type'] = 'blob'
-    newFile['mode'] = '100644'
-    newFile['originalContent'] = ''
-    newFile['size'] = 0
-    with open(str(newFilePath), 'w') as nf:
-      nf.write('')
-    return Response({
-      'res': newFilePath.exists(),
-      'createdFiles': [newFile]
-    })
-  else:
+  elif mode =='file':
+    fileOrFolder = request.data['fileOrFolder']
+    if fileOrFolder == 'file':
+      # Create a text file
+      newFilePath = pathlib.Path(userBasePathStr) / path / files[0]
+      newFile = {}
+      newFile['path'] = str(newFilePath)
+      newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+      newFile['path'] = newFile['path'][1:] # To remove the leading /
+      newFile['name'] = os.path.basename(newFile['path'])
+      newFile['nodes'] = []
+      newFile['added'] = True
+      newFile['modified'] = False
+      newFile['sha'] = None
+      newFile['url'] = None
+      newFile['type'] = 'blob'
+      newFile['mode'] = '100644'
+      newFile['originalContent'] = ''
+      newFile['size'] = 0
+      with open(str(newFilePath), 'w') as nf:
+        nf.write('')
+      return Response({
+        'res': newFilePath.exists(),
+        'createdFiles': [newFile]
+      })
+    elif fileOrFolder == 'folder':
+      # Create a folder
+      newFolderPath = pathlib.Path(userBasePathStr) / path / files[0]
+      newFolderPath.mkdir(mode=0o777, parents=True)
+      newFolder = {
+        'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
+        'name': files[0],
+        'nodes': [],
+        'type': 'tree',
+        'mode': '040000'
+      }
+      return Response({
+        'res': newFolderPath.exists(),
+        'createdFiles': [newFolder]
+      })
+    else:
+      # Unexpected: file or folder
+      pass
+  elif mode == 'upload':
+    pass
+  # else:
+  #   pass
+
+
+
+
+
+  # if fileOrFolder == 'folder':
+    # # Create a folder
+    # newFolderPath = pathlib.Path(userBasePathStr) / path / fileName
+    # newFolderPath.mkdir(mode=0o777, parents=True)
+    # newFolder = {
+    #   'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
+    #   'name': fileName,
+    #   'nodes': [],
+    #   'type': 'tree',
+    #   'mode': '040000'
+    # }
+    # return Response({
+    #   'res': newFolderPath.exists(),
+    #   'createdFiles': [newFolder]
+    # })
+  # elif scaffold:
+    # # Hexo source file: Hexo new
+    # hexoNewCommand = 'cd {} && hexo new {} {}'.format(userBasePathStr, scaffold, fileName)
+    # # If shell is True, it is recommended to pass args as a string rather than as a sequence.
+    # hexoNewCompProc = subprocess.run(
+    #   hexoNewCommand, shell=True, stdin=subprocess.PIPE,
+    #   input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    # )
+    # if hexoNewCompProc.returncode == 0:
+    #   # Completed Process returned with zero
+    #   fileCreationMsgs = re.findall(
+    #     r'^INFO\s+Created:\s+[\w\-\s\./]+/source/[\w\-\s\./]+\.[\w]+$',
+    #     hexoNewCompProc.stdout.decode('utf-8')
+    #   )
+    #   createdFiles = []
+    #   # Note: Hexo new command is supposed to create one file
+    #   for msg in fileCreationMsgs:
+    #     newFile = {}
+    #     newFile['path'] = re.sub(r'^INFO\s+Created:\s+', '', msg)
+    #     newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+    #     newFile['path'] = newFile['path'][1:] # To remove the leading /
+    #     newFile['name'] = os.path.basename(newFile['path'])
+    #     newFile['nodes'] = []
+    #     newFile['added'] = True
+    #     newFile['modified'] = False
+    #     newFile['sha'] = None
+    #     newFile['url'] = None
+    #     newFile['type'] = 'blob'
+    #     newFile['mode'] = '100644'
+    #     # newFile['originalContent'] = None
+    #     actualPath = os.path.join(userBasePathStr, newFile['path'])
+    #     newFile['size'] = os.stat(actualPath).st_size
+    #     with open(actualPath, 'r') as nf:
+    #       newFile['originalContent'] = nf.read()
+    #     createdFiles.append(newFile)
+    #   return Response({
+    #     'completedProcess': {
+    #       'msgs': fileCreationMsgs,
+    #       'args': hexoNewCompProc.args,
+    #       'returncode': hexoNewCompProc.returncode,
+    #       'stdout': hexoNewCompProc.stdout.decode('utf-8'),
+    #       'stderr': hexoNewCompProc.stderr
+    #     },
+    #     'createdFiles': createdFiles
+    #   })
+    # else:
+    #   # Completed Process returned with non-zero
+    #   return Response({
+    #     'completedProcess': {
+    #       'msgs': fileCreationMsgs,
+    #       'args': hexoNewCompProc.args,
+    #       'returncode': hexoNewCompProc.returncode,
+    #       'stdout': hexoNewCompProc.stdout.decode('utf-8'),
+    #       'stderr': hexoNewCompProc.stderr
+    #     }
+    #   })
+  # elif fileOrFolder == 'file':
+    # # Create a text file
+    # newFilePath = pathlib.Path(userBasePathStr) / path / fileName
+    # newFile = {}
+    # newFile['path'] = str(newFilePath)
+    # newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+    # newFile['path'] = newFile['path'][1:] # To remove the leading /
+    # newFile['name'] = os.path.basename(newFile['path'])
+    # newFile['nodes'] = []
+    # newFile['added'] = True
+    # newFile['modified'] = False
+    # newFile['sha'] = None
+    # newFile['url'] = None
+    # newFile['type'] = 'blob'
+    # newFile['mode'] = '100644'
+    # newFile['originalContent'] = ''
+    # newFile['size'] = 0
+    # with open(str(newFilePath), 'w') as nf:
+    #   nf.write('')
+    # return Response({
+    #   'res': newFilePath.exists(),
+    #   'createdFiles': [newFile]
+    # })
+  # else:
     # Unexpected case
     # TODO: Upload?
-    pass
+    # pass
 
 
 @api_view(['POST'])
