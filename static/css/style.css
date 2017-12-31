@@ -5,6 +5,7 @@ html,body{ height:100%; overflow: hidden; }
   html,body{ height:100%; overflow: auto; }
   /*body { padding-top: 0px; }*/
 }
+button.btn.btn-link:hover { text-decoration: none; }
 .full-height { height: 98.3%; }
 .height-95 { height: 95%; }
 .height-90 { height: 90%; }
@@ -58,6 +59,10 @@ ul.subtree {
 }
 .file-node-file { color: #222222 !important; }
 .new-file-button { color: #3fb618 !important; }
+.file-node-folder:hover,
+.file-node-file:hover,
+.new-file-button:hover { background-color: #eee; }
+.file-manipulation.icon:hover { text-decoration: underline; }
 .v-middle {
   position: relative;
   top: 50%;
