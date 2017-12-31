@@ -11,6 +11,7 @@ from workspace.models import Project, Theme
 from copy import deepcopy
 import markdown
 import base64
+import mimetypes
 import yaml
 from jinja2 import Template, Environment, meta
 import traceback
@@ -21,6 +22,17 @@ from django.conf import settings
 # from django.core.files import File
 import pathlib, shutil, subprocess
 
+def _isBinary(fileName):
+  fileType, encoding = mimetypes.guess_type(fileName)
+  if fileType.startswith('text/')\
+    or fileType == 'application/json'\
+    or fileType == 'application/x-latex'\
+    or fileType == 'application/javascript'\
+    or fileType == 'application/yaml'\
+    or fileName.endswith('.md'): # Just in case
+    return False
+  else:
+    return True
 
 # @api_view(['GET'])
 # def theme(request, slug):
@@ -931,7 +943,6 @@ def uploadFile(request):
   branch = request.data['branch']
   path = request.data['path']
   file = request.data['files']
-  fileType = request.data[file.name + '-type']
   username = request.session['username'].split('@')[0]
   userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
   # TODO
@@ -951,12 +962,10 @@ def uploadFile(request):
   newFile['url'] = None
   newFile['type'] = 'blob'
   newFile['mode'] = '100644'
-  if fileType.startswith('text/')\
-    or fileType == 'application/json'\
-    or fileType == 'application/yaml':
-    newFile['originalContent'] = fileContent
+  if _isBinary((newFile['name'])):
+    newFile['originalContent'] = fileContent.decode('utf-8')
   else:
-    newFile['originalContent'] = base64.b64encode(fileContent)
+    newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
   newFile['size'] = os.stat(str(uploadedFilePath)).st_size
   return Response({
     'res': uploadedFilePath.exists(),
@@ -989,21 +998,60 @@ def updateFile(request):
 def generate(request):
   repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
   branch = request.data['branch']
-  addedFiles = request.data['addedFiles']
-  # changedFiles = request.data['changedFiles']
   username = request.session['username'].split('@')[0]
   userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
-  # hexoBasePath = pathlib.Path(userBasePathStr)
-  for file in addedFiles:
-    # TODO: Check binary or text
-    filePath = os.path.join(userBasePathStr, file['path'])
-    with open(filePath, 'w') as fo:
-      content = None
-      if file['newContent']:
-        content = file['newContent']
-      else:
-        content = file['originalContent']
-      fo.write(content)
-  return Response({
-    'res': 'res'
-  })
+  # Hexo generate
+  hexoGenCommand = 'cd {} && hexo generate'.format(userBasePathStr)
+  # If shell is True, it is recommended to pass args as a string rather than as a sequence.
+  hexoGenCompProc = subprocess.run(
+    hexoGenCommand, shell=True, stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  if hexoGenCompProc.returncode == 0:
+    # Completed Process returned with zero
+    msgLines = hexoGenCompProc.stdout.decode('utf-8').split('\n')
+    createdFiles = []
+    genRegex = re.compile('^INFO\s+Generated:\s+')
+    for line in msgLines:
+      # INFO  Generated: fancybox/fancybox_loading.gif
+      if re.match(genRegex, line):
+        # Matched
+        newFilePartialPathStr = os.path.join('docs', genRegex.sub('', line))
+        newFileFullPath = pathlib.Path(userBasePathStr) / newFilePartialPathStr
+        newFile = {}
+        newFile['path'] = newFilePartialPathStr
+        newFile['name'] = os.path.basename(newFile['path'])
+        newFile['nodes'] = []
+        newFile['added'] = True
+        newFile['modified'] = False
+        newFile['sha'] = None
+        newFile['url'] = None
+        newFile['type'] = 'blob'
+        newFile['mode'] = '100644'
+        if _isBinary(newFile['name']):
+          with open(str(newFileFullPath), 'rb') as fi:
+            newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        else:
+          with open(str(newFileFullPath), 'r') as fi:
+            newFile['originalContent'] = fi.read().encode('utf-8')
+        newFile['size'] = os.stat(str(newFileFullPath)).st_size
+        createdFiles.append(newFile)
+    return Response({
+      'completedProcess': {
+        'args': hexoGenCompProc.args,
+        'returncode': hexoGenCompProc.returncode,
+        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
+        'stderr': hexoGenCompProc.stderr
+      },
+      'createdFiles': createdFiles
+    })
+  else:
+    # Completed Process returned with non-zero
+    return Response({
+      'completedProcess': {
+        'args': hexoGenCompProc.args,
+        'returncode': hexoGenCompProc.returncode,
+        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
+        'stderr': hexoGenCompProc.stderr
+      }
+    })

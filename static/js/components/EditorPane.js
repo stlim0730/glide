@@ -81,7 +81,6 @@ class EditorPane extends React.Component {
             style={{paddingTop: 8, paddingBottom: 6}}>
             <h6 className="inline-block">Editor</h6>
             <button
-              disabled={!this.state.fileActive}
               style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
               className="btn btn-outline-success btn-sm inline-block float-right"
               onClick={this.handleRenderClick} type="button" >
