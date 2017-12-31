@@ -514,6 +514,8 @@ class CreateFileModalContent extends React.Component {
             // To match encoding / decoding scheme to blobs through GitHub API
             createdFile.originalContent = atob(createdFile.originalContent);
             // Push the file into tree
+            //   Duplicate check not required: UI has addressed it
+            //   (c.f., EditorPane)
             tree.tree.push(createdFile);
 
             // Push the file into recursiveTree

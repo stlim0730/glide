@@ -19,7 +19,7 @@ class EditorPane extends React.Component {
       fileActive: null
     };
 
-    this.handleRenderClick = this.handleRenderClick.bind(this);
+    this.handleGenerateClick = this.handleGenerateClick.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
   }
 
@@ -64,7 +64,7 @@ class EditorPane extends React.Component {
     }
   }
 
-  handleRenderClick() {
+  handleGenerateClick() {
     // POST request for Hexo initialization
     let url = '/api/project/generate';
     let self = this;
@@ -97,7 +97,13 @@ class EditorPane extends React.Component {
           _.forEach(createdFiles, function(createdFile) {
             // To match encoding / decoding scheme to blobs through GitHub API
             createdFile.originalContent = atob(createdFile.originalContent);
-            // Push the file into tree
+            // Update the tree
+            //   Duplicate check:
+            //   Just remove potentially existing duplicate
+            //   and just push the new file.
+            _.remove(tree.tree, function(file) {
+              return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+            });
             tree.tree.push(createdFile);
 
             // Push the file into recursiveTree
@@ -105,6 +111,7 @@ class EditorPane extends React.Component {
             self._addFileToRecursiveTree(recursiveTree, createdFile, folders);
             
             // Update addedFiles
+            //   Duplicate check:
             //   Just remove potentially existing duplicate
             //   and just push the new file.
             _.remove(addedFiles, function(file) {
@@ -166,8 +173,8 @@ class EditorPane extends React.Component {
             <button
               style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
               className="btn btn-outline-success btn-sm inline-block float-right"
-              onClick={this.handleRenderClick} type="button" >
-              Render <i className="angle double right icon"></i>
+              onClick={this.handleGenerateClick} type="button" >
+              Generate & Render <i className="angle double right icon"></i>
             </button>
           </div>
           
