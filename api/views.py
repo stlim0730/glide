@@ -962,10 +962,14 @@ def uploadFile(request):
   newFile['url'] = None
   newFile['type'] = 'blob'
   newFile['mode'] = '100644'
-  if _isBinary((newFile['name'])):
-    newFile['originalContent'] = fileContent.decode('utf-8')
-  else:
-    newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
+  # To match encoding / decoding scheme to blobs through GitHub API
+  newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
+  # The if block below didn't work for uploaded text files
+  #   (worked for existing text, binary, and uploaded binary, though)
+  # if _isBinary((newFile['name'])):
+  #   newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
+  # else:
+  #   newFile['originalContent'] = fileContent.decode('utf-8')
   newFile['size'] = os.stat(str(uploadedFilePath)).st_size
   return Response({
     'res': uploadedFilePath.exists(),

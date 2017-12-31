@@ -466,7 +466,7 @@ class CreateFileModalContent extends React.Component {
         contentType = false;
         _.forEach(this.state.filesToUpload, function(f) {
           formData.append('files', f, f.name);
-          formData.append(f.name + '-type', f.type);
+          // formData.append(f.name + '-type', f.type);
         });
         formData.append('repository', data.repository);
         formData.append('branch', data.branch);
@@ -506,6 +506,8 @@ class CreateFileModalContent extends React.Component {
           let addedFiles = app.state.addedFiles;
 
           _.forEach(createdFiles, function(createdFile) {
+            // To match encoding / decoding scheme to blobs through GitHub API
+            createdFile.originalContent = atob(createdFile.originalContent);
             // Push the file into tree
             tree.tree.push(createdFile);
 

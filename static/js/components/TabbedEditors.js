@@ -52,19 +52,31 @@ class TabbedEditors extends React.Component {
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
-
+  
   _isTextFile(fileObj) {
-    let textFileRegex = /\.(txt|text|html|htm|yaml|yml|json|css|sass|less|js|csv|latex|log|md|markdown|mdown|mkdn|mkd)$/i;
-    if(textFileRegex.test(fileObj.name)) {
-      return true;
+    const regexes = {
+      'textFileRegex'          : /\.txt/,
+      'htmlFileRegex'          : /\.(htm|html)/,
+      'webDevFileRegex'        : /\.(js|css|sass|less)/,
+      'hexoTemplateFileRegex'  : /\.(swig|ejs|pug|haml|jade)/,
+      'customTemplateFileRegex': /\.(mustache|handlebars|dust)/,
+      'dataFileRegex'          : /\.(yaml|yml|json)/,
+      'markdownFileRegex'      : /\.(md|markdown|mdown|mkdn|mkd)/,
+      'miscAppFileRegex'       : /\.(csv|latex|tex|log|sh)/
+    };
+
+    for(let key in regexes) {
+      let regex = regexes[key];
+      if(regex.test(fileObj.name)) {
+        return true;
+      }
     }
-    else {
-      return false;
-    }
+
+    return false;
   }
 
   _isImageFile(fileObj) {
-    let imgFileRegex = /\.(jpg|jpeg|gif|png|svg|bmp|ico)$/i;
+    const imgFileRegex = /\.(jpg|jpeg|gif|png|svg|bmp|ico)$/i;
     if(imgFileRegex.test(fileObj.name)) {
       return true;
     }
