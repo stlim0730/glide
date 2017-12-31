@@ -18,6 +18,9 @@ class FileNode extends React.Component {
     // this._slugify = this._slugify.bind(this);
     this._getFolderId = this._getFolderId.bind(this);
     // this._getEditorId = this._getEditorId.bind(this);
+    this.handleFileMouseOver = this.handleFileMouseOver.bind(this);
+    this.handleFileMouseOut = this.handleFileMouseOut.bind(this);
+    this.handleFileManClick = this.handleFileManClick.bind(this);
     this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
     this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
@@ -63,6 +66,26 @@ class FileNode extends React.Component {
     app.setState({
       scaffolds: scaffolds
     });
+  }
+
+  handleFileMouseOver(e) {
+    $(e.target).children('.file-manipulation.icon').removeClass('invisible');
+  }
+
+  handleFileMouseOut(e) {
+    $(e.target).children('.file-manipulation.icon').addClass('invisible');
+  }
+
+  handleFileManClick(operation, e) {
+    console.log(operation, this);
+    e.stopPropagation();
+    
+    // switch(operation) {
+    //   case 'remove':
+    //     break;
+    //   case 'copy':
+    //     break;
+    // }
   }
 
   handleFolderClick(e) {
@@ -225,6 +248,8 @@ class FileNode extends React.Component {
                 <button
                   key={index} type="button"
                   className="btn btn-link file-node-file block"
+                  onMouseEnter={this.handleFileMouseOver.bind(this)}
+                  onMouseLeave={this.handleFileMouseOut.bind(this)}
                   onClick={this.handleFileClick.bind(this, item)}>
                   {
                     _.find(this.state.filesOpened, function(f) {
@@ -233,9 +258,14 @@ class FileNode extends React.Component {
                     <i className="file text outline icon"></i>
                   } {item.name}
                   {
-                    // item.modified &&
-                    // !item.added &&
-                    // <span className="glyphicon glyphicon-asterisk"></span>
+                    <i
+                      style={{ marginLeft: 20 }} onClick={this.handleFileManClick.bind(this, 'remove')}
+                      className="red remove icon invisible file-manipulation"></i>
+                  }
+                  {
+                    <i
+                      onClick={this.handleFileManClick.bind(this, 'copy')}
+                      className="teal copy icon invisible file-manipulation"></i>
                   }
                 </button>
               );
