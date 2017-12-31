@@ -37,7 +37,7 @@ class FileSideBar extends React.Component {
 
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
-    // console.info('FileSideBar _ajaxTree', this.state);
+    // console.debug('FileSideBar _ajaxTree', this.state);
     let url = '/api/project/tree/'
       + repository.full_name + '/'
       + branch.name + '/' + commit.sha;
@@ -48,7 +48,7 @@ class FileSideBar extends React.Component {
       url: url,
       method: 'GET',
       success: function(response) {
-        // console.info('_ajaxTree AJAX success', response);
+        // console.debug('_ajaxTree AJAX success', response);
         if('error' in response) {
           // TODO
         }
@@ -76,7 +76,7 @@ class FileSideBar extends React.Component {
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive
     }, function() {
-      // console.info('FileSideBar CDM', this.state);
+      // console.debug('FileSideBar CDM', this.state);
       // let repository = self.state.repository;
       // let branch = self.state.branch;
       // let commit = self.state.commit;
@@ -103,7 +103,7 @@ class FileSideBar extends React.Component {
     //   //   This should happen
     //   //   when the recursiveTree structure has changed
     //   //   outside this component (e.g., CreateFileModalContent).
-    //   console.info('rec tree received');
+    //   console.debug('rec tree received');
     //   this.setState({
     //     recursiveTree: nextProps.recursiveTree
     //   });
@@ -118,7 +118,7 @@ class FileSideBar extends React.Component {
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
-      console.info('FileSideBar WRP', this.state, nextProps);
+      console.debug('FileSideBar WRP', this.state, nextProps);
       // self._ajaxTree(
       //   self.state.repository,
       //   self.state.branch,
@@ -145,7 +145,7 @@ class FileSideBar extends React.Component {
   }
 
   render () {
-    // console.info('FileSideBar', this.state);
+    // console.debug('FileSideBar', this.state);
     return (
       <div className="col-lg-2 col-md-2 no-padding full-height">
 
@@ -157,6 +157,7 @@ class FileSideBar extends React.Component {
               <FileNode
                 app={this.props.app}
                 repository={this.state.repository}
+                tree={this.state.tree}
                 filesOpened={this.state.filesOpened}
                 fileActive={this.state.fileActive}
                 currentPath=''

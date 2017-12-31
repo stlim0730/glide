@@ -207,13 +207,13 @@ class RepositoryPane extends React.Component {
             Sort by:
             <button
               onClick={this.handleSortRepo.bind(this, 'date')}
-              className="btn btn-link">Date</button>
+              className="btn btn-link" type="button">Date</button>
             <button
               onClick={this.handleSortRepo.bind(this, 'name')}
-              className="btn btn-link">Name</button>
+              className="btn btn-link" type="button">Name</button>
             <button
               onClick={this.handleSortRepo.bind(this, 'owner')}
-              className="btn btn-link">Owner</button>
+              className="btn btn-link" type="button">Owner</button>
           </div>
         </div>
 

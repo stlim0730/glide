@@ -1,6 +1,6 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import JSONParser, FormParser, MultiPartParser
 from rest_framework.response import Response
-# from rest_framework.renderers import JSONRenderer
 from .serializers import *
 import json
 from urllib.parse import urlencode
@@ -11,13 +11,28 @@ from workspace.models import Project, Theme
 from copy import deepcopy
 import markdown
 import base64
+import mimetypes
 import yaml
 from jinja2 import Template, Environment, meta
 import traceback
 import re
+import os
 from glide import *
 from django.conf import settings
+# from django.core.files import File
+import pathlib, shutil, subprocess
 
+def _isBinary(fileName):
+  fileType, encoding = mimetypes.guess_type(fileName)
+  if fileType.startswith('text/')\
+    or fileType == 'application/json'\
+    or fileType == 'application/x-latex'\
+    or fileType == 'application/javascript'\
+    or fileType == 'application/yaml'\
+    or fileName.endswith('.md'): # Just in case
+    return False
+  else:
+    return True
 
 # @api_view(['GET'])
 # def theme(request, slug):
@@ -772,3 +787,278 @@ def nodetest(request):
     resStr = glideNodeRes.read().decode('utf-8')
     # res = json.loads(resStr)
     return Response({ 'resStr': resStr })
+
+
+@api_view(['POST'])
+def hardclone(request):
+  cloneUrl = request.data['cloneUrl']
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  username = request.session['username'].split('@')[0]
+  # Create dirs
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  userBasePath = pathlib.Path(userBasePathStr)
+  if userBasePath.exists():
+    if userBasePath.is_file():
+      userBasePath.unlink()
+    elif userBasePath.is_dir():
+      shutil.rmtree(userBasePathStr, ignore_errors=True)
+  userBasePath.mkdir(mode=0o777, parents=True)
+  # Clone project
+  cloneCommand = 'git clone -b {} {} {}'.format(branch, cloneUrl, userBasePathStr)
+  cloneCompProc = subprocess.run(
+    cloneCommand.split(), stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  return Response({
+    'args': cloneCompProc.args,
+    'returncode': cloneCompProc.returncode,
+    'stdout': cloneCompProc.stdout,
+    'stderr': cloneCompProc.stderr
+  })
+
+
+@api_view(['POST'])
+def newFile(request):
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  mode = request.data['mode']
+  path = request.data['path']
+  file = request.data['file']
+  username = request.session['username'].split('@')[0]
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+
+  if mode == 'source':
+    scaffold = request.data['scaffold']
+    # Hexo source file: Hexo new
+    hexoNewCommand = 'cd {} && hexo new {} {}'.format(userBasePathStr, scaffold, file)
+    # If shell is True, it is recommended to pass args as a string rather than as a sequence.
+    hexoNewCompProc = subprocess.run(
+      hexoNewCommand, shell=True, stdin=subprocess.PIPE,
+      input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+    )
+    if hexoNewCompProc.returncode == 0:
+      # Completed Process returned with zero
+      fileCreationMsgs = re.findall(
+        r'^INFO\s+Created:\s+[\w\-\s\./]+/source/[\w\-\s\./]+\.[\w]+$',
+        hexoNewCompProc.stdout.decode('utf-8')
+      )
+      createdFiles = []
+      # Note: Hexo new command is supposed to create one file
+      for msg in fileCreationMsgs:
+        newFile = {}
+        newFile['path'] = re.sub(r'^INFO\s+Created:\s+', '', msg)
+        newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+        newFile['path'] = newFile['path'][1:] # To remove the leading /
+        newFile['name'] = os.path.basename(newFile['path'])
+        newFile['nodes'] = []
+        newFile['added'] = True
+        newFile['modified'] = False
+        newFile['sha'] = None
+        newFile['url'] = None
+        newFile['type'] = 'blob'
+        newFile['mode'] = '100644'
+        # newFile['originalContent'] = None
+        actualPath = os.path.join(userBasePathStr, newFile['path'])
+        newFile['size'] = os.stat(actualPath).st_size
+        with open(actualPath, 'rb') as fi:
+          # newFile['originalContent'] = nf.read()
+          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        createdFiles.append(newFile)
+      return Response({
+        'completedProcess': {
+          'msgs': fileCreationMsgs,
+          'args': hexoNewCompProc.args,
+          'returncode': hexoNewCompProc.returncode,
+          'stdout': hexoNewCompProc.stdout.decode('utf-8'),
+          'stderr': hexoNewCompProc.stderr
+        },
+        'createdFiles': createdFiles
+      })
+    else:
+      # Completed Process returned with non-zero
+      return Response({
+        'completedProcess': {
+          'msgs': fileCreationMsgs,
+          'args': hexoNewCompProc.args,
+          'returncode': hexoNewCompProc.returncode,
+          'stdout': hexoNewCompProc.stdout.decode('utf-8'),
+          'stderr': hexoNewCompProc.stderr
+        }
+      })
+  elif mode =='file':
+    fileOrFolder = request.data['fileOrFolder']
+    if fileOrFolder == 'file':
+      # Create a text file
+      newFilePath = pathlib.Path(userBasePathStr) / path / file
+      newFile = {}
+      newFile['path'] = str(newFilePath)
+      newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+      newFile['path'] = newFile['path'][1:] # To remove the leading /
+      newFile['name'] = os.path.basename(newFile['path'])
+      newFile['nodes'] = []
+      newFile['added'] = True
+      newFile['modified'] = False
+      newFile['sha'] = None
+      newFile['url'] = None
+      newFile['type'] = 'blob'
+      newFile['mode'] = '100644'
+      newFile['originalContent'] = ''
+      newFile['size'] = 0
+      with open(str(newFilePath), 'w') as nf:
+        nf.write(newFile['originalContent'])
+      return Response({
+        'res': newFilePath.exists(),
+        'createdFiles': [newFile]
+      })
+    elif fileOrFolder == 'folder':
+      # Create a folder
+      newFolderPath = pathlib.Path(userBasePathStr) / path / file
+      newFolderPath.mkdir(mode=0o777, parents=True)
+      newFolder = {
+        'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
+        'name': file,
+        'nodes': [],
+        'type': 'tree',
+        'mode': '040000'
+      }
+      return Response({
+        'res': newFolderPath.exists(),
+        'createdFiles': [newFolder]
+      })
+    else:
+      # Unexpected file or folder flag
+      pass
+  else:
+    # Unexpected file creation mode
+    pass
+
+
+@api_view(['POST'])
+@parser_classes((FormParser, MultiPartParser, ))
+def uploadFile(request):
+  """
+  Currently supports uploading one file
+  """
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  path = request.data['path']
+  file = request.data['files']
+  username = request.session['username'].split('@')[0]
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  # TODO
+  uploadedFilePath = pathlib.Path(userBasePathStr) / path / file.name
+  fileContent = file.read()
+  with open(str(uploadedFilePath), 'wb') as fo:
+    fo.write(fileContent)
+  newFile = {}
+  newFile['path'] = str(uploadedFilePath)
+  newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+  newFile['path'] = newFile['path'][1:] # To remove the leading /
+  newFile['name'] = os.path.basename(newFile['path'])
+  newFile['nodes'] = []
+  newFile['added'] = True
+  newFile['modified'] = False
+  newFile['sha'] = None
+  newFile['url'] = None
+  newFile['type'] = 'blob'
+  newFile['mode'] = '100644'
+  # To match encoding / decoding scheme to blobs through GitHub API
+  newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
+  # The if block below didn't work for uploaded text files
+  #   (worked for existing text, binary, and uploaded binary, though)
+  # if _isBinary((newFile['name'])):
+  #   newFile['originalContent'] = base64.b64encode(fileContent).decode('utf-8')
+  # else:
+  #   newFile['originalContent'] = fileContent.decode('utf-8')
+  newFile['size'] = os.stat(str(uploadedFilePath)).st_size
+  return Response({
+    'res': uploadedFilePath.exists(),
+    'createdFiles': [newFile],
+    'size': newFile['size']
+  })
+
+
+@api_view(['POST'])
+def updateFile(request):
+  """
+  Currently supports text file (not binary)
+  """
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  filePath = request.data['filePath']
+  newVal = request.data['newVal']
+  username = request.session['username'].split('@')[0]
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  actualPath = pathlib.Path(userBasePathStr) / filePath
+  with open(str(actualPath), 'w') as fo:
+    fo.write(newVal)
+  return Response({
+    'res': actualPath.exists(),
+    'size': os.stat(str(actualPath)).st_size
+  })
+
+
+@api_view(['POST'])
+def generate(request):
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  username = request.session['username'].split('@')[0]
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  # Hexo generate
+  hexoGenCommand = 'cd {} && hexo generate'.format(userBasePathStr)
+  # If shell is True, it is recommended to pass args as a string rather than as a sequence.
+  hexoGenCompProc = subprocess.run(
+    hexoGenCommand, shell=True, stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  if hexoGenCompProc.returncode == 0:
+    # Completed Process returned with zero
+    msgLines = hexoGenCompProc.stdout.decode('utf-8').split('\n')
+    createdFiles = []
+    genRegex = re.compile('^INFO\s+Generated:\s+')
+    for line in msgLines:
+      # INFO  Generated: fancybox/fancybox_loading.gif
+      if re.match(genRegex, line):
+        # Matched
+        newFilePartialPathStr = os.path.join('docs', genRegex.sub('', line))
+        newFileFullPath = pathlib.Path(userBasePathStr) / newFilePartialPathStr
+        newFile = {}
+        newFile['path'] = newFilePartialPathStr
+        newFile['name'] = os.path.basename(newFile['path'])
+        newFile['nodes'] = []
+        newFile['added'] = True
+        newFile['modified'] = False
+        newFile['sha'] = None
+        newFile['url'] = None
+        newFile['type'] = 'blob'
+        newFile['mode'] = '100644'
+        with open(str(newFileFullPath), 'rb') as fi:
+          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        # if _isBinary(newFile['name']):
+        #   with open(str(newFileFullPath), 'rb') as fi:
+        #     newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        # else:
+        #   with open(str(newFileFullPath), 'r') as fi:
+        #     newFile['originalContent'] = fi.read().encode('utf-8')
+        newFile['size'] = os.stat(str(newFileFullPath)).st_size
+        createdFiles.append(newFile)
+    return Response({
+      'completedProcess': {
+        'args': hexoGenCompProc.args,
+        'returncode': hexoGenCompProc.returncode,
+        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
+        'stderr': hexoGenCompProc.stderr
+      },
+      'createdFiles': createdFiles
+    })
+  else:
+    # Completed Process returned with non-zero
+    return Response({
+      'completedProcess': {
+        'args': hexoGenCompProc.args,
+        'returncode': hexoGenCompProc.returncode,
+        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
+        'stderr': hexoGenCompProc.stderr
+      }
+    })
