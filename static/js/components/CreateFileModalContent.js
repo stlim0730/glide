@@ -119,16 +119,22 @@ class CreateFileModalContent extends React.Component {
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
     if(folders.length == 1) {
+      // This is the location where we add the file
+      // TODO: Duplicate Check
+      //   This component does duplicate check on the UI before the add operation
+      //   (c.f., EditorPane)
       recursiveTree.nodes.push(newFile);
     }
     else {
+      // We should go deeper
       let folderName = folders.shift();
       let targetFolder = _.find(recursiveTree.nodes, {name: folderName, type: 'tree'});
       if(targetFolder) {
+        // The target path exists
         this._addFileToRecursiveTree(targetFolder, newFile, folders);
       }
       else {
-        // console.log('_add', newFile, folders);
+        // Create a subfolder
         let subdirs = '/' + folders.join('/');
         let path  = '/' + newFile.path.replace(subdirs, '');
         // Create a folder
@@ -388,8 +394,7 @@ class CreateFileModalContent extends React.Component {
   }
 
   handleUploadFilesError(error, file) {
-    console.log('file error', error, file);
-    
+    // console.log('file error', error, file);
     let filesFailedToUpload = this.state.filesFailedToUpload;
     filesFailedToUpload.push(file);
     this.setState({
@@ -408,9 +413,9 @@ class CreateFileModalContent extends React.Component {
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let fileName = this.state.fileName;
-    if(this.state.fileCreationMode == 'source') {
-      fileName = this._slugify(fileName);
-    }
+    // if(this.state.fileCreationMode == 'source') {
+    //   fileName = this._slugify(fileName);
+    // }
 
     // Must remove leading '/'
     let path = this.pathInput.value.trim();
@@ -515,7 +520,12 @@ class CreateFileModalContent extends React.Component {
             let folders = createdFile.path.split('/');
             self._addFileToRecursiveTree(recursiveTree, createdFile, folders);
             
-            // Update the states
+            // Update addedFiles
+            //   Just remove potentially existing duplicate
+            //   and just push the new file.
+            _.remove(addedFiles, function(file) {
+              return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+            });
             addedFiles.push(createdFile);
           });
 

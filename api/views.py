@@ -861,8 +861,9 @@ def newFile(request):
         # newFile['originalContent'] = None
         actualPath = os.path.join(userBasePathStr, newFile['path'])
         newFile['size'] = os.stat(actualPath).st_size
-        with open(actualPath, 'r') as nf:
-          newFile['originalContent'] = nf.read()
+        with open(actualPath, 'rb') as fi:
+          # newFile['originalContent'] = nf.read()
+          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
         createdFiles.append(newFile)
       return Response({
         'completedProcess': {
@@ -1032,12 +1033,14 @@ def generate(request):
         newFile['url'] = None
         newFile['type'] = 'blob'
         newFile['mode'] = '100644'
-        if _isBinary(newFile['name']):
-          with open(str(newFileFullPath), 'rb') as fi:
-            newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
-        else:
-          with open(str(newFileFullPath), 'r') as fi:
-            newFile['originalContent'] = fi.read().encode('utf-8')
+        with open(str(newFileFullPath), 'rb') as fi:
+          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        # if _isBinary(newFile['name']):
+        #   with open(str(newFileFullPath), 'rb') as fi:
+        #     newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
+        # else:
+        #   with open(str(newFileFullPath), 'r') as fi:
+        #     newFile['originalContent'] = fi.read().encode('utf-8')
         newFile['size'] = os.stat(str(newFileFullPath)).st_size
         createdFiles.append(newFile)
     return Response({
