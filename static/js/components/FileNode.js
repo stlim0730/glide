@@ -212,7 +212,7 @@ class FileNode extends React.Component {
     });
   }
 
-  render () {
+  render() {
     return (
       <div>
         {

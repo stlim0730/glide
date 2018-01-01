@@ -120,8 +120,9 @@ class CreateFileModalContent extends React.Component {
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
     if(folders.length == 1) {
       // This is the location where we add the file
-      // TODO: Duplicate Check
+      // Duplicate Check:
       //   This component does duplicate check on the UI before the add operation
+      //   So, just push it
       //   (c.f., EditorPane)
       recursiveTree.nodes.push(newFile);
     }
@@ -512,7 +513,20 @@ class CreateFileModalContent extends React.Component {
 
           _.forEach(createdFiles, function(createdFile) {
             // To match encoding / decoding scheme to blobs through GitHub API
-            createdFile.originalContent = atob(createdFile.originalContent);
+            if(self.state.fileCreationMode != 'file' || self.state.fileOrFolder != 'folder') {
+              // When the created object is a file, not a folder
+              
+              createdFile.originalContent = atob(createdFile.originalContent);
+
+              // Update addedFiles
+              //   Just remove potentially existing duplicate
+              //   and just push the new file.
+              _.remove(addedFiles, function(file) {
+                return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+              });
+              addedFiles.push(createdFile);
+            }
+            
             // Push the file into tree
             //   Duplicate check not required: UI has addressed it
             //   (c.f., EditorPane)
@@ -521,14 +535,6 @@ class CreateFileModalContent extends React.Component {
             // Push the file into recursiveTree
             let folders = createdFile.path.split('/');
             self._addFileToRecursiveTree(recursiveTree, createdFile, folders);
-            
-            // Update addedFiles
-            //   Just remove potentially existing duplicate
-            //   and just push the new file.
-            _.remove(addedFiles, function(file) {
-              return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
-            });
-            addedFiles.push(createdFile);
           });
 
           self.setState({

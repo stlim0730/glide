@@ -59,9 +59,9 @@ ul.subtree {
 }
 .file-node-file { color: #222222 !important; }
 .new-file-button { color: #3fb618 !important; }
-.file-node-folder:hover,
-.file-node-file:hover,
-.new-file-button:hover { background-color: #eee; }
+button.file-node-folder:hover,
+button.file-node-file:hover,
+button.new-file-button:hover { background-color: #eee; }
 .file-manipulation.icon:hover { text-decoration: underline; }
 .v-middle {
   position: relative;
