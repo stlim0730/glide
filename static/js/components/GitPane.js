@@ -32,7 +32,7 @@ class GitPane extends React.Component {
       let file = recursiveTree.nodes[i];
 
       let existsInTree = _.find(tree.tree, function(treeFile) {
-        return (('/' + treeFile.path) == file.path);// || (treeFile.path == file.path);
+        return (('/' + treeFile.path) == file.path) || (treeFile.path == file.path);
       });
 
       if(!existsInTree) {
@@ -50,7 +50,7 @@ class GitPane extends React.Component {
         });
 
         // Remove potential leading / from treeFile.path
-        treeFile.path = treeFile.path.startsWith('/') ? treeFile.path.substring(1) : treeFile.path;
+        // treeFile.path = treeFile.path.startsWith('/') ? treeFile.path.substring(1) : treeFile.path;
 
         // GitHub API doc says
         //   Use either tree.content or tree.sha
@@ -93,7 +93,7 @@ class GitPane extends React.Component {
   }
 
   handleCommitClick(e) {
-    console.log('tree to commit', this.state.tree, this.state.recursiveTree);
+    // console.log('tree to commit', this.state.tree, this.state.recursiveTree);
 
     // POST tree to make a create tree request
     let tree = this.state.tree;
@@ -124,6 +124,15 @@ class GitPane extends React.Component {
     //   }
     // }
 
+    // Remove potential leading / from treeFile.path
+    _.forEach(tree.tree, function(file) {
+      if(file.path.startsWith('/')) {
+        file.path = file.path.substring(1);
+      }
+    });
+
+    // TODO: One suspicious thing: empty subfolders cause some trouble sometimes?
+
     // Remove tree type files with null value of sha
     //   These are subfolders created by the user
     _.remove(tree.tree, function(file) {
@@ -134,7 +143,7 @@ class GitPane extends React.Component {
     // console.info('r tree path bugs', rTreePathBugs);
     // console.info('shaNulls', shaNulls);
     // console.info('contentNulls', contentNulls);
-    // console.info('tree optimized before commit & push', tree);
+    console.info('tree optimized before commit & push', tree);
     
     let repository = this.state.repository;
     let branch = this.state.branch;

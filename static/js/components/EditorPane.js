@@ -31,9 +31,10 @@ class EditorPane extends React.Component {
       //   and just push the new file.
       _.remove(recursiveTree.nodes, function(file) {
         // console.log(file.path, newFile.path);
-        return _.lowerCase(file.path) === _.lowerCase(newFile.path);
+        return file.path == newFile.path;
       });
-
+      
+      // TODO: Add a leading '/'?
       recursiveTree.nodes.push(newFile);
     }
     else {
@@ -102,7 +103,7 @@ class EditorPane extends React.Component {
             //   Just remove potentially existing duplicate
             //   and just push the new file.
             _.remove(tree.tree, function(file) {
-              return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+              return file.path == createdFile.path;
             });
             tree.tree.push(createdFile);
 
@@ -115,7 +116,7 @@ class EditorPane extends React.Component {
             //   Just remove potentially existing duplicate
             //   and just push the new file.
             _.remove(addedFiles, function(file) {
-              return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+              return file.path == createdFile.path;
             });
             addedFiles.push(createdFile);
           });

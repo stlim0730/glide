@@ -522,7 +522,7 @@ class CreateFileModalContent extends React.Component {
               //   Just remove potentially existing duplicate
               //   and just push the new file.
               _.remove(addedFiles, function(file) {
-                return _.lowerCase(file.path) === _.lowerCase(createdFile.path);
+                return file.path == createdFile.path;
               });
               addedFiles.push(createdFile);
             }
