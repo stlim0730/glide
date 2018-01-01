@@ -1,5 +1,6 @@
 import RendererPane from './RendererPane.js';
-import DebuggerPane from './DebuggerPane.js';
+// import DebuggerPane from './DebuggerPane.js';
+import GitPane from './GitPane.js';
 
 // 
 // RuntimePane component
@@ -34,11 +35,24 @@ class RuntimePane extends React.Component {
   render () {
     return (
       <div className="col-lg-5 col-md-5 no-padding full-height">
+        
         <RendererPane
           liveHtml={this.state.liveHtml} />
-        <DebuggerPane
-          liveYaml={this.state.liveYaml}
-          liveBugs={this.state.liveBugs} />
+        {
+          // <DebuggerPane
+          //   liveYaml={this.state.liveYaml}
+          //   liveBugs={this.state.liveBugs} />
+        }
+
+        <GitPane
+          repository={this.props.repository}
+          branch={this.props.branch}
+          commit={this.props.commit}
+          tree={this.props.tree}
+          recursiveTree={this.props.recursiveTree}
+          changedFiles={this.props.changedFiles}
+          addedFiles={this.props.addedFiles} />
+          
       </div>
     );
   }

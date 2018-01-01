@@ -362,15 +362,16 @@ def branch(request, owner=None, repo=None, branch=None):
 
 
 @api_view(['POST'])
-def commit(request, owner, repo):
-  accessToken = request.session['accessToken']
+def commit(request):
+  repositoryFullName = request.data['repository']
   tree = request.data['tree']
   branch = 'heads/{}'.format(request.data['branch'])
   commit = request.data['commit']
   message = request.data['message']
-  # POST the tree from the client
-  createTreeUrl = 'https://api.github.com/repos/{}/{}/git/trees?access_token={}'
-  createTreeUrl = createTreeUrl.format(owner, repo, accessToken)
+  accessToken = request.session['accessToken']
+  # POST the tree
+  createTreeUrl = 'https://api.github.com/repos/{}/git/trees?access_token={}'
+  createTreeUrl = createTreeUrl.format(repositoryFullName, accessToken)
   createTreeUrl = getAuthUrl(createTreeUrl)
   createTreeData = {
     'tree': tree
@@ -379,26 +380,26 @@ def commit(request, owner, repo):
   with urlopen(createTreeUrl, createTreeData) as createTreeRes:
     resStr = createTreeRes.read().decode('utf-8')
     res = json.loads(resStr)
-    shaTree = res['sha']
+    treeSha = res['sha']
     # Create a commit that points the tree
-    createCommitUrl = 'https://api.github.com/repos/{}/{}/git/commits?access_token={}'
-    createCommitUrl = createCommitUrl.format(owner, repo, accessToken)
+    createCommitUrl = 'https://api.github.com/repos/{}/git/commits?access_token={}'
+    createCommitUrl = createCommitUrl.format(repositoryFullName, accessToken)
     createCommitUrl = getAuthUrl(createCommitUrl)
     createCommitData = {
       'message': message,
-      'tree': shaTree,
-      'parents': [commit]
+      'tree': treeSha,
+      'parents': [commit] # Merge commits have 2+ parent commits
     }
     createCommitData = json.dumps(createCommitData).encode('utf-8')
     with urlopen(createCommitUrl, createCommitData) as createCommitRes:
       resStr = createCommitRes.read().decode('utf-8')
       newCommit = json.loads(resStr)
-      shaNewCommit = newCommit['sha']
-      updateRefUrl = 'https://api.github.com/repos/{}/{}/git/refs/{}?access_token={}'
-      updateRefUrl = updateRefUrl.format(owner, repo, branch, accessToken)
+      newCommitSha = newCommit['sha']
+      updateRefUrl = 'https://api.github.com/repos/{}/git/refs/{}?access_token={}'
+      updateRefUrl = updateRefUrl.format(repositoryFullName, branch, accessToken)
       updateRefUrl = getAuthUrl(updateRefUrl)
       updateRefData = {
-        'sha': shaNewCommit
+        'sha': newCommitSha
       }
       updateRefData = json.dumps(updateRefData).encode('utf-8')
       req = Request(
@@ -408,7 +409,7 @@ def commit(request, owner, repo):
         resStr = updateRefRes.read().decode('utf-8')
         res = json.loads(resStr)
         return Response({
-          'createTreeRes': shaTree,
+          'createTreeRes': treeSha,
           'createCommitRes': newCommit,
           'updateRefRes': res
         })

@@ -15,8 +15,6 @@ class WorkspacePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
-      // scaffolds: [],
-      // scaffold: null,
       changedFiles: [],
       addedFiles: [],
       fileActive: null,
@@ -52,8 +50,6 @@ class WorkspacePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      // scaffolds: this.props.scaffolds,
-      // scaffold: this.props.scaffold,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       fileActive: this.props.fileActive,
@@ -71,8 +67,6 @@ class WorkspacePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      // scaffolds: nextProps.scaffolds,
-      // scaffold: nextProps.scaffold,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       fileActive: nextProps.fileActive,
@@ -107,6 +101,13 @@ class WorkspacePane extends React.Component {
             fileActive={this.state.fileActive} />
           <RuntimePane
             app={this.props.app}
+            repository={this.state.repository}
+            branch={this.state.branch}
+            commit={this.state.commit}
+            tree={this.state.tree}
+            recursiveTree={this.state.recursiveTree}
+            changedFiles={this.state.changedFiles}
+            addedFiles={this.state.addedFiles}
             liveYaml={this.state.liveYaml}
             liveHtml={this.state.liveHtml}
             liveBugs={this.state.liveBugs} />
