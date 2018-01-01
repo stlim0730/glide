@@ -31,7 +31,7 @@ class GitCommitPushModalContent extends React.Component {
 
     this.commitMessageInput.value = '';
   }
-
+  
   _updateTreeContent(tree, recursiveTree) {
     for(let i in recursiveTree.nodes) {
       let file = recursiveTree.nodes[i];

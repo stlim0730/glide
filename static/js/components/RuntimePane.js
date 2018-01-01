@@ -45,7 +45,11 @@ class RuntimePane extends React.Component {
         }
 
         <GitPane
+          repository={this.props.repository}
           branch={this.props.branch}
+          commit={this.props.commit}
+          tree={this.props.tree}
+          recursiveTree={this.props.recursiveTree}
           changedFiles={this.props.changedFiles}
           addedFiles={this.props.addedFiles} />
           

@@ -69,9 +69,10 @@ class FileNode extends React.Component {
   }
 
   handleFileMouseOver(e) {
+    $('.file-manipulation.icon').addClass('invisible');
     $(e.target).children('.file-manipulation.icon').removeClass('invisible');
   }
-
+  
   handleFileMouseOut(e) {
     $(e.target).children('.file-manipulation.icon').addClass('invisible');
   }

@@ -459,7 +459,7 @@ class BranchPane extends React.Component {
                   this.state.branchSelMode=='newBranch' &&
                   this.state.newBranchName &&
                   <div className="margin-top-15">
-                    <button
+                    <button type="button"
                       onClick={this.handleCheckoutClick.bind(this)}
                       className="btn btn-success btn-lg btn-block">
                       Create Branch

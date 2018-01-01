@@ -101,7 +101,11 @@ class WorkspacePane extends React.Component {
             fileActive={this.state.fileActive} />
           <RuntimePane
             app={this.props.app}
+            repository={this.state.repository}
             branch={this.state.branch}
+            commit={this.state.commit}
+            tree={this.state.tree}
+            recursiveTree={this.state.recursiveTree}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             liveYaml={this.state.liveYaml}
