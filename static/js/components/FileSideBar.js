@@ -1,5 +1,4 @@
 import FileNode from './FileNode.js';
-import LoadingPane from './LoadingPane.js';
 
 // 
 // FileSideBar component
@@ -15,11 +14,11 @@ class FileSideBar extends React.Component {
       recursiveTree: null,
       tree: null,
       filesOpened: [],
-      fileActive: null,
-      loading: false
+      fileActive: null
     };
 
     this._ajaxTree = this._ajaxTree.bind(this);
+    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
     // this._reset = this._reset.bind(this);
   }
 
@@ -37,11 +36,29 @@ class FileSideBar extends React.Component {
   //   });
   // }
 
-  _ajaxTree(repository, branch, commit) {
-    this.setState({
-      loading: true
+  _pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
     });
 
+    return messageKey;
+  }
+
+  _popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+  }
+
+  _ajaxTree(repository, branch, commit) {
     // GET project file structure
     // console.debug('FileSideBar _ajaxTree', this.state);
     let url = '/api/project/tree/'
@@ -49,6 +66,7 @@ class FileSideBar extends React.Component {
       + branch.name + '/' + commit.sha;
     let app = this.props.app;
     let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Loading file system from the remote repository');
 
     $.ajax({
       url: url,
@@ -61,12 +79,13 @@ class FileSideBar extends React.Component {
         else {
           self.setState({
             recursiveTree: response.recursiveTree,
-            tree: response.tree,
-            loading: false
+            tree: response.tree
           }, function() {
             app.setState({
               recursiveTree: response.recursiveTree,
               tree: response.tree
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
             });
           });
         }
@@ -172,10 +191,6 @@ class FileSideBar extends React.Component {
             </div>
           }
         </div>
-
-        {
-          this.state.loading ? <LoadingPane /> : null
-        }
 
       </div>
     );

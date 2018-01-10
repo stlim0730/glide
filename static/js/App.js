@@ -29,7 +29,8 @@ import CreateFileModalContent from './components/CreateFileModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import WorkspacePane from './components/WorkspacePane.js';
-import RepoToolBar from './components/RepoToolBar.js';
+// import RepoToolBar from './components/RepoToolBar.js';
+import LoadingPane from './components/LoadingPane.js';
 
 // 
 // App component
@@ -47,8 +48,7 @@ class App extends React.Component {
         APP_PHASE_BRANCH_SELECTION: 'branch_selection',
         APP_PHASE_REPOSITORY_OPEN: 'repository_open',
         APP_PHASE_BRANCH_OPEN: 'branch_open',
-        APP_PHASE_COMMIT_OPEN: 'commit_open',
-        APP_PHASE_LOADING: 'loading'
+        APP_PHASE_COMMIT_OPEN: 'commit_open'
       },
 
       phase: 'clean_slate',
@@ -69,7 +69,8 @@ class App extends React.Component {
       addedFiles: [],
       liveYaml: null,
       liveHtml: null,
-      liveBugs: []
+      liveBugs: [],
+      loadingMessages: {}
     };
   }
 
@@ -208,6 +209,8 @@ class App extends React.Component {
           <div>
             <NavBar app={this} />
             {modals}
+            <LoadingPane
+              messages={this.state.loadingMessages} />
           </div>
         );
 
@@ -218,6 +221,8 @@ class App extends React.Component {
             <NavBar app={this} />
             {modals}
             <RepositoryPane app={this} />
+            <LoadingPane
+              messages={this.state.loadingMessages} />
           </div>
         );
 
@@ -232,6 +237,8 @@ class App extends React.Component {
               repository={this.state.repository}
               branches={this.state.branches}
               branch={this.state.branch} />
+            <LoadingPane
+              messages={this.state.loadingMessages} />
           </div>
         );
 
@@ -284,17 +291,11 @@ class App extends React.Component {
               liveYaml={this.state.liveYaml}
               liveHtml={this.state.liveHtml}
               liveBugs={this.state.liveBugs} />
+            <LoadingPane
+              messages={this.state.loadingMessages} />
           </div>
         );
 
-      case this.state.constants.APP_PHASE_LOADING:
-        return (
-          <div>
-            <NavBar app={this} />
-            {modals}
-          </div>
-        );
-      
       default:
         return (
           <div>WHERE ARE YOU GOING?</div>
