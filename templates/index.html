@@ -7,11 +7,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="!">
     <meta name="author" content="Seongtaek Lim">
+    <meta name="description" content="GLIDE: Git-Learning IDE">
+    <meta name="apple-mobile-web-app-title" content="GLIDE">
+    <meta name="application-name" content="GLIDE">
+    <meta name="msapplication-TileColor" content="#2b5797">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+    <meta name="theme-color" content="#f3f3f3">
 
-    <title>GLIDE: Collaboration, Rivision Control, and Web Development</title>
+    <title>GLIDE: Git-Learning IDE</title>
 
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/icons/favicon-16x16.png">
+    <link rel="manifest" href="/static/img/icons/manifest.json">
+    <link rel="mask-icon" href="/static/img/icons/safari-pinned-tab.svg" color="#008cba">
     <link rel="stylesheet" href="/static/css/bootstrap/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/icon/icon.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/glide-icon.css">
 
 
     <!--[if lt IE 9]>
@@ -22,14 +35,47 @@
   <body>
 
     <!-- Content -->
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-lg-2 col-md-2 col-lg-offset-5 col-md-offset-5 full-height">
-          <p>This is the landing page.</p>
-          <p>Click <a href="/user/login/github">here</a> to login with <a href="https://github.com" target="_blank">GitHub</a>.</p>
+    <div class="full-height">
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+          
+          <a class="navbar-brand" href="../"
+            style="font-family:'Jura'; letter-spacing: 3px; font-weight: bold">
+            <i class="icon-glide"></i> GLIDE
+          </a>
+          <button class="navbar-toggler"
+            type="button" data-toggle="collapse"
+            data-target="#nav-menus">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="nav-menus">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="#">About<span class="sr-only"></span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link toggle-github" href="/user/login/github"
+                  title="Sign In With GitHub" style="padding-top: 5px; padding-bottom: 0px">
+                  <i class="sign in icon"></i>Sign In with <i class="big github icon"></i>
+                  <span class="sr-only"></span></a>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </nav>
+    </div>
+
+
+    <!-- <div class="container-fluid full-height">
+      <div class="row v-middle">
+        <div class="col-lg-4 col-md-4 offset-lg-4 offset-md-4">
+          <p class="text-center">This is the landing page.</p>
+          <p class="text-center">Click <a href="/user/login/github">here</a> to login with <a href="https://github.com" target="_blank">GitHub</a>.</p>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </body>
 </html>

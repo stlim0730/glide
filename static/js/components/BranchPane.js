@@ -366,7 +366,7 @@ class BranchPane extends React.Component {
 
         <div className="row">
           <div className="col">
-            <div className="h1">
+            <div className="h3" style={{paddingTop: 30}}>
               Checkout a Branch
               <button
                 type="button" className="btn btn-lg btn-link" data-placement="bottom"
@@ -388,19 +388,18 @@ class BranchPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-3 col-md-3 offset-lg-1 offset-md-1">
+          <div className="col-lg-3 col-md-3">
 
             {
               this.state.repository &&
-              <h2>
-                Branches in&nbsp;
+              <h4>
+                Branches in<br />
                 <a
                   target="_blank"
                   href={this.state.repository.html_url}>
                   {this.state.repository.name}
                 </a>
-              </h2>
-              
+              </h4>
             }
 
             <div className="radio">
@@ -475,7 +474,7 @@ class BranchPane extends React.Component {
             {
               this.state.branch &&
               <div>
-                <p className="h3">
+                <p className="h4">
                   <span className="text-muted">Latest committer</span>&emsp;
                   <a
                     target="_blank"
@@ -483,7 +482,7 @@ class BranchPane extends React.Component {
                     {this.state.branchDesc.committer}
                   </a>
                 </p>
-                <p className="h3">
+                <p className="h4">
                   <span className="text-muted">Committed At</span>&emsp;
                   <small>
                     {
