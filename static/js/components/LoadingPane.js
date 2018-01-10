@@ -48,7 +48,8 @@ class LoadingPane extends React.Component {
                     messageKeys.map(function(item, index) {
                       return (
                         <h3 key={index}>
-                          {this.state.messages[item]}
+                          <i className="icon-glide"
+                            style={{fontSize: '40%', verticalAlign: '0.4em'}}></i> {this.state.messages[item]}
                         </h3>
                       );
                     }.bind(this))
