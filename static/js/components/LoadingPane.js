@@ -1,3 +1,6 @@
+import spinner_style from '../../css/spinner.css';
+// Reference: http://tobiasahlin.com/spinkit/
+
 // 
 // LoadingPane component
 // 
@@ -35,7 +38,10 @@ class LoadingPane extends React.Component {
           <div className="container-fluid">
             <div className="row">
               <div className="col-lg-4 col-md-4 offset-lg-4 offset-md-4 text-center">
-                asdf
+                <div className="spinner">
+                  <div className="cube1"></div>
+                  <div className="cube2"></div>
+                </div>
               </div>
             </div>
           </div>

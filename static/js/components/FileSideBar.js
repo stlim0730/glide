@@ -61,8 +61,8 @@ class FileSideBar extends React.Component {
         else {
           self.setState({
             recursiveTree: response.recursiveTree,
-            tree: response.tree//,
-            // loading: false
+            tree: response.tree,
+            loading: false
           }, function() {
             app.setState({
               recursiveTree: response.recursiveTree,
