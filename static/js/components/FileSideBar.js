@@ -19,6 +19,7 @@ class FileSideBar extends React.Component {
 
     this._ajaxTree = this._ajaxTree.bind(this);
     this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
+    this._popLoadingMsg = this._popLoadingMsg.bind(this);
     // this._reset = this._reset.bind(this);
   }
 
@@ -66,7 +67,7 @@ class FileSideBar extends React.Component {
       + branch.name + '/' + commit.sha;
     let app = this.props.app;
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Loading file system from the remote repository');
+    let loadingMsgHandle = this._pushLoadingMsg('Loading the branch\'s file system on GLIDE.');
 
     $.ajax({
       url: url,

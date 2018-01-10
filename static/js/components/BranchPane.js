@@ -20,6 +20,8 @@ class BranchPane extends React.Component {
     this._openCommit = this._openCommit.bind(this);
     this._hardClone = this._hardClone.bind(this);
     this._validateBranchName = this._validateBranchName.bind(this);
+    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
+    this._popLoadingMsg = this._popLoadingMsg.bind(this);
     this.handlePreviousClick = this.handlePreviousClick.bind(this);
     this.handleRefreshClick = this.handleRefreshClick.bind(this);
     this.handleLabelFocus = this.handleLabelFocus.bind(this);
@@ -82,6 +84,28 @@ class BranchPane extends React.Component {
       }
     }
     return true;
+  }
+
+  _pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+
+    return messageKey;
+  }
+
+  _popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
   }
 
   _ajaxBranches() {
@@ -165,6 +189,7 @@ class BranchPane extends React.Component {
     // POST request for Hexo initialization
     let url = '/api/project/hardclone';
     let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository.');
 
     $.ajax({
       url: url,
@@ -183,7 +208,7 @@ class BranchPane extends React.Component {
           // TODO: Duplicated branch name is used
         }
         else {
-          //
+          self._popLoadingMsg(loadingMsgHandle);
         }
       }
     });
@@ -400,7 +425,6 @@ class BranchPane extends React.Component {
                   {this.state.repository.name}
                 </a>
               </h2>
-              
             }
 
             <div className="radio">
