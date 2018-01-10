@@ -83,13 +83,14 @@ class NavBar extends React.Component {
       );
     });
 
-    let gitToolBar;
-
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
         <div className="container">
           
-          <a className="navbar-brand" href="../">GLIDE</a>
+          <a className="navbar-brand" href="../"
+            style={{fontFamily: 'Jura', letterSpacing: 3, fontWeight: 'bold'}}>
+            <i className="icon-glide"></i> <strong>GLIDE</strong>
+          </a>
           <button className="navbar-toggler"
             type="button" data-toggle="collapse"
             data-target="#nav-menus">
@@ -132,24 +133,22 @@ class NavBar extends React.Component {
 
             </ul>
 
-            {
-              // this.state.commit &&
-              // <GitToolBar />
-            }
-
-            {
-              // <form className="form-inline my-2 my-lg-0">
-              //   <input
-              //     className="form-control mr-sm-2"
-              //     type="search"
-              //     placeholder="Search" />
-              //   <button
-              //     className="btn btn-secondary my-2 my-sm-0"
-              //     type="button" onClick={this.nodetest}>
-              //     Search
-              //   </button>
-              // </form>
-            }
+            <ul className="navbar-nav ml-auto">
+              <li className="nav-item">
+                <a className="nav-link" href="#">About<span className="sr-only"></span></a>
+              </li>
+              <li className="nav-item">
+                {
+                  window.glide.username &&
+                  window.glide.csrfToken &&
+                  window.glide.accessToken &&
+                  <a className="nav-link toggle-github" href="#">
+                    <i className="sign out icon"></i>Sign Out
+                    <span className="sr-only"></span>
+                  </a>
+                }
+              </li>
+            </ul>
 
           </div>
 

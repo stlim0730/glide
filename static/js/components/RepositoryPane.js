@@ -180,7 +180,7 @@ class RepositoryPane extends React.Component {
 
         <div className="row">
           <div className="col">
-            <div className="h1">
+            <div className="h3" style={{paddingTop: 30}}>
               Select a Repository to Clone
               <button
                 type="button" className="btn btn-lg btn-link" data-placement="bottom"
@@ -245,7 +245,7 @@ class RepositoryPane extends React.Component {
             {
               this.state.repository &&
               <div>
-                <p className="h3">
+                <p className="h4">
                   <span className="text-muted">Repository Name</span>&emsp;
                   <a
                     target="_blank"
@@ -253,7 +253,7 @@ class RepositoryPane extends React.Component {
                     {this.state.repository.name}
                   </a>
                 </p>
-                <p className="h3">
+                <p className="h4">
                   <span className="text-muted">Owner</span>&emsp;
                   <a
                     target="_blank"
@@ -261,7 +261,7 @@ class RepositoryPane extends React.Component {
                     {this.state.repository.owner.login}
                   </a>
                 </p>
-                <p className="h3">
+                <p className="h4">
                   <span className="text-muted">Created At</span>&emsp;
                   <small>
                     {

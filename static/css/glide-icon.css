@@ -1,0 +1,30 @@
+@font-face {
+  font-family: 'glide-logo';
+  src:  url('../fonts/glide-logo.eot?fwjhct');
+  src:  url('../fonts/glide-logo.eot?fwjhct#iefix') format('embedded-opentype'),
+    url('../fonts/glide-logo.ttf?fwjhct') format('truetype'),
+    url('../fonts/glide-logo.woff?fwjhct') format('woff'),
+    url('../fonts/glide-logo.svg?fwjhct#glide-logo') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'glide-logo' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-glide:before {
+  content: "\e900";
+  font-size: 70%;
+}

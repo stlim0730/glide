@@ -4,6 +4,7 @@
 import bootstrap_style from '../css/bootstrap/bootstrap.css';
 import icon_style from '../css/icon/icon.min.css';
 import custom_style from '../css/style.css';
+import glide_logo_style from '../css/glide-icon.css';
 
 //
 // Load Javascript libraries
