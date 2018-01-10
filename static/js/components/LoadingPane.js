@@ -9,39 +9,57 @@ class LoadingPane extends React.Component {
     super(props);
 
     this.state = {
-      //
+      messages: {}
     };
   }
 
   _reset() {
     this.setState({
-      // 
+      messages: {}
     });
   }
 
   componentDidMount() {
     this.setState({
-      //
+      messages: this.props.messages
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      //
+      messages: nextProps.messages
     });
   }
 
   render () {
+    let loadingPaneClassName = _.size(this.state.messages) > 0 ?
+      "full-screen-loading" :
+      "full-screen-loading invisible";
+    let messageKeys = _.keys(this.state.messages).sort();
+
     return (
-      <div className="full-screen-loading">
+      <div className={loadingPaneClassName}>
         <div className="v-middle">
           <div className="container-fluid">
             <div className="row">
-              <div className="col-lg-4 col-md-4 offset-lg-4 offset-md-4 text-center">
+              <div className="col-lg-6 col-md-6 offset-lg-3 offset-md-3 text-center">
+                <div>
+                  {
+                    messageKeys.map(function(item, index) {
+                      return (
+                        <h3 key={index}>
+                          {this.state.messages[item]}
+                        </h3>
+                      );
+                    }.bind(this))
+                  }
+                </div>
+
                 <div className="spinner">
                   <div className="cube1"></div>
                   <div className="cube2"></div>
                 </div>
+
               </div>
             </div>
           </div>
