@@ -1,4 +1,5 @@
 import FileNode from './FileNode.js';
+import LoadingPane from './LoadingPane.js';
 
 // 
 // FileSideBar component
@@ -14,7 +15,8 @@ class FileSideBar extends React.Component {
       recursiveTree: null,
       tree: null,
       filesOpened: [],
-      fileActive: null
+      fileActive: null,
+      loading: false
     };
 
     this._ajaxTree = this._ajaxTree.bind(this);
@@ -36,6 +38,10 @@ class FileSideBar extends React.Component {
   // }
 
   _ajaxTree(repository, branch, commit) {
+    this.setState({
+      loading: true
+    });
+
     // GET project file structure
     // console.debug('FileSideBar _ajaxTree', this.state);
     let url = '/api/project/tree/'
@@ -55,7 +61,8 @@ class FileSideBar extends React.Component {
         else {
           self.setState({
             recursiveTree: response.recursiveTree,
-            tree: response.tree
+            tree: response.tree//,
+            // loading: false
           }, function() {
             app.setState({
               recursiveTree: response.recursiveTree,
@@ -165,6 +172,10 @@ class FileSideBar extends React.Component {
             </div>
           }
         </div>
+
+        {
+          this.state.loading ? <LoadingPane /> : null
+        }
 
       </div>
     );
