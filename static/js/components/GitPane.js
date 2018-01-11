@@ -257,7 +257,7 @@ class GitPane extends React.Component {
     let url = '/api/project/commit';
     let self = this;
     let app = this.props.app;
-    let loadingMsgHandle = this._pushLoadingMsg('Commiting (making checkpoint) and pushing (uploading) the changes to the remote repository');
+    let loadingMsgHandle = this._pushLoadingMsg('Commiting and pushing the changes to the remote repository');
 
     $.ajax({
       url: url,
@@ -609,7 +609,6 @@ class GitPane extends React.Component {
                 <div className="list-group">
                   {
                     this.state.commits.map(function(item, index) {
-                      console.debug(item);
                       return (
                         <div key={index}
                           className="list-group-item list-group-item-action flex-column align-items-start">
