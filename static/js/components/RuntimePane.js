@@ -49,6 +49,7 @@ class RuntimePane extends React.Component {
           repository={this.props.repository}
           branches={this.props.branches}
           branch={this.props.branch}
+          commits={this.props.commits}
           commit={this.props.commit}
           tree={this.props.tree}
           recursiveTree={this.props.recursiveTree}

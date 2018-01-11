@@ -9,6 +9,7 @@ class GitPane extends React.Component {
       repository: null,
       branches: [],
       branch: null,
+      commits: [],
       commit: null,
       tree: null,
       recursiveTree: null,
@@ -373,7 +374,9 @@ class GitPane extends React.Component {
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
+      branches: this.props.branches,
       branch: this.props.branch,
+      commits: this.props.commits,
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
@@ -385,7 +388,9 @@ class GitPane extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       repository: nextProps.repository,
+      branches: nextProps.branches,
       branch: nextProps.branch,
+      commits: nextProps.commits,
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
@@ -592,11 +597,41 @@ class GitPane extends React.Component {
               </div>
             }
 
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-log">
-              Log
-            </div>
+            {
+              this.state.commits &&
+              <div
+                className="card-body tab-pane fade"
+                id="git-command-log">
+                <h5 className="card-title">
+                  Shows history of commits on the branch and its parent(s)
+                </h5>
+
+                <div className="list-group">
+                  {
+                    this.state.commits.map(function(item, index) {
+                      console.debug(item);
+                      return (
+                        <div key={index}
+                          className="list-group-item list-group-item-action flex-column align-items-start">
+                          <div className="d-flex w-100 justify-content-between">
+                            <h5 className="mb-1">{item.commit.message}</h5>
+                            <span className="badge badge-primary badge-pill"
+                              style={{paddingTop: 8}}
+                              title={item.sha}>
+                              {item.sha.substring(0, 7)}
+                            </span>
+                          </div>
+                          <p className="mb-1">at {new Date(item.commit.author.date).toLocaleTimeString()}&nbsp;
+                            on {new Date(item.commit.author.date).toLocaleDateString()}</p>
+                          <p className="mb-1">by <strong>{item.commit.author.name}</strong></p>
+                        </div>
+                      );
+                    }.bind(this))
+                  }
+                </div>
+
+              </div>
+            }
 
             {
               pullRequestable &&

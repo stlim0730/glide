@@ -279,7 +279,9 @@ class App extends React.Component {
             <WorkspacePane
               app={this}
               repository={this.state.repository}
+              branches={this.state.branches}
               branch={this.state.branch}
+              commits={this.state.commits}
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
