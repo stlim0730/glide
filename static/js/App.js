@@ -59,6 +59,7 @@ class App extends React.Component {
       branch: null,
       commits: [],
       commit: null,
+      initialCommit: null,
       tree: null,
       recursiveTree: null,
       scaffolds: [],
@@ -131,7 +132,7 @@ class App extends React.Component {
   // }
 
   render() {
-    console.info('App', this.state);
+    console.debug('App', this.state);
 
     let modals = (
       <div>
@@ -278,7 +279,9 @@ class App extends React.Component {
             <WorkspacePane
               app={this}
               repository={this.state.repository}
+              branches={this.state.branches}
               branch={this.state.branch}
+              commits={this.state.commits}
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}

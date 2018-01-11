@@ -11,7 +11,9 @@ class WorkspacePane extends React.Component {
 
     this.state = {
       repository: null,
+      branches: [],
       branch: null,
+      commits: [],
       commit: null,
       tree: null,
       recursiveTree: null,
@@ -46,7 +48,9 @@ class WorkspacePane extends React.Component {
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
+      branches: this.props.branches,
       branch: this.props.branch,
+      commits: this.props.commits,
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
@@ -63,7 +67,9 @@ class WorkspacePane extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       repository: nextProps.repository,
+      branches: nextProps.branches,
       branch: nextProps.branch,
+      commits: nextProps.commits,
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
@@ -102,7 +108,9 @@ class WorkspacePane extends React.Component {
           <RuntimePane
             app={this.props.app}
             repository={this.state.repository}
+            branches={this.state.branches}
             branch={this.state.branch}
+            commits={this.state.commits}
             commit={this.state.commit}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}

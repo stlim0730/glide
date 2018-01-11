@@ -7,18 +7,52 @@ class GitPane extends React.Component {
 
     this.state = {
       repository: null,
+      branches: [],
       branch: null,
+      commits: [],
       commit: null,
       tree: null,
       recursiveTree: null,
       changedFiles: [],
       addedFiles: [],
-      commitMessage: ''
+      commitMessage: '',
+      pullReqTitle: '',
+      pullReqBody: ''
     };
 
+    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
+    this._popLoadingMsg = this._popLoadingMsg.bind(this);
+    this._updateFileContentInTree = this._updateFileContentInTree.bind(this);
+    this._openCommit = this._openCommit.bind(this);
+    this._hardClone = this._hardClone.bind(this);
     this.handleStagedFileClick = this.handleStagedFileClick.bind(this);
     this.handleCommitMessageChange = this.handleCommitMessageChange.bind(this);
     this.handleCommitClick = this.handleCommitClick.bind(this);
+    this.handlePRTitleChange = this.handlePRTitleChange.bind(this);
+    this.handlePRBodyChange = this.handlePRBodyChange.bind(this);
+    this.handlePRClick = this.handlePRClick.bind(this);
+  }
+
+  _pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+
+    return messageKey;
+  }
+
+  _popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
   }
 
   _updateFileContentInTree(tree, recursiveTree) {
@@ -80,6 +114,81 @@ class GitPane extends React.Component {
     }
   }
 
+  _openCommit(branch) {
+    // GET commits on the branch
+    let url = '/api/project/commits/'
+      + this.state.repository.full_name
+      + '/' + branch.name;
+    let app = this.props.app;
+    let self = this;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          // Set the current branches, branch, commits, and commit
+          //   as specified
+          let commits = response.commits;
+          let latestCommit = commits[0];
+          let branches = self.state.branches;
+          let isExisting = _.find(branches, function(b) {
+            return b.name == branch.name;
+          });
+          if(!isExisting) {
+            branches.push(branch);
+          }
+
+          app.setState({
+            phase: app.state.constants.APP_PHASE_COMMIT_OPEN,
+            branches: branches,
+            branch: branch,
+            commits: commits,
+            commit: latestCommit
+          }, function() {
+            self._hardClone(
+              this.state.repository,
+              branch
+            );
+          });
+        }
+      }
+    });
+  }
+
+  _hardClone(repository, branch) {
+    // POST request for Hexo initialization
+    let url = '/api/project/hardclone';
+    let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Updating your workspace after commit & push');
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        cloneUrl: repository.clone_url,
+        repository: repository.full_name,
+        branch: branch.name
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.debug(response);
+        if('error' in response) {
+          // TODO: Duplicated branch name is used
+        }
+        else {
+          self._popLoadingMsg(loadingMsgHandle);
+          $('a.nav-link[data-command=log]').click();
+        }
+      }
+    });
+  }
+
   handleStagedFileClick(file, e) {
     console.log(file);
     // TODO: Diff the file
@@ -92,7 +201,7 @@ class GitPane extends React.Component {
     });
   }
 
-  handleCommitClick(e) {
+  handleCommitClick() {
     // console.log('tree to commit', this.state.tree, this.state.recursiveTree);
 
     // POST tree to make a create tree request
@@ -139,11 +248,7 @@ class GitPane extends React.Component {
       return file.type == 'tree' && file.sha == null;
     });
 
-    // console.info('tree path bugs', treePathBugs);
-    // console.info('r tree path bugs', rTreePathBugs);
-    // console.info('shaNulls', shaNulls);
-    // console.info('contentNulls', contentNulls);
-    console.info('tree optimized before commit & push', tree);
+    console.debug('tree optimized before commit & push', tree);
     
     let repository = this.state.repository;
     let branch = this.state.branch;
@@ -151,6 +256,8 @@ class GitPane extends React.Component {
     let message = this.state.commitMessage;
     let url = '/api/project/commit';
     let self = this;
+    let app = this.props.app;
+    let loadingMsgHandle = this._pushLoadingMsg('Commiting and pushing the changes to the remote repository');
 
     $.ajax({
       url: url,
@@ -166,41 +273,99 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        console.debug(response);
         if('error' in response) {
           //
         }
         else {
-          // self._reset();
-          // Update app state
-          // Clean up staged areas
+          self.setState({
+            changedFiles: [],
+            addedFiles: [],
+            commitMessage: ''
+          }, function() {
+            app.setState({
+              changedFiles: [],
+              addedFiles: []
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
+              self._openCommit(branch);
+            });
+          });
+        }
+      }
+    });
+  }
 
-          // GET commits on the branch
-          // let url = '/api/project/commits/' + repository.full_name + '/' + branch;
-          // let app = self.props.app;
+  handlePRTitleChange(e) {
+    let msg = e.target.value.trim();
+    this.setState({
+      pullReqTitle: msg
+    });
+  }
 
-          // $.ajax({
-          //   url: url,
-          //   method: 'GET',
-          //   success: function(response) {
-          //     if('error' in response) {
-          //       // TODO
-          //     }
-          //     else {
-          //       let commits = response.commits;
-          //       let newCommit = commits[0];
-          //       newCommit.pushed = true;
-          //       app.setState({
-          //         phase: app.state.constants.APP_PHASE_COMMIT_OPEN,
-          //         commit: newCommit,
-          //         commits: commits,
-          //         changedFiles: [],
-          //         addedFiles: []
-          //         // TODO
-          //       });
-          //     }
-          //   }
-          // });
+  handlePRBodyChange(e) {
+    let msg = e.target.value.trim();
+    this.setState({
+      pullReqBody: msg
+    });
+  }
+
+  handlePRClick() {
+    // console.debug(this.state.pullReqTitle, this.state.pullReqBody);
+    
+    // POST branch name to create
+    let url = '/api/project/pr';
+    let repository = this.state.repository.full_name;
+    let title = this.state.pullReqTitle;
+    let body = this.state.pullReqBody;
+    let head = this.state.branch.name;
+    let base = 'master';
+    let app = this.props.app;
+    let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Making a pull request');
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        repository: repository,
+        head: head,
+        base: base,
+        pullReqTitle: title,
+        pullReqBody: body
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.debug(response);
+        if('error' in response) {
+          
+        }
+        else {
+          if(response.message == 'A pull request already exists.') {
+            // TODO: Show message saying that a pull request already exists
+            self.setState({
+              pullReqTitle: '',
+              pullReqBody: ''
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
+              $('a.nav-link[data-command=status]').click();
+            });
+          }
+          else {
+            self.setState({
+              pullReqTitle: '',
+              pullReqBody: ''
+            }, function() {
+              app.setState({
+                initialCommit: self.state.commit
+              }, function() {
+                self._popLoadingMsg(loadingMsgHandle);
+                $('a.nav-link[data-command=status]').click();
+              });
+            });
+          }
         }
       }
     });
@@ -209,7 +374,9 @@ class GitPane extends React.Component {
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
+      branches: this.props.branches,
       branch: this.props.branch,
+      commits: this.props.commits,
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
@@ -221,7 +388,9 @@ class GitPane extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       repository: nextProps.repository,
+      branches: nextProps.branches,
       branch: nextProps.branch,
+      commits: nextProps.commits,
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
@@ -231,10 +400,13 @@ class GitPane extends React.Component {
   }
 
   render () {
+    let app = this.props.app;
     let commitable = this.state.changedFiles.length > 0 || this.state.addedFiles.length > 0;
+    let pullRequestable = app.state.initialCommit && this.state.commit
+      && app.state.initialCommit.sha != this.state.commit.sha && !commitable;
 
     return (
-      <div className="card no-padding height-40">
+      <div className="card no-padding height-50">
         <h6 className="card-header">Git Operations</h6>
         <div className="card-body auto-scroll full-height">
           
@@ -265,14 +437,6 @@ class GitPane extends React.Component {
             </li>
             <li className="nav-item">
               <a
-                data-command="pull_request" data-toggle="tab"
-                href="#git-command-pull_request"
-                className="nav-link">
-                Pull Request
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
                 data-command="log" data-toggle="tab"
                 href="#git-command-log"
                 className="nav-link">
@@ -281,12 +445,22 @@ class GitPane extends React.Component {
             </li>
             <li className="nav-item">
               <a
-                data-command="reset" data-toggle="tab"
-                href="#git-command-reset"
-                className="nav-link disabled">
-                Reset
+                data-command="pull_request" data-toggle="tab"
+                href="#git-command-pull_request"
+                className={pullRequestable ? "nav-link" : "nav-link disabled"}>
+                Pull Request
               </a>
             </li>
+            {
+              // <li className="nav-item">
+              //   <a
+              //     data-command="reset" data-toggle="tab"
+              //     href="#git-command-reset"
+              //     className="nav-link disabled">
+              //     Reset
+              //   </a>
+              // </li>
+            }
           </ul>
 
           <div className="tab-content">
@@ -297,7 +471,7 @@ class GitPane extends React.Component {
                 className="card-body tab-pane fade active show in"
                 id="git-command-status">
                 <h5 className="card-title">
-                  Status of Your Workspace
+                  Shows the Current State of Your Workspace
                 </h5>
 
                 <h6>
@@ -416,30 +590,97 @@ class GitPane extends React.Component {
                     <code>git push</code> command uploads the content on the current branch to the remote repository from which you cloned the repository to begin with.
                   </p>
                   <p>
-                    <code>git commit</code> and <code>git push</code> are independent commands, but GLIDE pushes every single commit not to lose any of them.
+                    <code>git commit</code> and <code>git push</code> are independent commands, but GLIDE, as a web app running on web browsers, pushes every single commit not to lose any of them.
                   </p>
                 </div>
 
               </div>
             }
 
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-pull_request">
-              Pull Request
-            </div>
+            {
+              this.state.commits &&
+              <div
+                className="card-body tab-pane fade"
+                id="git-command-log">
+                <h5 className="card-title">
+                  Shows history of commits on the branch and its parent(s)
+                </h5>
 
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-log">
-              Log
-            </div>
+                <div className="list-group">
+                  {
+                    this.state.commits.map(function(item, index) {
+                      return (
+                        <div key={index}
+                          className="list-group-item list-group-item-action flex-column align-items-start">
+                          <div className="d-flex w-100 justify-content-between">
+                            <h5 className="mb-1">{item.commit.message}</h5>
+                            <span className="badge badge-primary badge-pill"
+                              style={{paddingTop: 8}}
+                              title={item.sha}>
+                              {item.sha.substring(0, 7)}
+                            </span>
+                          </div>
+                          <p className="mb-1">at {new Date(item.commit.author.date).toLocaleTimeString()}&nbsp;
+                            on {new Date(item.commit.author.date).toLocaleDateString()}</p>
+                          <p className="mb-1">by <strong>{item.commit.author.name}</strong></p>
+                        </div>
+                      );
+                    }.bind(this))
+                  }
+                </div>
 
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-reset">
-              Reset
-            </div>
+              </div>
+            }
+
+            {
+              pullRequestable &&
+              <div
+                className="card-body tab-pane fade"
+                id="git-command-pull_request">
+                <h5 className="card-title">
+                  Let collaboraors know your changes were pushed
+                </h5>
+                <h6 className="text-muted">
+                  Discuss and review the potential changes with collaborators before the changes are merged into the repository.
+                </h6>
+
+                <div className="form-group">
+                  <p className="text-muted">
+                    Write a short message that describes what your pull request will do to the shared repository.
+                  </p>
+                  <h6 className="col-form-label">
+                    Title
+                  </h6>
+                  <input
+                    type="text" className="form-control"
+                    onChange={this.handlePRTitleChange}
+                    placeholder="Pull request title is required." />
+                  <h6 className="col-form-label">
+                    Body
+                  </h6>
+                  <textarea
+                    style={{resize: null}} onChange={this.handlePRBodyChange}
+                    placeholder="Pull request body is optional."
+                    className="form-control col-lg-12 col-md-12" rows="3">
+                  </textarea>
+                  <button type="button" style={{marginTop: 10}}
+                    onClick={this.handlePRClick}
+                    disabled={!pullRequestable || this.state.pullReqTitle == ''}
+                    className="btn btn-outline-primary btn-block">
+                    Make a Pull Request
+                  </button>
+                </div>
+
+              </div>
+            }
+
+            {
+              // <div
+              //   className="card-body tab-pane fade"
+              //   id="git-command-reset">
+              //   Reset
+              // </div>
+            }
 
           </div>
 

@@ -168,7 +168,8 @@ class BranchPane extends React.Component {
             branches: branches,
             branch: branch,
             commits: commits,
-            commit: latestCommit
+            commit: latestCommit,
+            initialCommit: latestCommit
           }, function() {
             self._hardClone(
               this.state.repository,
@@ -189,7 +190,7 @@ class BranchPane extends React.Component {
     // POST request for Hexo initialization
     let url = '/api/project/hardclone';
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository.');
+    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository');
 
     $.ajax({
       url: url,

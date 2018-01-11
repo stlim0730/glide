@@ -96,7 +96,7 @@ class EditorPane extends React.Component {
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let app = this.props.app;
-    let loadingMsgHandle = this._pushLoadingMsg('Generating website resources in docs folder.');
+    let loadingMsgHandle = this._pushLoadingMsg('Generating website resources in docs folder');
 
     $.ajax({
       url: url,
