@@ -18,6 +18,8 @@ class FileSideBar extends React.Component {
     };
 
     this._ajaxTree = this._ajaxTree.bind(this);
+    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
+    this._popLoadingMsg = this._popLoadingMsg.bind(this);
     // this._reset = this._reset.bind(this);
   }
 
@@ -35,6 +37,28 @@ class FileSideBar extends React.Component {
   //   });
   // }
 
+  _pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+
+    return messageKey;
+  }
+
+  _popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+  }
+
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
     // console.debug('FileSideBar _ajaxTree', this.state);
@@ -43,6 +67,7 @@ class FileSideBar extends React.Component {
       + branch.name + '/' + commit.sha;
     let app = this.props.app;
     let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Loading the branch\'s file system on GLIDE.');
 
     $.ajax({
       url: url,
@@ -60,6 +85,8 @@ class FileSideBar extends React.Component {
             app.setState({
               recursiveTree: response.recursiveTree,
               tree: response.tree
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
             });
           });
         }

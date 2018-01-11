@@ -19,8 +19,10 @@ class EditorPane extends React.Component {
       fileActive: null
     };
 
-    this.handleGenerateClick = this.handleGenerateClick.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
+    this._popLoadingMsg = this._popLoadingMsg.bind(this);
+    this.handleGenerateClick = this.handleGenerateClick.bind(this);
   }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
@@ -65,13 +67,36 @@ class EditorPane extends React.Component {
     }
   }
 
-  handleGenerateClick() {
+  _pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+
+    return messageKey;
+  }
+
+  _popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+  }
+
+  handleGenerateClick() {    
     // POST request for Hexo initialization
     let url = '/api/project/generate';
     let self = this;
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let app = this.props.app;
+    let loadingMsgHandle = this._pushLoadingMsg('Generating website resources in docs folder.');
 
     $.ajax({
       url: url,
@@ -129,6 +154,8 @@ class EditorPane extends React.Component {
               recursiveTree: recursiveTree,
               tree: tree,
               addedFiles: addedFiles
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
             });
           });
         }
