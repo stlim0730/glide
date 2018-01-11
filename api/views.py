@@ -19,7 +19,6 @@ import re
 import os
 from glide import *
 from django.conf import settings
-# from django.core.files import File
 import pathlib, shutil, subprocess
 
 def _isBinary(fileName):

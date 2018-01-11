@@ -59,6 +59,7 @@ class App extends React.Component {
       branch: null,
       commits: [],
       commit: null,
+      initialCommit: null,
       tree: null,
       recursiveTree: null,
       scaffolds: [],

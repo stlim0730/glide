@@ -102,6 +102,7 @@ class WorkspacePane extends React.Component {
           <RuntimePane
             app={this.props.app}
             repository={this.state.repository}
+            branches={this.state.branches}
             branch={this.state.branch}
             commit={this.state.commit}
             tree={this.state.tree}

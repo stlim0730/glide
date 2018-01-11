@@ -168,7 +168,8 @@ class BranchPane extends React.Component {
             branches: branches,
             branch: branch,
             commits: commits,
-            commit: latestCommit
+            commit: latestCommit,
+            initialCommit: latestCommit
           }, function() {
             self._hardClone(
               this.state.repository,
