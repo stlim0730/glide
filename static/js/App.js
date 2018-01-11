@@ -132,7 +132,7 @@ class App extends React.Component {
   // }
 
   render() {
-    console.info('App', this.state);
+    console.debug('App', this.state);
 
     let modals = (
       <div>

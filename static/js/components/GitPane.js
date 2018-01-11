@@ -152,11 +152,6 @@ class GitPane extends React.Component {
               this.state.repository,
               branch
             );
-            // self._reset();
-            // console.info(app.state, commits, latestCommit);
-            // app.setState({
-            //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
-            // });
           });
         }
       }
@@ -167,7 +162,7 @@ class GitPane extends React.Component {
     // POST request for Hexo initialization
     let url = '/api/project/hardclone';
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository.');
+    let loadingMsgHandle = this._pushLoadingMsg('Updating your workspace after commit & push');
 
     $.ajax({
       url: url,
@@ -181,12 +176,13 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        console.debug(response);
         if('error' in response) {
           // TODO: Duplicated branch name is used
         }
         else {
           self._popLoadingMsg(loadingMsgHandle);
+          $('a.nav-link[data-command=log]').click();
         }
       }
     });
@@ -251,7 +247,7 @@ class GitPane extends React.Component {
       return file.type == 'tree' && file.sha == null;
     });
 
-    console.info('tree optimized before commit & push', tree);
+    console.debug('tree optimized before commit & push', tree);
     
     let repository = this.state.repository;
     let branch = this.state.branch;
@@ -260,7 +256,7 @@ class GitPane extends React.Component {
     let url = '/api/project/commit';
     let self = this;
     let app = this.props.app;
-    let loadingMsgHandle = this._pushLoadingMsg('Commiting (making checkpoint) and pushing (uploading) the changes to the remote repository.');
+    let loadingMsgHandle = this._pushLoadingMsg('Commiting (making checkpoint) and pushing (uploading) the changes to the remote repository');
 
     $.ajax({
       url: url,
@@ -276,7 +272,7 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        console.debug(response);
         if('error' in response) {
           //
         }
@@ -314,7 +310,64 @@ class GitPane extends React.Component {
   }
 
   handlePRClick() {
-    // TODO
+    // console.debug(this.state.pullReqTitle, this.state.pullReqBody);
+    
+    // POST branch name to create
+    let url = '/api/project/pr';
+    let repository = this.state.repository.full_name;
+    let title = this.state.pullReqTitle;
+    let body = this.state.pullReqBody;
+    let head = this.state.branch.name;
+    let base = 'master';
+    let app = this.props.app;
+    let self = this;
+    let loadingMsgHandle = this._pushLoadingMsg('Making a pull request');
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        repository: repository,
+        head: head,
+        base: base,
+        pullReqTitle: title,
+        pullReqBody: body
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.debug(response);
+        if('error' in response) {
+          
+        }
+        else {
+          if(response.message == 'A pull request already exists.') {
+            // TODO: Show message saying that a pull request already exists
+            self.setState({
+              pullReqTitle: '',
+              pullReqBody: ''
+            }, function() {
+              self._popLoadingMsg(loadingMsgHandle);
+              $('a.nav-link[data-command=status]').click();
+            });
+          }
+          else {
+            self.setState({
+              pullReqTitle: '',
+              pullReqBody: ''
+            }, function() {
+              app.setState({
+                initialCommit: self.state.commit
+              }, function() {
+                self._popLoadingMsg(loadingMsgHandle);
+                $('a.nav-link[data-command=status]').click();
+              });
+            });
+          }
+        }
+      }
+    });
   }
 
   componentDidMount() {
@@ -348,7 +401,7 @@ class GitPane extends React.Component {
       && app.state.initialCommit.sha != this.state.commit.sha && !commitable;
 
     return (
-      <div className="card no-padding height-40">
+      <div className="card no-padding height-50">
         <h6 className="card-header">Git Operations</h6>
         <div className="card-body auto-scroll full-height">
           
@@ -379,14 +432,6 @@ class GitPane extends React.Component {
             </li>
             <li className="nav-item">
               <a
-                data-command="pull_request" data-toggle="tab"
-                href="#git-command-pull_request"
-                className={pullRequestable ? "nav-link" : "nav-link disabled"}>
-                Pull Request
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
                 data-command="log" data-toggle="tab"
                 href="#git-command-log"
                 className="nav-link">
@@ -395,12 +440,22 @@ class GitPane extends React.Component {
             </li>
             <li className="nav-item">
               <a
-                data-command="reset" data-toggle="tab"
-                href="#git-command-reset"
-                className="nav-link disabled">
-                Reset
+                data-command="pull_request" data-toggle="tab"
+                href="#git-command-pull_request"
+                className={pullRequestable ? "nav-link" : "nav-link disabled"}>
+                Pull Request
               </a>
             </li>
+            {
+              // <li className="nav-item">
+              //   <a
+              //     data-command="reset" data-toggle="tab"
+              //     href="#git-command-reset"
+              //     className="nav-link disabled">
+              //     Reset
+              //   </a>
+              // </li>
+            }
           </ul>
 
           <div className="tab-content">
@@ -537,29 +592,40 @@ class GitPane extends React.Component {
               </div>
             }
 
+            <div
+              className="card-body tab-pane fade"
+              id="git-command-log">
+              Log
+            </div>
+
             {
               pullRequestable &&
               <div
                 className="card-body tab-pane fade"
                 id="git-command-pull_request">
                 <h5 className="card-title">
-                  Let collaboraors know your changes are pushed
+                  Let collaboraors know your changes were pushed
                 </h5>
-                
+                <h6 className="text-muted">
+                  Discuss and review the potential changes with collaborators before the changes are merged into the repository.
+                </h6>
+
                 <div className="form-group">
-                  <h6 className="col-form-label">
-                    Title
-                  </h6>
                   <p className="text-muted">
                     Write a short message that describes what your pull request will do to the shared repository.
                   </p>
+                  <h6 className="col-form-label">
+                    Title
+                  </h6>
                   <input
                     type="text" className="form-control"
                     onChange={this.handlePRTitleChange}
                     placeholder="Pull request title is required." />
-                    <br />
+                  <h6 className="col-form-label">
+                    Body
+                  </h6>
                   <textarea
-                    style={{resize: false;}} onChange={this.handlePRBodyChange}
+                    style={{resize: null}} onChange={this.handlePRBodyChange}
                     placeholder="Pull request body is optional."
                     className="form-control col-lg-12 col-md-12" rows="3">
                   </textarea>
@@ -574,17 +640,13 @@ class GitPane extends React.Component {
               </div>
             }
 
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-log">
-              Log
-            </div>
-
-            <div
-              className="card-body tab-pane fade"
-              id="git-command-reset">
-              Reset
-            </div>
+            {
+              // <div
+              //   className="card-body tab-pane fade"
+              //   id="git-command-reset">
+              //   Reset
+              // </div>
+            }
 
           </div>
 

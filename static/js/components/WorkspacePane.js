@@ -11,6 +11,7 @@ class WorkspacePane extends React.Component {
 
     this.state = {
       repository: null,
+      branches: [],
       branch: null,
       commit: null,
       tree: null,
@@ -46,6 +47,7 @@ class WorkspacePane extends React.Component {
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
+      branches: this.props.branches,
       branch: this.props.branch,
       commit: this.props.commit,
       tree: this.props.tree,
@@ -63,6 +65,7 @@ class WorkspacePane extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       repository: nextProps.repository,
+      branches: nextProps.branches,
       branch: nextProps.branch,
       commit: nextProps.commit,
       tree: nextProps.tree,

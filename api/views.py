@@ -676,17 +676,16 @@ def blob(request, owner, repo, sha):
 
 
 @api_view(['POST'])
-def pull(request, owner, repo):
-  accessToken = request.session['accessToken']
-  title = request.data['title']
+def pr(request):
+  repositoryFullName = request.data['repository']
   head = request.data['head']
   base = request.data['base']
-  body = ''
-  if 'pullReqBody' in request.data:
-    body = request.data['pullReqBody']
+  title = request.data['pullReqTitle']
+  body = request.data['pullReqBody']
+  accessToken = request.session['accessToken']
   # POST the pull request
-  createPullReqUrl = 'https://api.github.com/repos/{}/{}/pulls?access_token={}'
-  createPullReqUrl = createPullReqUrl.format(owner, repo, accessToken)
+  createPullReqUrl = 'https://api.github.com/repos/{}/pulls?access_token={}'
+  createPullReqUrl = createPullReqUrl.format(repositoryFullName, accessToken)
   createPullReqUrl = getAuthUrl(createPullReqUrl)
   createPullReqData = {
     'title': title,
@@ -695,12 +694,50 @@ def pull(request, owner, repo):
     'body': body
   }
   createPullReqData = json.dumps(createPullReqData).encode('utf-8')
-  with urlopen(createPullReqUrl, createPullReqData) as createPullReqRes:
-    resStr = createPullReqRes.read().decode('utf-8')
-    return Response({
-      'createPullReqRes': json.loads(resStr),
-      'code': createPullReqRes.getcode()
-    })
+  req = Request(
+    url=createPullReqUrl, headers={'Content-Type': 'application/json'},
+    data=createPullReqData, method='POST')
+  try:
+    with urlopen(req) as createPullReqRes:
+      resStr = createPullReqRes.read().decode('utf-8')
+      return Response({
+        'createPullReqRes': json.loads(resStr),
+        'code': createPullReqRes.getcode()
+      })
+  except HTTPError as ex:
+    for e in ex:
+      e = e.decode('utf-8')
+      e = json.loads(e)
+      errors = e['errors']
+      for error in errors:
+        if error['resource'] == 'PullRequest' and error['message'].startswith('A pull request already exists for'):
+          # Pull request already exists for this branch
+          # Just return
+          return Response({
+            'createPullReqRes': None,
+            'code': None,
+            'message': 'A pull request already exists.'
+          })
+
+
+  # POST the pull request
+  # createPullReqUrl = 'https://api.github.com/repos/{}/pulls?access_token={}'
+  # createPullReqUrl = createPullReqUrl.format(repositoryFullName, accessToken)
+  # createPullReqUrl = getAuthUrl(createPullReqUrl)
+  # createPullReqData = {
+  #   'title': title,
+  #   'head': head,
+  #   'base': base,
+  #   'body': body
+  # }
+  # createPullReqData = json.dumps(createPullReqData).encode('utf-8')
+  # with urlopen(createPullReqUrl, createPullReqData) as createPullReqRes:
+  #   resStr = createPullReqRes.read().decode('utf-8')
+  #   return Response({
+  #     'createPullReqRes': json.loads(resStr),
+  #     'code': createPullReqRes.getcode()
+  #   })
+
 
 @api_view(['POST'])
 def render(request):

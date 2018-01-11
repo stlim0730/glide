@@ -67,7 +67,7 @@ class FileSideBar extends React.Component {
       + branch.name + '/' + commit.sha;
     let app = this.props.app;
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Loading the branch\'s file system on GLIDE.');
+    let loadingMsgHandle = this._pushLoadingMsg('Loading the branch\'s file system on GLIDE');
 
     $.ajax({
       url: url,

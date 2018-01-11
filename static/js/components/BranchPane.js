@@ -190,7 +190,7 @@ class BranchPane extends React.Component {
     // POST request for Hexo initialization
     let url = '/api/project/hardclone';
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository.');
+    let loadingMsgHandle = this._pushLoadingMsg('Cloning your branch from the remote repository');
 
     $.ajax({
       url: url,
