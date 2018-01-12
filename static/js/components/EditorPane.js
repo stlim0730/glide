@@ -1,5 +1,6 @@
 import EditorToolBar from './EditorToolBar.js';
 import TabbedEditors from './TabbedEditors.js';
+import Alert from 'react-s-alert';
 
 // 
 // EditorPane component
@@ -156,6 +157,8 @@ class EditorPane extends React.Component {
               addedFiles: addedFiles
             }, function() {
               self._popLoadingMsg(loadingMsgHandle);
+              let msg = 'Your website has been successfully generated!';
+              Alert.success(msg);
             });
           });
         }
@@ -217,6 +220,11 @@ class EditorPane extends React.Component {
             filesOpened={this.state.filesOpened}
             fileActive={this.state.fileActive} />
         </div>
+
+        <Alert
+          stack={{limit: 3, spacing: 50}}
+          timeout={4000} html={true}
+          effect='stackslide' position='top' />
       </div>
     );
   }
