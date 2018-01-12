@@ -3,6 +3,8 @@
 // 
 import bootstrap_style from '../css/bootstrap/bootstrap.css';
 import icon_style from '../css/icon/icon.min.css';
+import s_alert_style from '../css/s-alert/s-alert-default-customized.css';
+import s_alert_stackslide_effect_style from '../css/s-alert/s-alert-effect-stackslide-customized.css';
 import custom_style from '../css/style.css';
 import glide_logo_style from '../css/glide-icon.css';
 
@@ -13,7 +15,7 @@ import glide_logo_style from '../css/glide-icon.css';
 import './lib/bootstrap/bootstrap.min.js';
 
 // 
-// Load components
+// Load custom components
 // 
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
@@ -202,6 +204,13 @@ class App extends React.Component {
         {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>
     );
+
+    // let alert = (
+    //   <Alert
+    //     stack={{limit: 3, spacing: 50}}
+    //     timeout={5000} html={true}
+    //     effect='scale' position='bottom' />
+    // );
 
     switch(this.state.phase) {
       case this.state.constants.APP_PHASE_CLEAN_SLATE:

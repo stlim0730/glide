@@ -1,3 +1,5 @@
+import Alert from 'react-s-alert';
+
 // 
 // GitPane component
 // 
@@ -177,13 +179,15 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.debug(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO: Duplicated branch name is used
         }
         else {
           self._popLoadingMsg(loadingMsgHandle);
           $('a.nav-link[data-command=log]').click();
+          let msg = 'Your changes have been successfully commited & pushed!';
+          Alert.success(msg);
         }
       }
     });
@@ -273,7 +277,7 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.debug(response);
+        // console.debug(response);
         if('error' in response) {
           //
         }
@@ -287,8 +291,8 @@ class GitPane extends React.Component {
               changedFiles: [],
               addedFiles: []
             }, function() {
-              self._popLoadingMsg(loadingMsgHandle);
               self._openCommit(branch);
+              self._popLoadingMsg(loadingMsgHandle);
             });
           });
         }
@@ -338,19 +342,20 @@ class GitPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.debug(response);
+        // console.debug(response);
         if('error' in response) {
           
         }
         else {
           if(response.message == 'A pull request already exists.') {
-            // TODO: Show message saying that a pull request already exists
             self.setState({
               pullReqTitle: '',
               pullReqBody: ''
             }, function() {
               self._popLoadingMsg(loadingMsgHandle);
               $('a.nav-link[data-command=status]').click();
+              let msg = 'Pull request for branch <strong>' + head + '</strong> already exists. All your commits on this branch are covered!';
+              Alert.info(msg);
             });
           }
           else {
@@ -363,6 +368,8 @@ class GitPane extends React.Component {
               }, function() {
                 self._popLoadingMsg(loadingMsgHandle);
                 $('a.nav-link[data-command=status]').click();
+                let msg = 'Pull request for branch <strong>' + head + '</strong> has been successfully made!';
+                Alert.success(msg);
               });
             });
           }
@@ -685,6 +692,11 @@ class GitPane extends React.Component {
           </div>
 
         </div>
+
+        <Alert
+          stack={{limit: 3, spacing: 50}}
+          timeout={5000} html={true}
+          effect='stackslide' position='top' />
       </div>
     );
   }

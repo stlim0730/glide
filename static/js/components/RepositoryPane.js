@@ -1,3 +1,5 @@
+import Alert from 'react-s-alert';
+
 // 
 // RepositoryPane component
 // 
@@ -92,7 +94,6 @@ class RepositoryPane extends React.Component {
   }
 
   handleRepositoryClick(repository) {
-
     // GET repository url to clone from
     let owner = repository.owner.login;
     let repo = repository.name;
@@ -171,6 +172,9 @@ class RepositoryPane extends React.Component {
   }
 
   componentDidMount() {
+    let username = window.glide.username.split('@')[0];
+    let msg = 'Hi, <strong>' + username + '</strong>. Welcome to GLIDE!';
+    Alert.success(msg);
     this._ajaxRepositories();
   }
 
@@ -310,6 +314,10 @@ class RepositoryPane extends React.Component {
 
         </div>
 
+        <Alert
+          stack={{limit: 3, spacing: 50}}
+          timeout={4000} html={true}
+          effect='stackslide' position='top' />
       </div>
     );
   }
