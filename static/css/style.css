@@ -1,7 +1,6 @@
 html, body {
   height:100%;
   overflow: hidden;
-  /*font-family: "Jura", "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";;*/
 }
 /*body { padding-top: 70px; padding-bottom: 21px;}*/
 /**:focus { outline: none !important; }*/  /* To disable web browser's highlight box */
@@ -48,7 +47,7 @@ button.btn.btn-link:hover { text-decoration: none; }
   top: 0px;
   width: 100%;
   height: 100%;
-  z-index: 99999;
+  z-index: 99998;
   background-color: rgba(255, 255, 255, 0.8);
 }
 
@@ -102,4 +101,17 @@ button[type="button"] { cursor: pointer; }
     top: -130px;
     left: -12px;
   }
+}
+
+/* s-alert */
+/*
+<div class="s-alert-box s-alert-success s-alert-top s-alert-is-effect s-alert-effect-stackslide s-alert-show" id="d3kl5fgcul7" style="top: 0px;">
+  <div class="s-alert-box-inner">
+    <span>Hi, stlim0730. Welcome to GLIDE!</span>
+  </div>
+  <span class="s-alert-close"></span>
+</div>
+*/
+div.s-alert-box-inner {
+  text-align: center;
 }
