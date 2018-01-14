@@ -17,6 +17,8 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-  url(r'^login/(?P<repoProvider>.+)', views.login, name='login'),
-  url(r'^logging_in/(?P<repoProvider>.+)', views.loggingIn, name='loggingIn')
+  url(r'^login/(?P<repoProvider>.+)$', views.login, name='login'),
+  url(r'^logging_in/(?P<repoProvider>.+)$', views.loggingIn, name='loggingIn'),
+  url(r'^logout/(?P<owner>.+)/(?P<repo>.+)/(?P<branch>.+)$', views.logout, name='logout'),
+  url(r'^logout$', views.logout, name='logout'),
 ]

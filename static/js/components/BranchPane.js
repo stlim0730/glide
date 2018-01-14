@@ -176,7 +176,7 @@ class BranchPane extends React.Component {
               branch
             );
             // self._reset();
-            // console.info(app.state, commits, latestCommit);
+            // console.debug(app.state, commits, latestCommit);
             // app.setState({
             //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
             // });
@@ -204,7 +204,7 @@ class BranchPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        console.debug(response);
         if('error' in response) {
           // TODO: Duplicated branch name is used
         }
@@ -282,7 +282,7 @@ class BranchPane extends React.Component {
       url: url,
       method: 'GET',
       success: function(response) {
-        // console.info(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -343,7 +343,7 @@ class BranchPane extends React.Component {
         }),
         contentType: 'application/json; charset=utf-8',
         success: function(response) {
-          // console.info(response);
+          // console.debug(response);
           if('error' in response) {
             // TODO: Duplicated branch name is used
           }
@@ -383,7 +383,7 @@ class BranchPane extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     // This lifecycle callback is not expected to be called
-    console.info('BranchPane WRP');
+    console.debug('BranchPane WRP');
   }
 
   render () {
