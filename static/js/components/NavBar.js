@@ -10,7 +10,7 @@ class NavBar extends React.Component {
     this.state = {
       repository: null,
       branch: null,
-      commit: null,
+      // commit: null,
       menu: [
         {
           // slug: 'projects',
@@ -69,8 +69,8 @@ class NavBar extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       repository: nextProps.repository,
-      branch: nextProps.branch,
-      commit: nextProps.commit
+      branch: nextProps.branch//,
+      // commit: nextProps.commit
     });
   }
 
@@ -82,6 +82,10 @@ class NavBar extends React.Component {
           disabled={item.disabled} children={item.children} />
       );
     });
+
+    let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
+        '/user/logout/' + this.state.repository.full_name + '/' + this.state.branch.name :
+        '/user/logout';
 
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -142,7 +146,7 @@ class NavBar extends React.Component {
                   window.glide.username &&
                   window.glide.csrfToken &&
                   window.glide.accessToken &&
-                  <a className="nav-link toggle-github" href="#">
+                  <a className="nav-link toggle-github" href={logoutUrl}>
                     <i className="sign out icon"></i>Sign Out
                     <span className="sr-only"></span>
                   </a>

@@ -217,7 +217,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} />
+            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
             {modals}
             <LoadingPane
               messages={this.state.loadingMessages} />
@@ -228,7 +228,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} />
+            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
             {modals}
             <RepositoryPane app={this} />
             <LoadingPane
@@ -240,7 +240,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} />
+            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
             {modals}
             <BranchPane
               app={this}
@@ -256,7 +256,7 @@ class App extends React.Component {
       // case this.state.constants.APP_PHASE_BRANCH_OPEN:
       //   return (
       //     <div className="row full-height">
-      //       <NavBar app={this} />
+      //       <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
       //       {modals}
       //       <RepoToolBar
       //         app={this}
@@ -272,7 +272,7 @@ class App extends React.Component {
         
         return (
           <div className="full-height">
-            <NavBar app={this} />
+            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
             {modals}
             {
               // <RepoToolBar

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as loginUser
+from django.contrib.auth import logout as logoutUser
 from urllib.request import urlopen
 from urllib.parse import urlencode, parse_qs
 import json
@@ -9,6 +10,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from glide import getAuthUrl
+import re
+import os
+from django.conf import settings
+import pathlib, shutil, subprocess
 
 
 def login(request, repoProvider):
@@ -114,21 +119,53 @@ def loggingIn(request, repoProvider):
           return redirect('/workspace')
       else:
         return redirect('/')
-        # TODO: better error handling in case the user's not authenticated
-        # TODO: messages.error(
-        #   request,
-        #   'The project title "{}" is being used. Try with a different title.'.format(slug),
-        #   fail_silently=False
-        # )
-        # TODO: return redirect('/user/login/{}'.format(repoProvider))
+        # Error handling, in case the user's not authenticated, is not necessary
+        #   because GitHub doesn't redirect the user in that case
   elif repoProvider=='bitbucket':
     pass
   elif repoProvider=='gitlab':
     pass
 
 
-def logout(request):
+def logout(request, owner=None, repo=None, branch=None):
   """
-  TODO: Logs out the user.
+  TODO: Logs the user out
+  curl -v -u 1bcffc14a7141019248d:b4398ac47191a0ccaee15117080b0c82709d46ae -X "DELETE" https://api.github.com/applications/1bcffc14a7141019248d/tokens/754da6e8bc1d47de8a2b9e15c0bad8e0ae8e3da3
   """
-  pass
+  username = request.session['username'].split('@')[0]
+  accessToken = request.session['accessToken']
+  clientId = settings.GITHUB_CLIENT_ID
+  clientSecret = settings.GITHUB_CLIENT_SECRET
+  logoutCurlCommand = 'curl -v -u {}:{} -X "DELETE" https://api.github.com/applications/{}/tokens/{}'
+  logoutCurlCommand = logoutCurlCommand.format(clientId, clientSecret, clientId, accessToken)
+  logoutCompProc = subprocess.run(
+    logoutCurlCommand, shell=True, stdin=subprocess.PIPE,
+    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+  )
+  if owner and repo and branch:
+    userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo, branch, username)
+    branchPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo, branch)
+    repoPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo)
+    ownerPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner)
+    
+    userBasePath = pathlib.Path(userBasePathStr)
+    if userBasePath.exists():
+      shutil.rmtree(userBasePathStr, ignore_errors=True)
+    
+    branchPathList = os.listdir(branchPathStr)
+    if len(branchPathList) == 0:
+      branchPath = pathlib.Path(branchPathStr)
+      shutil.rmtree(branchPath, ignore_errors=True)
+
+    repoPathList = os.listdir(repoPathStr)
+    if len(repoPathList) == 0:
+      repoPath = pathlib.Path(repoPathStr)
+      shutil.rmtree(repoPath, ignore_errors=True)
+
+    ownerPathList = os.listdir(ownerPathStr)
+    if len(ownerPathList) == 0:
+      ownerPath = pathlib.Path(ownerPathStr)
+      shutil.rmtree(ownerPath, ignore_errors=True)
+
+  logoutUser(request)
+  return redirect('/')
