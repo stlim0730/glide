@@ -7,16 +7,16 @@ import 'brace/theme/github';
 //   since they weren't originally made to work with React.
 // 
 // Tried - didn't work well enough
-//   'react-ace'
 //   'react-ace-editor'
 //   'react-codemirror'
 //   'react-codemirror2'
 // 
 // Currently using
-//   'react-ace-2' // the module name is still 'react-ace'
+//   'react-ace'
 //   Be aware of the potential conflicts with 'react-ace'
 // 
 // Potential alternatives if things go wrong with the editor library
+//   'react-ace-2'
 //   'react-ace-wrapper'
 //   // To be added
 
