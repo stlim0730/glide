@@ -129,7 +129,7 @@ sudo apt-get install -y npm
 # Install NodeJS Packages
 # 
 cd /$PROJECT_NAME && sudo npm install
-cd /$PROJECT_NAME && sudo npm install pm2 -g
+# cd /$PROJECT_NAME && sudo npm install pm2 -g
 cd /$PROJECT_NAME && sudo npm install hexo-cli -g
 
 
