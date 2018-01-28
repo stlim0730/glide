@@ -90,6 +90,13 @@ class EditorPane extends React.Component {
     });
   }
 
+  _requestRender(createdFiles) {
+    let renderPath = null;
+    if(createdFiles.length > 1) {
+      renderPath = 'index.html'
+    }
+  }
+
   handleGenerateClick() {    
     // POST request for Hexo initialization
     let url = '/api/project/generate';
@@ -159,6 +166,7 @@ class EditorPane extends React.Component {
               self._popLoadingMsg(loadingMsgHandle);
               let msg = 'Your website has been successfully generated!';
               Alert.success(msg);
+              // self._requestRender(createdFiles);
             });
           });
         }
@@ -199,14 +207,39 @@ class EditorPane extends React.Component {
         <div className="card full-height">
           <div
             className="card-header"
-            style={{paddingTop: 8, paddingBottom: 6}}>
-            <h6 className="inline-block">Editor</h6>
-            <button
-              style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
-              className="btn btn-outline-success btn-sm inline-block float-right"
-              onClick={this.handleGenerateClick} type="button" >
-              Generate & Render <i className="angle double right icon"></i>
-            </button>
+            style={{paddingTop: 6, paddingBottom: 6}}>
+            <h6 className="inline-block" style={{paddingTop: 5, marginBottom: 7}}>Editor</h6>
+            {
+              // <button
+              //   style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
+              //   className="btn btn-outline-success btn-sm inline-block float-right"
+              //   onClick={this.handleGenerateClick} type="button" >
+              //   Generate & Render <i className="angle double right icon"></i>
+              // </button>
+            }
+
+            <div className="btn-group float-right" role="group">
+              <button
+                style={{paddingTop: 0, paddingBottom: 0}}
+                className="btn btn-outline-success btn-sm"
+                onClick={this.handleGenerateClick} type="button">
+                Generate & Render
+              </button>
+              <div className="btn-group" role="group">
+                <button
+                  type="button" data-toggle="dropdown"
+                  className="btn btn-outline-success btn-sm dropdown-toggle">
+                </button>
+                <div
+                  className="dropdown-menu dropdown-menu-class">
+                  <button type="button"
+                    className="dropdown-item btn btn-outline-success btn-sm">
+                    Generate & Go to This Page
+                  </button>
+                </div>
+              </div>
+            </div>
+
           </div>
           
           <TabbedEditors

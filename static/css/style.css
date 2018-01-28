@@ -14,15 +14,15 @@ button.btn.btn-link:hover { text-decoration: none; }
 .height-95 { height: 95%; }
 .height-90 { height: 90%; }
 .height-60 { height: 59%; }
-.height-50 { height: 50%; }
-.height-40 { height: 39.3%; }
+.height-50 { height: 49.15%; }
+/*.height-40 { height: 39.3%; }*/
 .height-200 { height: 200px; }
 .height-400 { height: 400px; }
 .height-600 { height: 600px; }
 .max-height-200 { max-height: 200px; }
 .max-height-400 { max-height: 400px; }
-.max-height-40 { max-height: 40%; }
-.max-height-50 { max-height: 50%; }
+/*.max-height-40 { max-height: 40%; }*/
+.max-height-50 { max-height: 49.15%; }
 .max-height-90 { max-height: 90%; }
 .auto-scroll { overflow-x: auto; overflow-y: auto; }
 .no-padding { padding: 0px; }
@@ -101,6 +101,13 @@ button[type="button"] { cursor: pointer; }
     top: -130px;
     left: -12px;
   }
+}
+.dropdown-menu.dropdown-menu-class {
+  position: absolute;
+  transform: translate3d(0px, 36px, 0px);
+  top: 0px;
+  left: 0px;
+  will-change: transform;
 }
 
 /* s-alert */
