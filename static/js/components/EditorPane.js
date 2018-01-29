@@ -14,6 +14,7 @@ class EditorPane extends React.Component {
       branch: null,
       tree: null,
       recursiveTree: null,
+      isHexoPrj: null,
       changedFiles: [],
       addedFiles: [],
       filesOpened: [],
@@ -90,7 +91,11 @@ class EditorPane extends React.Component {
     });
   }
 
-  handleGenerateClick() {    
+  _requestRender(gotoCurrentFile) {
+    let renderPath = !gotoCurrentFile ? 'index.html' : 'index.html';
+  }
+
+  handleGenerateClick(gotoCurrentFile) {
     // POST request for Hexo initialization
     let url = '/api/project/generate';
     let self = this;
@@ -159,6 +164,7 @@ class EditorPane extends React.Component {
               self._popLoadingMsg(loadingMsgHandle);
               let msg = 'Your website has been successfully generated!';
               Alert.success(msg);
+              // self._requestRender(gotoCurrentFile);
             });
           });
         }
@@ -172,6 +178,7 @@ class EditorPane extends React.Component {
       branch: this.props.branch,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
@@ -185,6 +192,7 @@ class EditorPane extends React.Component {
       branch: nextProps.branch,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
@@ -199,14 +207,45 @@ class EditorPane extends React.Component {
         <div className="card full-height">
           <div
             className="card-header"
-            style={{paddingTop: 8, paddingBottom: 6}}>
-            <h6 className="inline-block">Editor</h6>
-            <button
-              style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
-              className="btn btn-outline-success btn-sm inline-block float-right"
-              onClick={this.handleGenerateClick} type="button" >
-              Generate & Render <i className="angle double right icon"></i>
-            </button>
+            style={{paddingTop: 6, paddingBottom: 6}}>
+            <h6 className="inline-block" style={{paddingTop: 5, marginBottom: 7}}>Editor</h6>
+            {
+              // <button
+              //   style={{paddingTop: 0, paddingBottom: 0, marginTop: 3}}
+              //   className="btn btn-outline-success btn-sm inline-block float-right"
+              //   onClick={this.handleGenerateClick} type="button" >
+              //   Generate & Render <i className="angle double right icon"></i>
+              // </button>
+            }
+
+            {
+              this.state.isHexoPrj &&
+              <div className="btn-group float-right" role="group">
+                <button
+                  style={{paddingTop: 0, paddingBottom: 0}}
+                  className="btn btn-outline-success btn-sm"
+                  onClick={this.handleGenerateClick} type="button">
+                  Generate & Render
+                </button>
+                <div className="btn-group" role="group">
+                  <button
+                    type="button" data-toggle="dropdown"
+                    className="btn btn-outline-success btn-sm dropdown-toggle">
+                  </button>
+                  <div
+                    className="dropdown-menu dropdown-menu-class">
+                    <button type="button"
+                      // From react docs Passing arguments to event handlers
+                      //   https://reactjs.org/docs/handling-events.html#passing-arguments-to-event-handlers
+                      // onClick={this.handleGenerateClick(true)}
+                      className="dropdown-item btn btn-outline-success btn-sm">
+                      Generate & Go to This Page
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+
           </div>
           
           <TabbedEditors
@@ -215,6 +254,7 @@ class EditorPane extends React.Component {
             branch={this.state.branch}
             tree={this.props.tree}
             recursiveTree={this.props.recursiveTree}
+            isHexoPrj={this.state.isHexoPrj}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}

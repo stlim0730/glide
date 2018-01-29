@@ -82,6 +82,8 @@ class FileNode extends React.Component {
     e.stopPropagation();
     
     // switch(operation) {
+    //   case 'rename':
+    //     break;
     //   case 'remove':
     //     break;
     //   case 'copy':
@@ -260,7 +262,12 @@ class FileNode extends React.Component {
                   } {item.name}
                   {
                     <i
-                      style={{ marginLeft: 20 }} onClick={this.handleFileManClick.bind(this, 'remove')}
+                      style={{ marginLeft: 20 }} onClick={this.handleFileManClick.bind(this, 'rename')}
+                      className="olive write icon invisible file-manipulation"></i>
+                  }
+                  {
+                    <i
+                      onClick={this.handleFileManClick.bind(this, 'remove')}
                       className="red remove icon invisible file-manipulation"></i>
                   }
                   {

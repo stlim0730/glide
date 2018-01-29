@@ -32,16 +32,17 @@ class TabbedEditors extends React.Component {
       branch: null,
       tree: null,
       recursiveTree: null,
+      isHexoPrj: null,
       filesOpened: [],
       fileActive: null,
       changedFiles: []
     };
 
-    this._isTextFile = this._isTextFile.bind(this);
-    this._isImageFile = this._isImageFile.bind(this);
-    this._getObjUrl = this._getObjUrl.bind(this);
-    this._getTabId = this._getTabId.bind(this);
-    this._getEditorId = this._getEditorId.bind(this);
+    // this._isTextFile = this._isTextFile.bind(this);
+    // this._isImageFile = this._isImageFile.bind(this);
+    // this._getObjUrl = this._getObjUrl.bind(this);
+    // this._getTabId = this._getTabId.bind(this);
+    // this._getEditorId = this._getEditorId.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this.handleTabMouseOver = this.handleTabMouseOver.bind(this);
     this.handleTabMouseOut = this.handleTabMouseOut.bind(this);
@@ -50,7 +51,7 @@ class TabbedEditors extends React.Component {
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
   
-  _isTextFile(fileObj) {
+  static _isTextFile(fileObj) {
     const regexes = {
       'textFileRegex'          : /\.txt/,
       'htmlFileRegex'          : /\.(htm|html)/,
@@ -72,7 +73,7 @@ class TabbedEditors extends React.Component {
     return false;
   }
 
-  _isImageFile(fileObj) {
+  static _isImageFile(fileObj) {
     const imgFileRegex = /\.(jpg|jpeg|gif|png|svg|bmp|ico)$/i;
     if(imgFileRegex.test(fileObj.name)) {
       return true;
@@ -82,16 +83,16 @@ class TabbedEditors extends React.Component {
     }
   }
 
-  _getObjUrl(fileObj) {
+  static _getObjUrl(fileObj) {
     return 'data:image/png;base64,' + btoa(fileObj.originalContent);
   }
 
-  _getTabId(fileObj) {
-    let prefix = 'tab_';
-    return prefix + fileObj.sha;
-  }
+  // static _getTabId(fileObj) {
+  //   let prefix = 'tab_';
+  //   return prefix + fileObj.sha;
+  // }
 
-  _getEditorId(fileObj) {
+  static _getEditorId(fileObj) {
     let prefix = 'editor_';
     return prefix + fileObj.sha;
   }
@@ -185,11 +186,12 @@ class TabbedEditors extends React.Component {
   }
 
   handleEditorChange(file, newVal, aceEvent) {
-    file.newContent = newVal;
     let app = this.props.app;
     let self = this;
     let changedFiles = this.state.changedFiles;
-    
+
+    console.info(file, newVal);
+    file.newContent = newVal;
     if(file.originalContent != file.newContent) {
       // This file has been modified.
       file.modified = true;
@@ -216,7 +218,7 @@ class TabbedEditors extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.info(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -225,34 +227,41 @@ class TabbedEditors extends React.Component {
           file.size = response.size;
 
           let staged = true && _.find(changedFiles, { path: file.path });
-          let updateState = false;
+          // let updateState = false;
                     
           if(file.modified && !staged) {
             changedFiles.push(file);
-            updateState = true;
+            // updateState = true;
           }
           else if(!file.modified && staged) {
             _.remove(changedFiles, function(f) {
               return f.path == file.path;
             });
-            updateState = true;
+            // updateState = true;
           }
 
-          if(updateState) {
-            self.setState({
+          self.setState({
+            fileActive: file,
+            changedFiles: changedFiles
+          }, function() {
+            app.setState({
+              fileActive: file,
               changedFiles: changedFiles
-            }, function() {
-              app.setState({
-                changedFiles: changedFiles
-              });
             });
-          }
+          });
+
+          // if(updateState) {
+          //   self.setState({
+          //     changedFiles: changedFiles
+          //   }, function() {
+          //     app.setState({
+          //       changedFiles: changedFiles
+          //     });
+          //   });
+          // }
         }
       }
     });
-
-    // let data = this._prepareRenderingReq(file.newContent, file);
-    // this._requestRendering(data);
   }
 
   componentDidMount() {
@@ -261,6 +270,7 @@ class TabbedEditors extends React.Component {
       branch: this.props.branch,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
@@ -277,6 +287,7 @@ class TabbedEditors extends React.Component {
       branch: nextProps.branch,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
@@ -318,7 +329,7 @@ class TabbedEditors extends React.Component {
         <li key={index} className="nav-item">
           <a
             style={{paddingRight:8}} title={item.path}
-            href={"#" + this._getEditorId(item)}
+            href={"#" + TabbedEditors._getEditorId(item)}
             data-toggle="tab" className={tabClassName}
             onMouseEnter={this.handleTabMouseOver.bind(this)}
             onMouseLeave={this.handleTabMouseOut.bind(this)}
@@ -346,22 +357,22 @@ class TabbedEditors extends React.Component {
       let options = {
         lineNumbers: true
       };
-      let idStr = this._getEditorId(item);
+      let idStr = TabbedEditors._getEditorId(item);
       tabbedEditors.push(
         <div className={editorClassName} name={idStr} key={index}>
           {
-            this._isTextFile(item) ?
+            TabbedEditors._isTextFile(item) ?
             <AceEditor
               tabSize={2} mode="markdown" theme="github"
               onChange={this.handleEditorChange.bind(this, item)}
-              value={item.newContent ? item.newContent : item.originalContent}
+              value={item.modified ? item.newContent : item.originalContent}
               name={"ace_" + idStr} enableBasicAutocompletion={false}
               enableSnippets={false} enableLiveAutocompletion={false}
               editorProps={{$blockScrolling: Infinity}} /> :
             (
-              this._isImageFile(item) ?
+              TabbedEditors._isImageFile(item) ?
               <div>
-                <img src={this._getObjUrl(item)} />
+                <img src={TabbedEditors._getObjUrl(item)} />
               </div>:
               null
             )
