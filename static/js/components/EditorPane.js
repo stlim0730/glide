@@ -90,14 +90,11 @@ class EditorPane extends React.Component {
     });
   }
 
-  _requestRender(createdFiles) {
-    let renderPath = null;
-    if(createdFiles.length > 1) {
-      renderPath = 'index.html'
-    }
+  _requestRender(gotoCurrentFile) {
+    let renderPath = !gotoCurrentFile ? 'index.html' : 'index.html';
   }
 
-  handleGenerateClick() {    
+  handleGenerateClick(gotoCurrentFile) {
     // POST request for Hexo initialization
     let url = '/api/project/generate';
     let self = this;
@@ -166,7 +163,7 @@ class EditorPane extends React.Component {
               self._popLoadingMsg(loadingMsgHandle);
               let msg = 'Your website has been successfully generated!';
               Alert.success(msg);
-              // self._requestRender(createdFiles);
+              // self._requestRender(gotoCurrentFile);
             });
           });
         }
@@ -233,6 +230,7 @@ class EditorPane extends React.Component {
                 <div
                   className="dropdown-menu dropdown-menu-class">
                   <button type="button"
+                    onClick={this.handleGenerateClick(true)}
                     className="dropdown-item btn btn-outline-success btn-sm">
                     Generate & Go to This Page
                   </button>
