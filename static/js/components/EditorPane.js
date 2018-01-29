@@ -235,7 +235,9 @@ class EditorPane extends React.Component {
                   <div
                     className="dropdown-menu dropdown-menu-class">
                     <button type="button"
-                      onClick={this.handleGenerateClick(true)}
+                      // From react docs Passing arguments to event handlers
+                      //   https://reactjs.org/docs/handling-events.html#passing-arguments-to-event-handlers
+                      // onClick={this.handleGenerateClick(true)}
                       className="dropdown-item btn btn-outline-success btn-sm">
                       Generate & Go to This Page
                     </button>
