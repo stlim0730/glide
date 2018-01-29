@@ -61,10 +61,11 @@ class RuntimePane extends React.Component {
       <div className="col-lg-5 col-md-5 no-padding full-height">
         
         <RendererPane
-          app={this.props.app}
+          // app={this.props.app}
           fileActive={this.state.fileActive}
-          isHexoPrj={this.state.isHexoPrj} />
-          
+          isHexoPrj={this.state.isHexoPrj}
+          repository={this.state.repository}
+          branch={this.state.branch} />
         <GitPane
           app={this.props.app}
           repository={this.state.repository}

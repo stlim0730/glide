@@ -6,6 +6,8 @@ class RendererPane extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
       fileActive: null,
       isHexoPrj: null,
       srcDoc: null
@@ -51,6 +53,8 @@ class RendererPane extends React.Component {
   componentDidMount() {
     let self = this;
     this.setState({
+      repository: this.props.repository,
+      branch: this.props.branch,
       fileActive: this.props.fileActive,
       isHexoPrj: this.props.isHexoPrj
     }, function() {
@@ -61,6 +65,8 @@ class RendererPane extends React.Component {
   componentWillReceiveProps(nextProps) {
     let self = this;
     this.setState({
+      repository: nextProps.repository,
+      branch: nextProps.branch,
       fileActive: nextProps.fileActive,
       isHexoPrj: nextProps.isHexoPrj
     }, function() {
@@ -72,14 +78,28 @@ class RendererPane extends React.Component {
     // TODO: Set a placeholder for nothing to render
     // TODO: Set a placeholder for loading
     let srcDoc = this.state.srcDoc;
+    let hexoPrjUrl = null;
+    if(this.state.repository && this.state.branch) {
+      hexoPrjUrl= '/media/hexo/' + this.state.repository.full_name + '/'
+        + this.state.branch.name + '/' + window.glide.username.split('@')[0] + '/docs/index.html';
+    }
+    console.info(hexoPrjUrl);
 
     return (
       <div className="height-50 card">
         <h6 className="card-header">Preview</h6>
-        <iframe
-          className="auto-scroll height-90 panel-body" style={{border:'none'}}
-          srcDoc={ srcDoc ? srcDoc : null } width="100%" sandbox="allow-scripts">
-        </iframe>
+        {
+          !this.state.isHexoPrj ?
+          <iframe
+            className="auto-scroll height-90 panel-body" style={{border:'none'}}
+            srcDoc={ srcDoc ? srcDoc : null } width="100%" sandbox="allow-scripts">
+          </iframe>
+          :
+          <iframe
+            className="auto-scroll height-90 panel-body" style={{border:'none'}}
+            src={hexoPrjUrl} width="100%" sandbox="allow-scripts">
+          </iframe>
+        }
       </div>
     );
   }
