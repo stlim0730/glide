@@ -56,7 +56,6 @@ class App extends React.Component {
       phase: 'clean_slate',
       repositories: [],
       repository: null,
-      // isHexoPrj: true, // TODO: Dynamically detect Hexo projects
       branches: [],
       branch: null,
       commits: [],
@@ -64,15 +63,13 @@ class App extends React.Component {
       initialCommit: null,
       tree: null,
       recursiveTree: null,
+      isHexoPrj: null,
       scaffolds: [],
       scaffold: null,
       filesOpened: [],
       fileActive: null,
       changedFiles: [],
       addedFiles: [],
-      liveYaml: null,
-      liveHtml: null,
-      liveBugs: [],
       loadingMessages: {}
     };
   }
@@ -294,15 +291,11 @@ class App extends React.Component {
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
-              // scaffolds={this.state.scaffolds}
-              // scaffold={this.state.scaffold}
+              isHexoPrj={this.state.isHexoPrj}
               changedFiles={this.state.changedFiles}
               addedFiles={this.state.addedFiles}
               fileActive={this.state.fileActive}
-              filesOpened={this.state.filesOpened}
-              liveYaml={this.state.liveYaml}
-              liveHtml={this.state.liveHtml}
-              liveBugs={this.state.liveBugs} />
+              filesOpened={this.state.filesOpened} />
             <LoadingPane
               messages={this.state.loadingMessages} />
           </div>

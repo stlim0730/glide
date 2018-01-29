@@ -17,13 +17,11 @@ class WorkspacePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
+      isHexoPrj: null,
       changedFiles: [],
       addedFiles: [],
       fileActive: null,
-      filesOpened: [],
-      liveYaml: null,
-      liveHtml: null,
-      liveBugs: []
+      filesOpened: []
     };
 
     this._reset = this._reset.bind(this);
@@ -32,7 +30,7 @@ class WorkspacePane extends React.Component {
 
   _reset() {
     // this.setState({
-      // 
+    //
     // });
   }
 
@@ -54,13 +52,11 @@ class WorkspacePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       fileActive: this.props.fileActive,
-      filesOpened: this.props.filesOpened,
-      liveYaml: this.props.liveYaml,
-      liveHtml: this.props.liveHtml,
-      liveBugs: this.props.liveBugs
+      filesOpened: this.props.filesOpened
     });
   }
 
@@ -73,13 +69,11 @@ class WorkspacePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       fileActive: nextProps.fileActive,
-      filesOpened: nextProps.filesOpened,
-      liveYaml: nextProps.liveYaml,
-      liveHtml: nextProps.liveHtml,
-      liveBugs: nextProps.liveBugs
+      filesOpened: nextProps.filesOpened
     });
   }
 
@@ -101,6 +95,7 @@ class WorkspacePane extends React.Component {
             branch={this.state.branch}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}
+            isHexoPrj={this.state.isHexoPrj}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
@@ -116,9 +111,7 @@ class WorkspacePane extends React.Component {
             recursiveTree={this.state.recursiveTree}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
-            liveYaml={this.state.liveYaml}
-            liveHtml={this.state.liveHtml}
-            liveBugs={this.state.liveBugs} />
+            fileActive={this.state.fileActive} />
         </div>
 
       </div>

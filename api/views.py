@@ -740,77 +740,87 @@ def pr(request):
 
 
 @api_view(['POST'])
-def render(request):
+def renderFile(request):
   """
   Respond with rendered html
   Consider using Misaka (https://github.com/FSX/misaka) package,
     which has more like GitHub flavored markdown renderer
   """
-  data = request.data['data']
-  fileName = request.data['fileName']
+  file = request.data['file']
+  fileName = file['name']
   extension = fileName.split('.')
-  res = {}
+  res = { 'srcDoc': None }
   if len(extension) > 1:
     extension = extension[-1]
   else:
-    # No extension
+    # No extension: it shouldn't be a folder, though
     extension = None
   if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
     # Markdown
-    res['html'] = _mdToHtml(data)
-  elif extension in ['yaml', 'yml']:
-    # YAML
-    try:
-      res['yaml'] = yaml.load(data)
-      templateFileContent = None
-      if 'templateFileContent' in request.data:
-        templateFileContent = request.data['templateFileContent']
-      if templateFileContent:
-        # Render yaml with the given design template
-        template = Template(templateFileContent)
-        res['html'] = template.render(res['yaml'])
-    except (yaml.scanner.ScannerError, yaml.parser.ParserError) as e:
-      exceptions = traceback.format_exception_only(yaml.scanner.ScannerError, e)
-      error = []
-      for exception in exceptions:
-        exception = exception.replace('\n', ' ')
-        noColon = re.search('could not find expected \':\'', exception)
-        listHanging = re.search('expected the node content, but found \'<stream end>\'', exception)
-        stringHanging = re.search(r'while scanning a quoted scalar.+found unexpected end of stream', exception)
-        if noColon:
-          line = re.findall('line \d+', exception)[-1]
-          line = int(line.split(' ')[-1])
-          error.append({
-            'line': line,
-            'type': 'error',
-            'file': fileName,
-            'message': 'Could not find expected \':\''
-          })
-        elif listHanging:
-          line = re.findall('line \d+', exception)[-1]
-          line = int(line.split(' ')[-1])
-          error.append({
-            'line': line,
-            'type': 'error',
-            'file': fileName,
-            'message': 'Expected \',\' or \']\''
-          })
-        elif stringHanging:
-          line = re.findall('line \d+', exception)[0]
-          line = int(line.split(' ')[-1])
-          error.append({
-            'line': line,
-            'type': 'error',
-            'file': fileName,
-            'message': 'Expected " (end of quoted scalar)'
-          })
-        else:
-          error.append(exception)
-      return Response({
-        'error': error
-      })
-    # There was no YAML syntax error
-    # TODO: template engine
+    if 'newContent' in file and file['newContent']:
+      res['srcDoc'] = file['newContent']
+    else:
+      res['srcDoc'] = file['originalContent']
+    pass
+  elif extension in ['html', 'htm']:
+    # HTML
+    if 'newContent' in file and file['newContent']:
+      res['srcDoc'] = file['newContent']
+    else:
+      res['srcDoc'] = file['originalContent']
+  # elif extension in ['yaml', 'yml']:
+  #   # YAML
+  #   try:
+  #     res['yaml'] = yaml.load(data)
+  #     templateFileContent = None
+  #     if 'templateFileContent' in request.data:
+  #       templateFileContent = request.data['templateFileContent']
+  #     if templateFileContent:
+  #       # Render yaml with the given design template
+  #       template = Template(templateFileContent)
+  #       res['html'] = template.render(res['yaml'])
+  #   except (yaml.scanner.ScannerError, yaml.parser.ParserError) as e:
+  #     exceptions = traceback.format_exception_only(yaml.scanner.ScannerError, e)
+  #     error = []
+  #     for exception in exceptions:
+  #       exception = exception.replace('\n', ' ')
+  #       noColon = re.search('could not find expected \':\'', exception)
+  #       listHanging = re.search('expected the node content, but found \'<stream end>\'', exception)
+  #       stringHanging = re.search(r'while scanning a quoted scalar.+found unexpected end of stream', exception)
+  #       if noColon:
+  #         line = re.findall('line \d+', exception)[-1]
+  #         line = int(line.split(' ')[-1])
+  #         error.append({
+  #           'line': line,
+  #           'type': 'error',
+  #           'file': fileName,
+  #           'message': 'Could not find expected \':\''
+  #         })
+  #       elif listHanging:
+  #         line = re.findall('line \d+', exception)[-1]
+  #         line = int(line.split(' ')[-1])
+  #         error.append({
+  #           'line': line,
+  #           'type': 'error',
+  #           'file': fileName,
+  #           'message': 'Expected \',\' or \']\''
+  #         })
+  #       elif stringHanging:
+  #         line = re.findall('line \d+', exception)[0]
+  #         line = int(line.split(' ')[-1])
+  #         error.append({
+  #           'line': line,
+  #           'type': 'error',
+  #           'file': fileName,
+  #           'message': 'Expected " (end of quoted scalar)'
+  #         })
+  #       else:
+  #         error.append(exception)
+  #     return Response({
+  #       'error': error
+  #     })
+  #   # There was no YAML syntax error
+  #   # TODO: template engine
   else:
     # Unsupported file type
     pass

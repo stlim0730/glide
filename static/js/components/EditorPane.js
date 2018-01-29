@@ -14,6 +14,7 @@ class EditorPane extends React.Component {
       branch: null,
       tree: null,
       recursiveTree: null,
+      isHexoPrj: null,
       changedFiles: [],
       addedFiles: [],
       filesOpened: [],
@@ -177,6 +178,7 @@ class EditorPane extends React.Component {
       branch: this.props.branch,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
+      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
@@ -190,6 +192,7 @@ class EditorPane extends React.Component {
       branch: nextProps.branch,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
+      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
@@ -215,28 +218,31 @@ class EditorPane extends React.Component {
               // </button>
             }
 
-            <div className="btn-group float-right" role="group">
-              <button
-                style={{paddingTop: 0, paddingBottom: 0}}
-                className="btn btn-outline-success btn-sm"
-                onClick={this.handleGenerateClick} type="button">
-                Generate & Render
-              </button>
-              <div className="btn-group" role="group">
+            {
+              this.state.isHexoPrj &&
+              <div className="btn-group float-right" role="group">
                 <button
-                  type="button" data-toggle="dropdown"
-                  className="btn btn-outline-success btn-sm dropdown-toggle">
+                  style={{paddingTop: 0, paddingBottom: 0}}
+                  className="btn btn-outline-success btn-sm"
+                  onClick={this.handleGenerateClick} type="button">
+                  Generate & Render
                 </button>
-                <div
-                  className="dropdown-menu dropdown-menu-class">
-                  <button type="button"
-                    onClick={this.handleGenerateClick(true)}
-                    className="dropdown-item btn btn-outline-success btn-sm">
-                    Generate & Go to This Page
+                <div className="btn-group" role="group">
+                  <button
+                    type="button" data-toggle="dropdown"
+                    className="btn btn-outline-success btn-sm dropdown-toggle">
                   </button>
+                  <div
+                    className="dropdown-menu dropdown-menu-class">
+                    <button type="button"
+                      onClick={this.handleGenerateClick(true)}
+                      className="dropdown-item btn btn-outline-success btn-sm">
+                      Generate & Go to This Page
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            }
 
           </div>
           
@@ -246,6 +252,7 @@ class EditorPane extends React.Component {
             branch={this.state.branch}
             tree={this.props.tree}
             recursiveTree={this.props.recursiveTree}
+            isHexoPrj={this.state.isHexoPrj}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
