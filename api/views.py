@@ -758,9 +758,9 @@ def renderFile(request):
   if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
     # Markdown
     if 'newContent' in file and file['newContent']:
-      res['srcDoc'] = file['newContent']
+      res['srcDoc'] = _mdToHtml(file['newContent'])
     else:
-      res['srcDoc'] = file['originalContent']
+      res['srcDoc'] = _mdToHtml(file['originalContent'])
     pass
   elif extension in ['html', 'htm']:
     # HTML
