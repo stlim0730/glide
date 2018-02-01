@@ -23,14 +23,7 @@ class CreateFileModalContent extends React.Component {
     };
 
     this._reset = this._reset.bind(this);
-    // this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
-    // this._isTemplateFile = this._isTemplateFile.bind(this);
-    // this._isDataFile = this._isDataFile.bind(this);
-    // this._loadThemeStructure = this._loadThemeStructure.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
-    // this._loadTemplateContent = this._loadTemplateContent.bind(this);
-    // this._countLayouts = this._countLayouts.bind(this);
-    // this._renderThemeStructure = this._renderThemeStructure.bind(this);
     this.handleFileCreationModeChange = this.handleFileCreationModeChange.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
@@ -50,8 +43,7 @@ class CreateFileModalContent extends React.Component {
       filesToUpload: [],
       filesFailedToUpload: []
     }, function() {
-      self.fileNameInput1.value = '';
-      self.fileNameInput2.value = '';
+      self.fileNameInput.value = '';
       $('.file-creation-tabs').removeClass('active');
       $('.file-creation-panes').removeClass('active show in');
       document.getElementById('fileFormToReset').reset();
@@ -78,12 +70,6 @@ class CreateFileModalContent extends React.Component {
     else {
       return false;
     }
-  }
-  
-  static sfileNameOnly(file) {
-    let fileNameArr = file.name.split('.');
-    fileNameArr.pop();
-    return fileNameArr.join('.');
   }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
@@ -206,7 +192,7 @@ class CreateFileModalContent extends React.Component {
     }
 
     if(exists) {
-      console.error('GLIDE: File already exists!');
+      console.error('GLIDE: The same file name already exists!');
       this._reset();
       let msg = 'The same file name already exists!';
       Alert.error(msg);
@@ -215,7 +201,6 @@ class CreateFileModalContent extends React.Component {
 
     // Upload the data
     let data = {
-      mode: this.state.fileCreationMode,
       repository: this.state.repository.full_name,
       branch: this.state.branch.name,
       path: path
@@ -227,7 +212,7 @@ class CreateFileModalContent extends React.Component {
     switch(this.state.fileCreationMode) {
       case 'file':
         data.fileOrFolder = this.state.fileOrFolder;
-        data.file = fileName;
+        data.fileName = fileName;
         data = JSON.stringify(data);
         break;
       case 'upload':
@@ -242,11 +227,6 @@ class CreateFileModalContent extends React.Component {
         formData.append('branch', data.branch);
         formData.append('path', data.path);
         data = formData;
-        break;
-      default:
-        // Unexpected case
-        console.error('Unknown file creation mode');
-        return;
         break;
     }
 
@@ -265,7 +245,7 @@ class CreateFileModalContent extends React.Component {
       contentType: contentType,
       data: data,
       success: function(response) {
-        console.log(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -421,7 +401,7 @@ class CreateFileModalContent extends React.Component {
                     type="text" disabled={!this.state.fileOrFolder}
                     onChange={this.handleFileNameChange}
                     onKeyUp={this.handleKeyUp}
-                    ref={(c) => this.fileNameInput2 = c}
+                    ref={(c) => this.fileNameInput = c}
                     className="form-control" maxLength="255" />
                 </div>
               </fieldset>

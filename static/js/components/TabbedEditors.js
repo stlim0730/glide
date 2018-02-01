@@ -159,8 +159,7 @@ class TabbedEditors extends React.Component {
     let app = this.props.app;
     let self = this;
     let changedFiles = this.state.changedFiles;
-
-    console.info(file, newVal);
+    
     file.newContent = newVal;
     if(file.originalContent != file.newContent) {
       // This file has been modified.

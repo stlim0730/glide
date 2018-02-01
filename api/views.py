@@ -285,26 +285,6 @@ def _updateReference(accessToken, owner, repo, ref, refTo):
   #   return json.loads(resStr)
 
 
-# def _createFile(accessToken, repoUsername, projectSlug, fileObj, branch='master', message=None):
-#   createFileUrl = 'https://api.github.com/repos/{}/{}/contents/{}?access_token={}'
-#   # fileObj.path should be like 'foo/bar'
-#   createFileUrl = createFileUrl.format(repoUsername, projectSlug, fileObj['path'], accessToken)
-#   createFileUrl = getAuthUrl(createFileUrl)
-#   if not message:
-#     message = 'added {}'.format(fileObj['path'])
-#   createFileData = {
-#     'message': message,
-#     'originalContent': fileObj['originalContent'].decode('utf-8'),
-#     'branch': branch
-#   }
-#   req = Request(
-#     url=createFileUrl, headers={'Content-Type': 'application/json'},
-#     data=json.dumps(createFileData).encode('utf-8'), method='PUT')
-#   with urlopen(req) as createFileRes:
-#     resStr = createFileRes.read().decode('utf-8')
-#     return json.loads(resStr)
-
-
 def _mdToHtml(md):
   return markdown.markdown(md)
 
@@ -750,90 +730,31 @@ def renderFile(request):
   fileName = file['name']
   extension = fileName.split('.')
   res = { 'srcDoc': None }
+  
+  # Decide file types basedon file extension
   if len(extension) > 1:
     extension = extension[-1]
   else:
     # No extension: it shouldn't be a folder, though
     extension = None
+
   if extension in ['md', 'markdown', 'mdown', 'mkdn', 'mkd']:
-    # Markdown
+    # Markdown: file rendering
     if 'newContent' in file and file['newContent']:
       res['srcDoc'] = _mdToHtml(file['newContent'])
     else:
       res['srcDoc'] = _mdToHtml(file['originalContent'])
-    pass
-  elif extension in ['html', 'htm']:
-    # HTML
-    if 'newContent' in file and file['newContent']:
-      res['srcDoc'] = file['newContent']
-    else:
-      res['srcDoc'] = file['originalContent']
-  # elif extension in ['yaml', 'yml']:
-  #   # YAML
-  #   try:
-  #     res['yaml'] = yaml.load(data)
-  #     templateFileContent = None
-  #     if 'templateFileContent' in request.data:
-  #       templateFileContent = request.data['templateFileContent']
-  #     if templateFileContent:
-  #       # Render yaml with the given design template
-  #       template = Template(templateFileContent)
-  #       res['html'] = template.render(res['yaml'])
-  #   except (yaml.scanner.ScannerError, yaml.parser.ParserError) as e:
-  #     exceptions = traceback.format_exception_only(yaml.scanner.ScannerError, e)
-  #     error = []
-  #     for exception in exceptions:
-  #       exception = exception.replace('\n', ' ')
-  #       noColon = re.search('could not find expected \':\'', exception)
-  #       listHanging = re.search('expected the node content, but found \'<stream end>\'', exception)
-  #       stringHanging = re.search(r'while scanning a quoted scalar.+found unexpected end of stream', exception)
-  #       if noColon:
-  #         line = re.findall('line \d+', exception)[-1]
-  #         line = int(line.split(' ')[-1])
-  #         error.append({
-  #           'line': line,
-  #           'type': 'error',
-  #           'file': fileName,
-  #           'message': 'Could not find expected \':\''
-  #         })
-  #       elif listHanging:
-  #         line = re.findall('line \d+', exception)[-1]
-  #         line = int(line.split(' ')[-1])
-  #         error.append({
-  #           'line': line,
-  #           'type': 'error',
-  #           'file': fileName,
-  #           'message': 'Expected \',\' or \']\''
-  #         })
-  #       elif stringHanging:
-  #         line = re.findall('line \d+', exception)[0]
-  #         line = int(line.split(' ')[-1])
-  #         error.append({
-  #           'line': line,
-  #           'type': 'error',
-  #           'file': fileName,
-  #           'message': 'Expected " (end of quoted scalar)'
-  #         })
-  #       else:
-  #         error.append(exception)
-  #     return Response({
-  #       'error': error
-  #     })
-  #   # There was no YAML syntax error
-  #   # TODO: template engine
+
+  # elif extension in ['html', 'htm']:
+  #   # HTML: site-wide rendering
+  #   if 'newContent' in file and file['newContent']:
+  #     res['src'] = True
+  #   else:
+  #     res['src'] = True
   else:
     # Unsupported file type
     pass
   return Response(res)
-
-
-@api_view(['GET'])
-def nodetest(request):
-  glideNodeUrl = 'http://localhost:{}'.format(settings.NODE_PORT)
-  with urlopen(glideNodeUrl) as glideNodeRes:
-    resStr = glideNodeRes.read().decode('utf-8')
-    # res = json.loads(resStr)
-    return Response({ 'resStr': resStr })
 
 
 @api_view(['POST'])
@@ -843,7 +764,7 @@ def hardclone(request):
   branch = request.data['branch']
   username = request.session['username'].split('@')[0]
   # Create dirs
-  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
   userBasePath = pathlib.Path(userBasePathStr)
   if userBasePath.exists():
     if userBasePath.is_file():
@@ -869,116 +790,50 @@ def hardclone(request):
 def newFile(request):
   repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
   branch = request.data['branch']
-  mode = request.data['mode']
   path = request.data['path']
-  file = request.data['file']
+  fileName = request.data['fileName']
+  fileOrFolder = request.data['fileOrFolder']
   username = request.session['username'].split('@')[0]
-  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
-
-  if mode == 'source':
-    scaffold = request.data['scaffold']
-    # Hexo source file: Hexo new
-    hexoNewCommand = 'cd {} && hexo new {} {}'.format(userBasePathStr, scaffold, file)
-    # If shell is True, it is recommended to pass args as a string rather than as a sequence.
-    hexoNewCompProc = subprocess.run(
-      hexoNewCommand, shell=True, stdin=subprocess.PIPE,
-      input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-    )
-    if hexoNewCompProc.returncode == 0:
-      # Completed Process returned with zero
-      fileCreationMsgs = re.findall(
-        r'^INFO\s+Created:\s+[\w\-\s\./]+/source/[\w\-\s\./]+\.[\w]+$',
-        hexoNewCompProc.stdout.decode('utf-8')
-      )
-      createdFiles = []
-      # Note: Hexo new command is supposed to create one file
-      for msg in fileCreationMsgs:
-        newFile = {}
-        newFile['path'] = re.sub(r'^INFO\s+Created:\s+', '', msg)
-        newFile['path'] = newFile['path'].replace(userBasePathStr, '')
-        newFile['path'] = newFile['path'][1:] # To remove the leading /
-        newFile['name'] = os.path.basename(newFile['path'])
-        newFile['nodes'] = []
-        newFile['added'] = True
-        newFile['modified'] = False
-        newFile['sha'] = None
-        newFile['url'] = None
-        newFile['type'] = 'blob'
-        newFile['mode'] = '100644'
-        # newFile['originalContent'] = None
-        actualPath = os.path.join(userBasePathStr, newFile['path'])
-        newFile['size'] = os.stat(actualPath).st_size
-        with open(actualPath, 'rb') as fi:
-          # newFile['originalContent'] = nf.read()
-          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
-        createdFiles.append(newFile)
-      return Response({
-        'completedProcess': {
-          'msgs': fileCreationMsgs,
-          'args': hexoNewCompProc.args,
-          'returncode': hexoNewCompProc.returncode,
-          'stdout': hexoNewCompProc.stdout.decode('utf-8'),
-          'stderr': hexoNewCompProc.stderr
-        },
-        'createdFiles': createdFiles
-      })
-    else:
-      # Completed Process returned with non-zero
-      return Response({
-        'completedProcess': {
-          'msgs': fileCreationMsgs,
-          'args': hexoNewCompProc.args,
-          'returncode': hexoNewCompProc.returncode,
-          'stdout': hexoNewCompProc.stdout.decode('utf-8'),
-          'stderr': hexoNewCompProc.stderr
-        }
-      })
-  elif mode =='file':
-    fileOrFolder = request.data['fileOrFolder']
-    if fileOrFolder == 'file':
-      # Create a text file
-      newFilePath = pathlib.Path(userBasePathStr) / path / file
-      newFile = {}
-      newFile['path'] = str(newFilePath)
-      newFile['path'] = newFile['path'].replace(userBasePathStr, '')
-      newFile['path'] = newFile['path'][1:] # To remove the leading /
-      newFile['name'] = os.path.basename(newFile['path'])
-      newFile['nodes'] = []
-      newFile['added'] = True
-      newFile['modified'] = False
-      newFile['sha'] = None
-      newFile['url'] = None
-      newFile['type'] = 'blob'
-      newFile['mode'] = '100644'
-      newFile['originalContent'] = ''
-      newFile['size'] = 0
-      with open(str(newFilePath), 'w') as nf:
-        nf.write(newFile['originalContent'])
-      return Response({
-        'res': newFilePath.exists(),
-        'createdFiles': [newFile]
-      })
-    elif fileOrFolder == 'folder':
-      # Create a folder
-      newFolderPath = pathlib.Path(userBasePathStr) / path / file
-      newFolderPath.mkdir(mode=0o777, parents=True)
-      newFolder = {
-        'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
-        'name': file,
-        'nodes': [],
-        'type': 'tree',
-        'mode': '040000'
-      }
-      return Response({
-        'res': newFolderPath.exists(),
-        'createdFiles': [newFolder]
-      })
-    else:
-      # Unexpected file or folder flag
-      pass
-  else:
-    # Unexpected file creation mode
-    pass
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
+  
+  if fileOrFolder == 'file':
+    # Create a text file
+    newFilePath = pathlib.Path(userBasePathStr) / path / fileName
+    newFile = {}
+    newFile['path'] = str(newFilePath)
+    newFile['path'] = newFile['path'].replace(userBasePathStr, '')
+    newFile['path'] = newFile['path'][1:] # To remove the leading /
+    newFile['name'] = os.path.basename(newFile['path'])
+    newFile['nodes'] = []
+    newFile['added'] = True
+    newFile['modified'] = False
+    newFile['sha'] = None
+    newFile['url'] = None
+    newFile['type'] = 'blob'
+    newFile['mode'] = '100644'
+    newFile['originalContent'] = ''
+    newFile['size'] = 0
+    with open(str(newFilePath), 'w') as nf:
+      nf.write(newFile['originalContent'])
+    return Response({
+      'res': newFilePath.exists(),
+      'createdFiles': [newFile]
+    })
+  elif fileOrFolder == 'folder':
+    # Create a folder
+    newFolderPath = pathlib.Path(userBasePathStr) / path / fileName
+    newFolderPath.mkdir(mode=0o777, parents=True)
+    newFolder = {
+      'path': str(newFolderPath).replace(userBasePathStr + '/', ''),
+      'name': fileName,
+      'nodes': [],
+      'type': 'tree',
+      'mode': '040000'
+    }
+    return Response({
+      'res': newFolderPath.exists(),
+      'createdFiles': [newFolder]
+    })
 
 
 @api_view(['POST'])
@@ -992,7 +847,7 @@ def uploadFile(request):
   path = request.data['path']
   file = request.data['files']
   username = request.session['username'].split('@')[0]
-  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
   # TODO
   uploadedFilePath = pathlib.Path(userBasePathStr) / path / file.name
   fileContent = file.read()
@@ -1036,7 +891,7 @@ def updateFile(request):
   filePath = request.data['filePath']
   newVal = request.data['newVal']
   username = request.session['username'].split('@')[0]
-  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
   actualPath = pathlib.Path(userBasePathStr) / filePath
   with open(str(actualPath), 'w') as fo:
     fo.write(newVal)
@@ -1044,68 +899,3 @@ def updateFile(request):
     'res': actualPath.exists(),
     'size': os.stat(str(actualPath)).st_size
   })
-
-
-@api_view(['POST'])
-def generate(request):
-  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
-  branch = request.data['branch']
-  username = request.session['username'].split('@')[0]
-  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', repositoryFullName, branch, username)
-  # Hexo generate
-  hexoGenCommand = 'cd {} && hexo generate'.format(userBasePathStr)
-  # If shell is True, it is recommended to pass args as a string rather than as a sequence.
-  hexoGenCompProc = subprocess.run(
-    hexoGenCommand, shell=True, stdin=subprocess.PIPE,
-    input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-  )
-  if hexoGenCompProc.returncode == 0:
-    # Completed Process returned with zero
-    msgLines = hexoGenCompProc.stdout.decode('utf-8').split('\n')
-    createdFiles = []
-    genRegex = re.compile('^INFO\s+Generated:\s+')
-    for line in msgLines:
-      # INFO  Generated: fancybox/fancybox_loading.gif
-      if re.match(genRegex, line):
-        # Matched
-        newFilePartialPathStr = os.path.join('docs', genRegex.sub('', line))
-        newFileFullPath = pathlib.Path(userBasePathStr) / newFilePartialPathStr
-        newFile = {}
-        newFile['path'] = newFilePartialPathStr
-        newFile['name'] = os.path.basename(newFile['path'])
-        newFile['nodes'] = []
-        newFile['added'] = True
-        newFile['modified'] = False
-        newFile['sha'] = None
-        newFile['url'] = None
-        newFile['type'] = 'blob'
-        newFile['mode'] = '100644'
-        with open(str(newFileFullPath), 'rb') as fi:
-          newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
-        # if _isBinary(newFile['name']):
-        #   with open(str(newFileFullPath), 'rb') as fi:
-        #     newFile['originalContent'] = base64.b64encode(fi.read()).decode('utf-8')
-        # else:
-        #   with open(str(newFileFullPath), 'r') as fi:
-        #     newFile['originalContent'] = fi.read().encode('utf-8')
-        newFile['size'] = os.stat(str(newFileFullPath)).st_size
-        createdFiles.append(newFile)
-    return Response({
-      'completedProcess': {
-        'args': hexoGenCompProc.args,
-        'returncode': hexoGenCompProc.returncode,
-        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
-        'stderr': hexoGenCompProc.stderr
-      },
-      'createdFiles': createdFiles
-    })
-  else:
-    # Completed Process returned with non-zero
-    return Response({
-      'completedProcess': {
-        'args': hexoGenCompProc.args,
-        'returncode': hexoGenCompProc.returncode,
-        'stdout': hexoGenCompProc.stdout.decode('utf-8'),
-        'stderr': hexoGenCompProc.stderr
-      }
-    })
