@@ -17,7 +17,6 @@ class WorkspacePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
-      isHexoPrj: null,
       changedFiles: [],
       addedFiles: [],
       fileActive: null,
@@ -52,7 +51,6 @@ class WorkspacePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       fileActive: this.props.fileActive,
@@ -69,7 +67,6 @@ class WorkspacePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       fileActive: nextProps.fileActive,
@@ -95,7 +92,6 @@ class WorkspacePane extends React.Component {
             branch={this.state.branch}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}
-            isHexoPrj={this.state.isHexoPrj}
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}

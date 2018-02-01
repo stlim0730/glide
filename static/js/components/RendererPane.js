@@ -9,8 +9,8 @@ class RendererPane extends React.Component {
       repository: null,
       branch: null,
       fileActive: null,
-      isHexoPrj: null,
-      srcDoc: null
+      srcDoc: null,
+      src: null
     };
 
     this.renderFile = this.renderFile.bind(this);
@@ -19,7 +19,8 @@ class RendererPane extends React.Component {
   renderFile() {
     if(!this.state.fileActive) {
       this.setState({
-        srcDoc: null
+        srcDoc: null,
+        src: null
       });
     }
     else {
@@ -41,8 +42,21 @@ class RendererPane extends React.Component {
           }
           else {
             // Set state for changed files
+            let src = 
+              window.location.protocol + '//' +
+              window.location.host + '/media/repos/'
+              + self.state.repository.full_name + '/'
+              + self.state.branch.name + '/'
+              + window.glide.username.split('@')[0] + '/'
+              + self.state.fileActive.path;
+
             self.setState({
-              srcDoc: response.srcDoc
+              srcDoc: response.srcDoc,
+              src: src
+            }, function() {
+              self.state.srcDoc == null &&
+              self.state.src &&
+              self.srcIFrame.contentWindow.location.reload();
             });
           }
         }
@@ -55,8 +69,7 @@ class RendererPane extends React.Component {
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
-      fileActive: this.props.fileActive,
-      isHexoPrj: this.props.isHexoPrj
+      fileActive: this.props.fileActive
     }, function() {
       self.renderFile();
     });
@@ -67,8 +80,7 @@ class RendererPane extends React.Component {
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
-      fileActive: nextProps.fileActive,
-      isHexoPrj: nextProps.isHexoPrj
+      fileActive: nextProps.fileActive
     }, function() {
       self.renderFile();
     });
@@ -76,28 +88,26 @@ class RendererPane extends React.Component {
 
   render () {
     // TODO: Set a placeholder for nothing to render
-    // TODO: Set a placeholder for loading
     let srcDoc = this.state.srcDoc;
-    let hexoPrjUrl = null;
-    if(this.state.repository && this.state.branch) {
-      hexoPrjUrl= '/media/hexo/' + this.state.repository.full_name + '/'
-        + this.state.branch.name + '/' + window.glide.username.split('@')[0] + '/docs/index.html';
-    }
-    console.info(hexoPrjUrl);
+    let src = this.state.src;
 
     return (
       <div className="height-50 card">
         <h6 className="card-header">Preview</h6>
         {
-          !this.state.isHexoPrj ?
+          srcDoc &&
           <iframe
             className="auto-scroll height-90 panel-body" style={{border:'none'}}
-            srcDoc={ srcDoc ? srcDoc : null } width="100%" sandbox="allow-scripts">
+            srcDoc={srcDoc} width="100%" sandbox="allow-scripts">
           </iframe>
-          :
+        }
+        {
+          srcDoc == null &&
+          src &&
           <iframe
+            ref={(c) => this.srcIFrame = c}
             className="auto-scroll height-90 panel-body" style={{border:'none'}}
-            src={hexoPrjUrl} width="100%" sandbox="allow-scripts">
+            src={src} width="100%" sandbox="allow-scripts allow-same-origin">
           </iframe>
         }
       </div>

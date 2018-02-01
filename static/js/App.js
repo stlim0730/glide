@@ -63,7 +63,6 @@ class App extends React.Component {
       initialCommit: null,
       tree: null,
       recursiveTree: null,
-      isHexoPrj: null,
       scaffolds: [],
       scaffold: null,
       filesOpened: [],
@@ -132,6 +131,13 @@ class App extends React.Component {
 
   render() {
     console.debug('App', this.state);
+
+    let navbar = (
+      <NavBar
+        app={this}
+        repository={this.state.repository}
+        branch={this.state.branch} />
+    );
 
     let modals = (
       <div>
@@ -214,7 +220,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
+            {navbar}
             {modals}
             <LoadingPane
               messages={this.state.loadingMessages} />
@@ -225,7 +231,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
+            {navbar}
             {modals}
             <RepositoryPane app={this} />
             <LoadingPane
@@ -237,7 +243,7 @@ class App extends React.Component {
 
         return (
           <div>
-            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
+            {navbar}
             {modals}
             <BranchPane
               app={this}
@@ -269,7 +275,7 @@ class App extends React.Component {
         
         return (
           <div className="full-height">
-            <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
+            {navbar}
             {modals}
             {
               // <RepoToolBar
@@ -291,7 +297,6 @@ class App extends React.Component {
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
-              isHexoPrj={this.state.isHexoPrj}
               changedFiles={this.state.changedFiles}
               addedFiles={this.state.addedFiles}
               fileActive={this.state.fileActive}

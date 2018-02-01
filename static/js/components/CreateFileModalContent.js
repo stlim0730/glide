@@ -1,5 +1,6 @@
 import Files from 'react-files';
 import FileUploadThumbnail from './FileUploadThumbnail.js';
+import Alert from 'react-s-alert';
 
 // 
 // CreateFileModalContent component
@@ -16,29 +17,16 @@ class CreateFileModalContent extends React.Component {
       tree: null,
       recursiveTree: null,
       fileCreationMode: null,
-      scaffold: null,
-      scaffolds: [],
       filesToUpload: [],
       filesFailedToUpload: [],
       tempFileInput: null
     };
 
     this._reset = this._reset.bind(this);
-    this._slugify = this._slugify.bind(this);
-    this._validateFileName = this._validateFileName.bind(this);
-    // this._loadTemplateFiles = this._loadTemplateFiles.bind(this);
-    // this._isTemplateFile = this._isTemplateFile.bind(this);
-    // this._isDataFile = this._isDataFile.bind(this);
-    this._fileNameOnly = this._fileNameOnly.bind(this);
-    // this._loadThemeStructure = this._loadThemeStructure.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
-    // this._loadTemplateContent = this._loadTemplateContent.bind(this);
-    // this._countLayouts = this._countLayouts.bind(this);
-    // this._renderThemeStructure = this._renderThemeStructure.bind(this);
     this.handleFileCreationModeChange = this.handleFileCreationModeChange.bind(this);
     this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
-    this.handleScaffoldChange = this.handleScaffoldChange.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
     this.handleUploadFilesError = this.handleUploadFilesError.bind(this);
@@ -52,30 +40,27 @@ class CreateFileModalContent extends React.Component {
       fileOrFolder: null,
       fileName: '',
       fileCreationMode: null,
-      scaffold: null,
-      scaffolds: [],
       filesToUpload: [],
       filesFailedToUpload: []
     }, function() {
-      self.fileNameInput1.value = '';
-      self.fileNameInput2.value = '';
+      self.fileNameInput.value = '';
       $('.file-creation-tabs').removeClass('active');
       $('.file-creation-panes').removeClass('active show in');
       document.getElementById('fileFormToReset').reset();
     });
   }
 
-  _slugify(str) {
-    return str.toLowerCase()
-      .replace(/\s+/g, '-') // Replace spaces with -
-      .replace(/[^\w\-]+/g, '') // Remove all non-word chars
-      .replace(/\-\-+/g, '-') // Replace multiple - with single -
-      .replace(/^-+/, '') // Trim - from start of text
-      .replace(/-+$/, '') // Trim - from end of text
-      .trim();
-  }
+  // static slugify(str) {
+  //   return str.toLowerCase()
+  //     .replace(/\s+/g, '-') // Replace spaces with -
+  //     .replace(/[^\w\-]+/g, '') // Remove all non-word chars
+  //     .replace(/\-\-+/g, '-') // Replace multiple - with single -
+  //     .replace(/^-+/, '') // Trim - from start of text
+  //     .replace(/-+$/, '') // Trim - from end of text
+  //     .trim();
+  // }
 
-  _validateFileName(fileName) {
+  static validateFileName(fileName) {
     // Validate the file name
     // TODO: Allow unicode word characters
     let fileNameRegex = /^([\w\s\.-]+)$/i;
@@ -85,36 +70,6 @@ class CreateFileModalContent extends React.Component {
     else {
       return false;
     }
-  }
-
-  // _isTemplateFile(file) {
-  //   let templateExtensionsRegex = /\.(ejs|swig|htm|html)$/i;
-  //   if(templateExtensionsRegex.test(file.name)) {
-  //     return true;
-  //   }
-  //   else {
-  //     return false;
-  //   }
-  // }
-
-  // _isDataFile(fileName) {
-  //   if(this.state.fileOrFolder != 'file') {
-  //     return false;
-  //   }
-
-  //   let markdownRegex = /\.(md|markdown|mdown|mkdn|mkd)$/i;
-  //   if(markdownRegex.test(fileName)) {
-  //     return true;
-  //   }
-  //   else {
-  //     return false;
-  //   }
-  // }
-
-  _fileNameOnly(file) {
-    let fileNameArr = file.name.split('.');
-    fileNameArr.pop();
-    return fileNameArr.join('.');
   }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
@@ -153,163 +108,6 @@ class CreateFileModalContent extends React.Component {
     }
   }
 
-  // _loadTemplateFiles(tree) {
-  //   if(!tree) return [];
-
-  //   let templates = _.filter(tree.tree, function(file) {
-  //     let templateFileRegex = /templates\/([a-z0-9\s\._-])+\.(html|htm)/i;
-  //     return templateFileRegex.test(file.path);
-  //   });
-
-  //   return templates;
-  // }
-
-  // _loadThemeStructure(tree) {
-  //   if(!tree) return [];
-
-  //   let themes = _.filter(tree.tree, function(file) {
-  //     let themeFolderRegex = /themes\/([a-z0-9\s\._-])+$/i;
-  //     // Include theme folders
-  //     return themeFolderRegex.test(file.path) && file.type=='tree';
-  //   });
-
-  //   let layouts = {};
-  //   let self = this;
-  //   _.forEach(themes, function(theme) {
-  //     layouts[theme.name] = _.filter(tree.tree, function(file) {
-  //       let layoutFileRegex = /themes\/([a-z0-9\s\._-])+\/layout\/([a-z0-9\s\._-])+$/i;
-  //       // Include layout files per theme
-  //       return layoutFileRegex.test(file.path)
-  //         && file.type=='blob' && self._isTemplateFile(file);
-  //     });
-  //   });
-
-  //   return layouts;
-  // }
-
-  // _loadTemplateContent(repository, templateFile, yamlFile) {
-  //   let url = '/api/project/blob/' + repository.full_name + '/' + templateFile.sha;
-  //   let app = this.props.app;
-
-  //   $.ajax({
-  //     url: url,
-  //     method: 'GET',
-  //     success: function(response) {
-  //       // console.info('Template content loaded', response);
-  //       if('error' in response) {
-  //         // TODO
-  //       }
-  //       else {
-  //         let content = atob(response.blob.content)
-  //         templateFile.originalContent = content;
-  //         // return content;
-
-  //         // Request template variable parsing
-  //         $.ajax({
-  //           url: '/api/project/parse/template',
-  //           method: 'POST',
-  //           headers: { 'X-CSRFToken': window.glide.csrfToken },
-  //           dataType: 'json',
-  //           data: JSON.stringify({
-  //             templateFileContent: content
-  //           }),
-  //           contentType: 'application/json; charset=utf-8',
-  //           success: function(response) {
-  //             // console.info('Keys in the template parsed', response);
-  //             if('error' in response) {
-  //               // TODO
-  //             }
-  //             else {
-  //               _.forEach(response.keys, function(value, key) {
-  //                 yamlFile.newContent += value + ': ';
-  //                 yamlFile.newContent += '\n';
-  //               });
-  //             }
-  //           }
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
-
-  // _loadTemplateContent(repository, templateFile, yamlFile) {
-  //   let url = '/api/project/blob/' + repository.full_name + '/' + templateFile.sha;
-  //   let app = this.props.app;
-
-  //   $.ajax({
-  //     url: url,
-  //     method: 'GET',
-  //     success: function(response) {
-  //       // console.info('Template content loaded', response);
-  //       if('error' in response) {
-  //         // TODO
-  //       }
-  //       else {
-  //         let content = atob(response.blob.content)
-  //         templateFile.originalContent = content;
-  //         // return content;
-
-  //         // Request template variable parsing
-  //         $.ajax({
-  //           url: '/api/project/parse/template',
-  //           method: 'POST',
-  //           headers: { 'X-CSRFToken': window.glide.csrfToken },
-  //           dataType: 'json',
-  //           data: JSON.stringify({
-  //             templateFileContent: content
-  //           }),
-  //           contentType: 'application/json; charset=utf-8',
-  //           success: function(response) {
-  //             // console.info('Keys in the template parsed', response);
-  //             if('error' in response) {
-  //               // TODO
-  //             }
-  //             else {
-  //               _.forEach(response.keys, function(value, key) {
-  //                 yamlFile.newContent += value + ': ';
-  //                 yamlFile.newContent += '\n';
-  //               });
-  //             }
-  //           }
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
-
-  // _countLayouts(themes) {
-  //   let cnt = 0;
-  //   for(let theme in themes) {
-  //     let layouts = themes[theme];
-  //     cnt += layouts.length;
-  //   }
-  //   return cnt;
-  // }
-
-  // _renderThemeStructure(themeName, layouts, index) {
-  //   return (
-  //     <div key={index}>
-  //       <button
-  //         className="btn btn-link file-node-folder block theme-structure disabled">
-  //         <i className="folder icon"></i> {themeName}
-  //       </button>
-  //       <ul className="folder-level-indentation">
-  //         {
-  //           layouts.map(function(layout, index) {
-  //             return (
-  //               <button
-  //                 type="button" key={index} onClick={this.handleLayoutClick}
-  //                 className="btn btn-link file-node-file block theme-structure disabled">
-  //                 <i className="file outline text icon"></i> {layout.name}
-  //               </button>
-  //             )
-  //           })
-  //         }
-  //       </ul>
-  //     </div>
-  //   );
-  // }
-
   handleFileCreationModeChange(e) {
     this.setState({
       fileCreationMode: $(e.target).data('mode')
@@ -318,25 +116,14 @@ class CreateFileModalContent extends React.Component {
 
   handleFileOrFolderChange(e) {
     this.setState({
-      fileOrFolder: e.target.value,
-      scaffold: null
-    });
-  }
-
-  handleScaffoldChange(e) {
-    let scaffold = e.target.value;
-    if(scaffold == '') {
-      scaffold = null;
-    }
-    this.setState({
-      scaffold: scaffold
+      fileOrFolder: e.target.value
     });
   }
 
   handleFileNameChange(e) {
     let fileName = e.target.value.trim();
 
-    if(this._validateFileName(fileName)) {
+    if(CreateFileModalContent.validateFileName(fileName)) {
       this.setState({
         fileName: fileName
       });
@@ -347,36 +134,6 @@ class CreateFileModalContent extends React.Component {
       });
     }
   }
-
-  // handleLayoutChange(file, e) {
-  //   // Load template file content
-  //   let url = '/api/project/cdn/' + this.state.repository.full_name;
-  //   let self = this;
-
-  //   $.ajax({
-  //     url: url,
-  //     method: 'POST',
-  //     headers: { 'X-CSRFToken': window.glide.csrfToken },
-  //     dataType: 'json',
-  //     data: JSON.stringify({
-  //       file: file,
-  //       branch: null
-  //     }),
-  //     contentType: 'application/json; charset=utf-8',
-  //     success: function(response) {
-  //       console.info(response);
-  //       if('error' in response) {
-  //         // TODO
-  //       }
-  //       else {
-  //         self.setState({
-  //           template: file,
-  //           liveHtmlSrc: response.cdnUrl
-  //         });
-  //       }
-  //     }
-  //   });
-  // }
 
   handleKeyUp(e) {
     let keyCode = e.keyCode;
@@ -402,7 +159,7 @@ class CreateFileModalContent extends React.Component {
       filesFailedToUpload: filesFailedToUpload
     });
 
-    // error.code:
+    // Note: error.code
     //   1. Invalid file type
     //   2. File too large
     //   3. File too small
@@ -414,9 +171,6 @@ class CreateFileModalContent extends React.Component {
     let tree = this.state.tree;
     let recursiveTree = this.state.recursiveTree;
     let fileName = this.state.fileName;
-    // if(this.state.fileCreationMode == 'source') {
-    //   fileName = this._slugify(fileName);
-    // }
 
     // Must remove leading '/'
     let path = this.pathInput.value.trim();
@@ -438,15 +192,15 @@ class CreateFileModalContent extends React.Component {
     }
 
     if(exists) {
-      console.error('GLIDE: File already exists!');
+      console.error('GLIDE: The same file name already exists!');
       this._reset();
-      // TODO: Error message for duplicated file.
+      let msg = 'The same file name already exists!';
+      Alert.error(msg);
       return;
     }
 
     // Upload the data
     let data = {
-      mode: this.state.fileCreationMode,
       repository: this.state.repository.full_name,
       branch: this.state.branch.name,
       path: path
@@ -456,14 +210,9 @@ class CreateFileModalContent extends React.Component {
     let processData = true;
 
     switch(this.state.fileCreationMode) {
-      case 'source':
-        data.scaffold = this.state.scaffold;
-        data.file = fileName;
-        data = JSON.stringify(data);
-        break;
       case 'file':
         data.fileOrFolder = this.state.fileOrFolder;
-        data.file = fileName;
+        data.fileName = fileName;
         data = JSON.stringify(data);
         break;
       case 'upload':
@@ -478,11 +227,6 @@ class CreateFileModalContent extends React.Component {
         formData.append('branch', data.branch);
         formData.append('path', data.path);
         data = formData;
-        break;
-      default:
-        // Unexpected case
-        console.error('Unknown file creation mode');
-        return;
         break;
     }
 
@@ -501,7 +245,7 @@ class CreateFileModalContent extends React.Component {
       contentType: contentType,
       data: data,
       success: function(response) {
-        console.log(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -565,9 +309,7 @@ class CreateFileModalContent extends React.Component {
       repository: this.props.repository,
       branch: this.props.branch,
       tree: this.props.tree,
-      recursiveTree: this.props.recursiveTree,
-      scaffolds: this.props.scaffolds,
-      scaffold: this.props.scaffold
+      recursiveTree: this.props.recursiveTree
     });
   }
 
@@ -576,22 +318,11 @@ class CreateFileModalContent extends React.Component {
       repository: nextProps.repository,
       branch: nextProps.branch,
       tree: nextProps.tree,
-      recursiveTree: nextProps.recursiveTree,
-      scaffolds: nextProps.scaffolds,
-      scaffold: nextProps.scaffold
+      recursiveTree: nextProps.recursiveTree
     });
   }
 
   render() {
-    let sourceDisabled = false;
-    if(this.pathInput &&
-      this.pathInput.value.startsWith('/source/')) {
-      //
-    }
-    else {
-      sourceDisabled = true;
-    }
-
     return (
       <div className="modal-content">
         <div className="modal-header">
@@ -625,16 +356,6 @@ class CreateFileModalContent extends React.Component {
           <ul className="nav nav-tabs">
             <li className="nav-item">
               <a
-                data-mode="source"
-                title="You may create a Hexo-generated web page by creating a source file under /source/ folder."
-                href="#file-creation-source" onClick={this.handleFileCreationModeChange}
-                data-toggle="tab" className={
-                  sourceDisabled ? "nav-link disabled file-creation-tabs" : "nav-link file-creation-tabs"}>
-                Web Page (Hexo Source)
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
                 data-mode="file"
                 title=""
                 href="#file-creation-file" onClick={this.handleFileCreationModeChange}
@@ -655,43 +376,6 @@ class CreateFileModalContent extends React.Component {
 
           <div className="tab-content">
 
-            <div id="file-creation-source"
-              className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
-              <fieldset>
-                <label className="control-label">
-                  Content Type (Hexo Scaffolds)
-                </label>
-                <br />
-                {
-                  this.state.scaffolds.map(function(item, index) {
-                    return (
-                      <div key={index} className="inline-block">
-                        <label>
-                          <input
-                            type="radio" value={this._fileNameOnly(item)}
-                            checked={this.state.scaffold==this._fileNameOnly(item)}
-                            onChange={this.handleScaffoldChange} />
-                            &nbsp;{this._fileNameOnly(item)}
-                        </label>
-                        &emsp;
-                      </div>
-                    );
-                  }.bind(this))
-                }
-                <br />
-                <label className="control-label">
-                  Page Name
-                </label>
-                <div>
-                  <input
-                    type="text" ref={(c) => this.fileNameInput1 = c}
-                    onChange={this.handleFileNameChange}
-                    onKeyUp={this.handleKeyUp}
-                    className="form-control" maxLength="255" />
-                </div>
-              </fieldset>
-            </div>
-              
             <div id="file-creation-file"
               className="form-group file-creation-panes tab-pane fade padding-20 no-margin">
               <fieldset>
@@ -717,7 +401,7 @@ class CreateFileModalContent extends React.Component {
                     type="text" disabled={!this.state.fileOrFolder}
                     onChange={this.handleFileNameChange}
                     onKeyUp={this.handleKeyUp}
-                    ref={(c) => this.fileNameInput2 = c}
+                    ref={(c) => this.fileNameInput = c}
                     className="form-control" maxLength="255" />
                 </div>
               </fieldset>
@@ -810,10 +494,6 @@ class CreateFileModalContent extends React.Component {
             data-dismiss="modal" disabled={
               !this.state.fileCreationMode ||
               (
-                this.state.fileCreationMode == 'source' &&
-                !this.state.scaffold
-              ) ||
-              (
                 this.state.fileCreationMode == 'file' &&
                 !this.state.fileOrFolder
               ) ||
@@ -823,12 +503,17 @@ class CreateFileModalContent extends React.Component {
               ) ||
               (
                 this.state.fileCreationMode != 'upload' &&
-                !this._validateFileName(this.state.fileName)
+                !CreateFileModalContent.validateFileName(this.state.fileName)
               )
             }>
             Submit
           </button>
         </div>
+
+        <Alert
+          stack={{limit: 3, spacing: 50}}
+          timeout={4000} html={true}
+          effect='stackslide' position='top' />
       </div>
     );
   }

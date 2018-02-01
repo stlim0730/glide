@@ -32,17 +32,11 @@ class TabbedEditors extends React.Component {
       branch: null,
       tree: null,
       recursiveTree: null,
-      isHexoPrj: null,
       filesOpened: [],
       fileActive: null,
       changedFiles: []
     };
 
-    // this._isTextFile = this._isTextFile.bind(this);
-    // this._isImageFile = this._isImageFile.bind(this);
-    // this._getObjUrl = this._getObjUrl.bind(this);
-    // this._getTabId = this._getTabId.bind(this);
-    // this._getEditorId = this._getEditorId.bind(this);
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
     this.handleTabMouseOver = this.handleTabMouseOver.bind(this);
     this.handleTabMouseOut = this.handleTabMouseOut.bind(this);
@@ -53,14 +47,14 @@ class TabbedEditors extends React.Component {
   
   static _isTextFile(fileObj) {
     const regexes = {
-      'textFileRegex'          : /\.txt/,
-      'htmlFileRegex'          : /\.(htm|html)/,
-      'webDevFileRegex'        : /\.(js|css|sass|less)/,
-      'hexoTemplateFileRegex'  : /\.(swig|ejs|pug|haml|jade)/,
-      'customTemplateFileRegex': /\.(mustache|handlebars|dust)/,
-      'dataFileRegex'          : /\.(yaml|yml|json)/,
-      'markdownFileRegex'      : /\.(md|markdown|mdown|mkdn|mkd)/,
-      'miscAppFileRegex'       : /\.(csv|latex|tex|log|sh)/
+      'textFileRegex'      : /\.txt/i,
+      'htmlFileRegex'      : /\.(htm|html)/i,
+      'webDevFileRegex'    : /\.(js|css|sass|less)/i,
+      'templateFisleRegex'  : /\.(swig|ejs|pug|haml|jade|mustache|handlebars|dust)/i,
+      'dataFileRegex'      : /\.(yaml|yml|json|csv)/i,
+      'markdownFileRegex'  : /\.(md|markdown|mdown|mkdn|mkd)/i,
+      'miscAppFileRegex'   : /\.(log|sh)/i,
+      'sourceCodeFileRegex': /\.(py|java|c|h|cpp|php|cs|r|pl|rb|m|mlx|latex|tex)/i
     };
 
     for(let key in regexes) {
@@ -106,30 +100,6 @@ class TabbedEditors extends React.Component {
       this._addFileToRecursiveTree(targetFolder, newFile, folders);
     }
   }
-
-  // _getBlob(repository, file) {
-  //   let url = '/api/project/blob/' + repository.full_name + '/' + file.sha;
-  //   let app = this.props.app;
-
-  //   $.ajax({
-  //     url: url,
-  //     method: 'GET',
-  //     success: function(response) {
-  //       console.info('blob loaded', response);
-  //       if('error' in response) {
-  //         // TODO
-  //         return null;
-  //       }
-  //       else {
-  //         let content = atob(response.blob.content)
-  //         file.originalContent = content;
-  //         return content;
-  //       }
-  //     }
-  //   });
-
-  //   return null;
-  // }
 
   handleTabMouseOver(e) {
     let closeButton = $(e.target).children('button.close-tab');
@@ -189,8 +159,7 @@ class TabbedEditors extends React.Component {
     let app = this.props.app;
     let self = this;
     let changedFiles = this.state.changedFiles;
-
-    console.info(file, newVal);
+    
     file.newContent = newVal;
     if(file.originalContent != file.newContent) {
       // This file has been modified.
@@ -270,7 +239,6 @@ class TabbedEditors extends React.Component {
       branch: this.props.branch,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
@@ -287,30 +255,10 @@ class TabbedEditors extends React.Component {
       branch: nextProps.branch,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
-    }, function() {
-
-      if(self.state.filesOpened.length==0 && self.state.fileActive == null) {
-        // $('#tabbed-editors-tabs').empty();
-        // $('#tabbed-editors-editors').empty();
-      }
-      else if(self.state.fileActive && prevFileActive != nextProps.fileActive){
-        // let fileActive = self.state.fileActive;
-        // let content = null;
-        // if(fileActive.newContent) {
-        //   content = fileActive.newContent;
-        // }
-        // else {
-        //   content = fileActive.originalContent;
-        // }
-        
-        // let data = self._prepareRenderingReq(content, fileActive);
-        // self._requestRendering(data);
-      }
     });
   }
 
