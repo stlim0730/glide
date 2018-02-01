@@ -53,7 +53,7 @@ class BranchPane extends React.Component {
     //   Contain an ASCII control character, "~", "^", ":" or SP
     //   Contain a "\" (backslash)
     //   Contain whitespace
-    let regexesNotAllowedMsg = [
+    const regexesNotAllowedMsg = [
       'A branch name can\'t have "./".',
       'A branch name can\'t have a double dot "..".',
       'A branch name can\'t end with a "/".',
@@ -65,7 +65,7 @@ class BranchPane extends React.Component {
       'A branch name can\'t have a whitespace.'
     ];
 
-    let regexesNotAllowed = [
+    const regexesNotAllowed = [
       /\.\//,
       /\.\./,
       /\/$/,
@@ -175,11 +175,6 @@ class BranchPane extends React.Component {
               this.state.repository,
               branch
             );
-            // self._reset();
-            // console.debug(app.state, commits, latestCommit);
-            // app.setState({
-            //   phase: app.state.constants.APP_PHASE_COMMIT_OPEN
-            // });
           });
         }
       }
@@ -204,9 +199,9 @@ class BranchPane extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.debug(response);
+        // console.debug(response);
         if('error' in response) {
-          // TODO: Duplicated branch name is used
+          //
         }
         else {
           self._popLoadingMsg(loadingMsgHandle);

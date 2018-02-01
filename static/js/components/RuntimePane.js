@@ -17,7 +17,6 @@ class RuntimePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
-      isHexoPrj: null,
       changedFiles: [],
       addedFiles: [],
       fileActive: null
@@ -33,7 +32,6 @@ class RuntimePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      isHexoPrj: this.props.isHexoPrj,
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       fileActive: this.props.fileActive
@@ -49,7 +47,6 @@ class RuntimePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      isHexoPrj: nextProps.isHexoPrj,
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       fileActive: nextProps.fileActive
@@ -61,9 +58,8 @@ class RuntimePane extends React.Component {
       <div className="col-lg-5 col-md-5 no-padding full-height">
         
         <RendererPane
-          // app={this.props.app}
+          app={this.props.app}
           fileActive={this.state.fileActive}
-          isHexoPrj={this.state.isHexoPrj}
           repository={this.state.repository}
           branch={this.state.branch} />
         <GitPane

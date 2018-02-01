@@ -9,7 +9,6 @@ class RendererPane extends React.Component {
       repository: null,
       branch: null,
       fileActive: null,
-      isHexoPrj: null,
       srcDoc: null
     };
 
@@ -55,8 +54,7 @@ class RendererPane extends React.Component {
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
-      fileActive: this.props.fileActive,
-      isHexoPrj: this.props.isHexoPrj
+      fileActive: this.props.fileActive
     }, function() {
       self.renderFile();
     });
@@ -67,8 +65,7 @@ class RendererPane extends React.Component {
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
-      fileActive: nextProps.fileActive,
-      isHexoPrj: nextProps.isHexoPrj
+      fileActive: nextProps.fileActive
     }, function() {
       self.renderFile();
     });
@@ -76,28 +73,17 @@ class RendererPane extends React.Component {
 
   render () {
     // TODO: Set a placeholder for nothing to render
-    // TODO: Set a placeholder for loading
     let srcDoc = this.state.srcDoc;
-    let hexoPrjUrl = null;
-    if(this.state.repository && this.state.branch) {
-      hexoPrjUrl= '/media/hexo/' + this.state.repository.full_name + '/'
-        + this.state.branch.name + '/' + window.glide.username.split('@')[0] + '/docs/index.html';
-    }
-    console.info(hexoPrjUrl);
+    // let hexoPrjUrl= '/media/hexo/' + this.state.repository.full_name + '/'
+    //     + this.state.branch.name + '/' + window.glide.username.split('@')[0] + '/index.html';
 
     return (
       <div className="height-50 card">
         <h6 className="card-header">Preview</h6>
         {
-          !this.state.isHexoPrj ?
           <iframe
             className="auto-scroll height-90 panel-body" style={{border:'none'}}
             srcDoc={ srcDoc ? srcDoc : null } width="100%" sandbox="allow-scripts">
-          </iframe>
-          :
-          <iframe
-            className="auto-scroll height-90 panel-body" style={{border:'none'}}
-            src={hexoPrjUrl} width="100%" sandbox="allow-scripts">
           </iframe>
         }
       </div>
