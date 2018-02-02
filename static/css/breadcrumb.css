@@ -29,12 +29,12 @@ ul {
 
 .inner {
   /*max-width: 820px;*/
-  min-width: 660px;
+  min-width: 740px;
   margin: 0 auto;
 }
 
 .breadcrumbs {
-  margin-left: 50px;
+  margin-left: 15px;
   /*border-top: 1px solid #ddd;*/
   /*border-bottom: 1px solid #ddd;*/
   /*background-color: #f5f5f5;*/
@@ -55,7 +55,7 @@ ul {
   text-decoration: none;
   position: relative;
   display: block;
-  padding: 15px;
+  padding: 10px;
   padding-right: 0 !important;
   /* important overrides media queries */
   font-size: 14px;
@@ -107,9 +107,9 @@ ul {
   display: block;
   width: 0;
   height: 0;
-  border-top: 25px solid transparent;
-  border-bottom: 25px solid transparent;
-  border-left: 16px solid transparent;
+  border-top: 21px solid transparent;
+  border-bottom: 21px solid transparent;
+  border-left: 12px solid transparent;
 }
 
 .breadcrumbs a:before {
