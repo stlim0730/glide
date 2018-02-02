@@ -1,3 +1,4 @@
+import breadcrumb_style from '../../css/breadcrumb.css';
 import NavMenuList from './NavMenuList.js';
 
 // 
@@ -9,51 +10,51 @@ class NavBar extends React.Component {
 
     this.state = {
       repository: null,
-      branch: null,
+      branch: null//,
       // commit: null,
-      menu: [
-        {
-          // slug: 'projects',
-          label: 'Repository',
-          disabled: false,
-          children: [
-            // {
-            //   slug: 'browseProjects',
-            //   label: 'Browse Projects...',
-            //   targetModal: '#browse-projects-modal',
-            //   disabled: false
-            // },
-            // {
-            //   slug: 'createProject',
-            //   label: 'Create New...',
-            //   targetModal: '#create-project-modal',
-            //   disabled: false
-            // },
-            // {
-            //   label: 'Clone Repository...',
-            //   targetModal: '#clone-repository-modal',
-            //   disabled: false
-            // },
-            {
-              // slug: 'closeRepository',
-              label: 'Close',
-              disabled: true
-            }
-          ]
-        },
-        {
-          // slug: 'templates',
-          label: 'Templates',
-          disabled: false,
-          children: [
-            {
-              slug: 'browseTemplates',
-              label: 'Browse Templates...',
-              disabled: false
-            }
-          ]
-        }
-      ]
+      // menu: [
+      //   {
+      //     // slug: 'projects',
+      //     label: 'Repository',
+      //     disabled: false,
+      //     children: [
+      //       // {
+      //       //   slug: 'browseProjects',
+      //       //   label: 'Browse Projects...',
+      //       //   targetModal: '#browse-projects-modal',
+      //       //   disabled: false
+      //       // },
+      //       // {
+      //       //   slug: 'createProject',
+      //       //   label: 'Create New...',
+      //       //   targetModal: '#create-project-modal',
+      //       //   disabled: false
+      //       // },
+      //       // {
+      //       //   label: 'Clone Repository...',
+      //       //   targetModal: '#clone-repository-modal',
+      //       //   disabled: false
+      //       // },
+      //       {
+      //         // slug: 'closeRepository',
+      //         label: 'Close',
+      //         disabled: true
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     // slug: 'templates',
+      //     label: 'Templates',
+      //     disabled: false,
+      //     children: [
+      //       {
+      //         slug: 'browseTemplates',
+      //         label: 'Browse Templates...',
+      //         disabled: false
+      //       }
+      //     ]
+      //   }
+      // ]
     };
   }
   
@@ -75,67 +76,104 @@ class NavBar extends React.Component {
   }
 
   render () {
-    let menu = this.state.menu.map(function(item, index){
-      return (
-        <NavMenuList
-          key={index} label={item.label}
-          disabled={item.disabled} children={item.children} />
-      );
-    });
+    // let menu = this.state.menu.map(function(item, index){
+    //   return (
+    //     <NavMenuList
+    //       key={index} label={item.label}
+    //       disabled={item.disabled} children={item.children} />
+    //   );
+    // });
 
     let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
         '/user/logout/' + this.state.repository.full_name + '/' + this.state.branch.name :
         '/user/logout';
 
     return (
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary"
+        style={{paddingTop:0, paddingBottom:0}}>
         <div className="container">
           
           <a className="navbar-brand" href="../"
             style={{fontFamily: 'Jura', letterSpacing: 3, fontWeight: 'bold'}}>
             <i className="icon-glide"></i> <strong>GLIDE</strong>
           </a>
+
           <button className="navbar-toggler"
             type="button" data-toggle="collapse"
             data-target="#nav-menus">
             <span className="navbar-toggler-icon"></span>
           </button>
 
+          <div className='breadcrumbs'>
+            <div className='inner'>
+              <ul className='cf'>
+                <li>
+                  <a href="#" className="">
+                    <span>Repository</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="active">
+                    <span>Branch</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="">
+                    <span>Code</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="">
+                    <span>Commit & Push</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="">
+                    <span>Pull Request</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+
           <div className="collapse navbar-collapse" id="nav-menus">
             
-            <ul className="navbar-nav mr-auto">
-
-              {
-                this.props.app.state.repository &&
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                    Repository: {this.props.app.state.repository.name} <span className="caret"></span>
-                  </a>
+            {
+              // <ul className="navbar-nav mr-auto">
+            
+              //   {
+              //     this.props.app.state.repository &&
+              //     <li className="nav-item dropdown">
+              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+              //         Repository: {this.props.app.state.repository.name} <span className="caret"></span>
+              //       </a>
+    
+              //       <div className="dropdown-menu">
+              //         <a className="dropdown-item" href="#">
+              //           Close
+              //         </a>
+              //       </div>
+              //     </li>
+              //   }
   
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Close
-                    </a>
-                  </div>
-                </li>
-              }
-
-              {
-                this.props.app.state.branch &&
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                    Branch: {this.props.app.state.branch.name} <span className="caret"></span>
-                  </a>
+              //   {
+              //     this.props.app.state.branch &&
+              //     <li className="nav-item dropdown">
+              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+              //         Branch: {this.props.app.state.branch.name} <span className="caret"></span>
+              //       </a>
+    
+              //       <div className="dropdown-menu">
+              //         <a className="dropdown-item" href="#">
+              //           Close
+              //         </a>
+              //       </div>
+              //     </li>
+              //   }
   
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Close
-                    </a>
-                  </div>
-                </li>
-              }
-
-            </ul>
+              // </ul>
+            }
 
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
