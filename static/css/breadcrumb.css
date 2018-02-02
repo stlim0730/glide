@@ -75,6 +75,10 @@ ul {
   /*color: rgb(0, 140, 186);*/
   background-color: #30c2f4;
 }
+.breadcrumbs a.active:hover {
+  color: white;
+  font-weight: bold;
+}
 
 /*.breadcrumbs a span:first-child {
   display: inline-block;
