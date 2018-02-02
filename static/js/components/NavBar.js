@@ -109,7 +109,7 @@ class NavBar extends React.Component {
               <ul className='cf'>
                 <li>
                   <a href="#" className="">
-                    <span>Repository</span>
+                    <span>Clone</span>
                   </a>
                 </li>
                 <li>
@@ -129,7 +129,7 @@ class NavBar extends React.Component {
                 </li>
                 <li>
                   <a href="#" className="">
-                    <span>Pull Request</span>
+                    <span>Make Pull Request</span>
                   </a>
                 </li>
               </ul>
