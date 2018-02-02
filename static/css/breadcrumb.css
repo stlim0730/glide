@@ -108,17 +108,17 @@ ul {
   width: 0;
   height: 0;
   border-top: 21px solid transparent;
-  border-bottom: 21px solid transparent;
+  border-bottom: 20px solid transparent;
   border-left: 12px solid transparent;
 }
 
 .breadcrumbs a:before {
   margin-left: 1px;
-  /*border-left-color: rgba(255, 255, 255, 0.7);*/
+  border-left-color: #196884;
 }
 
 .breadcrumbs a:after {
-  /*border-left-color: rgba(255, 255, 255, 0.7);*/
+  border-left-color: rgb(0, 140, 186);
 }
 
 .breadcrumbs a:hover:after {
