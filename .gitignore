@@ -1,6 +1,6 @@
 webpack-stats.json
 glide/local_settings_digitalocean.py
-media/hexo/**/
+media/repos/**/
 nginx_conf_digitalocean
 staticfiles
 node_modules
