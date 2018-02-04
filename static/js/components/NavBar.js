@@ -58,57 +58,26 @@ class NavBar extends React.Component {
           <div className='breadcrumbs'>
             <div className='inner'>
               <ul className='cf'>
-                { app &&
-                  <div>
-                  <NavBreadCrumbListItem
-                    phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
-                    activePhase={this.state.phase}
-                    label='Clone' />
-                  <NavBreadCrumbListItem
-                    phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
-                    activePhase={this.state.phase}
-                    label='Branch' />
-                  <NavBreadCrumbListItem
-                    phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
-                    activePhase={this.state.phase}
-                    label='Code & Test' />
-                  <NavBreadCrumbListItem
-                    phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
-                    activePhase={this.state.phase}
-                    label='Commit & Push' />
-                  <NavBreadCrumbListItem
-                    phase={app.state.constants.APP_PHASE_PULL_REQUEST}
-                    activePhase={this.state.phase}
-                    label='Make Pull Request' />
-                  </div>
-                  }
-                {
-                  // <li>
-                  //   <a href="#" className="">
-                  //     <span>Clone</span>
-                  //   </a>
-                  // </li>
-                  // <li>
-                  //   <a href="#" className="active">
-                  //     <span>Branch</span>
-                  //   </a>
-                  // </li>
-                  // <li>
-                  //   <a href="#" className="">
-                  //     <span>Code & Test</span>
-                  //   </a>
-                  // </li>
-                  // <li>
-                  //   <a href="#" className="">
-                  //     <span>Commit & Push</span>
-                  //   </a>
-                  // </li>
-                  // <li>
-                  //   <a href="#" className="">
-                  //     <span>Make Pull Request</span>
-                  //   </a>
-                  // </li>
-                }
+                <NavBreadCrumbListItem
+                  phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
+                  activePhase={this.state.phase}
+                  label='Clone' />
+                <NavBreadCrumbListItem
+                  phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
+                  activePhase={this.state.phase}
+                  label='Branch' />
+                <NavBreadCrumbListItem
+                  phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
+                  activePhase={this.state.phase}
+                  label='Code & Test' />
+                <NavBreadCrumbListItem
+                  phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
+                  activePhase={this.state.phase}
+                  label='Commit & Push' />
+                <NavBreadCrumbListItem
+                  phase={app.state.constants.APP_PHASE_PULL_REQUEST}
+                  activePhase={this.state.phase}
+                  label='Make Pull Request' />
               </ul>
             </div>
           </div>
