@@ -1,5 +1,6 @@
 import breadcrumb_style from '../../css/breadcrumb.css';
-import NavMenuList from './NavMenuList.js';
+import NavBreadCrumbListItem from './NavBreadCrumbListItem.js';
+// import NavMenuList from './NavMenuList.js';
 
 // 
 // NavBar component
@@ -9,52 +10,9 @@ class NavBar extends React.Component {
     super(props);
 
     this.state = {
+      phase: null,
       repository: null,
-      branch: null//,
-      // commit: null,
-      // menu: [
-      //   {
-      //     // slug: 'projects',
-      //     label: 'Repository',
-      //     disabled: false,
-      //     children: [
-      //       // {
-      //       //   slug: 'browseProjects',
-      //       //   label: 'Browse Projects...',
-      //       //   targetModal: '#browse-projects-modal',
-      //       //   disabled: false
-      //       // },
-      //       // {
-      //       //   slug: 'createProject',
-      //       //   label: 'Create New...',
-      //       //   targetModal: '#create-project-modal',
-      //       //   disabled: false
-      //       // },
-      //       // {
-      //       //   label: 'Clone Repository...',
-      //       //   targetModal: '#clone-repository-modal',
-      //       //   disabled: false
-      //       // },
-      //       {
-      //         // slug: 'closeRepository',
-      //         label: 'Close',
-      //         disabled: true
-      //       }
-      //     ]
-      //   },
-      //   {
-      //     // slug: 'templates',
-      //     label: 'Templates',
-      //     disabled: false,
-      //     children: [
-      //       {
-      //         slug: 'browseTemplates',
-      //         label: 'Browse Templates...',
-      //         disabled: false
-      //       }
-      //     ]
-      //   }
-      // ]
+      branch: null
     };
   }
   
@@ -69,24 +27,17 @@ class NavBar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
+      phase: nextProps.phase,
       repository: nextProps.repository,
-      branch: nextProps.branch//,
-      // commit: nextProps.commit
+      branch: nextProps.branch
     });
   }
 
   render () {
-    // let menu = this.state.menu.map(function(item, index){
-    //   return (
-    //     <NavMenuList
-    //       key={index} label={item.label}
-    //       disabled={item.disabled} children={item.children} />
-    //   );
-    // });
-
     let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
         '/user/logout/' + this.state.repository.full_name + '/' + this.state.branch.name :
         '/user/logout';
+    let app = this.props.app;
 
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary"
@@ -107,35 +58,60 @@ class NavBar extends React.Component {
           <div className='breadcrumbs'>
             <div className='inner'>
               <ul className='cf'>
-                <li>
-                  <a href="#" className="">
-                    <span>Clone</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="active">
-                    <span>Branch</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="">
-                    <span>Code</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="">
-                    <span>Commit & Push</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="">
-                    <span>Make Pull Request</span>
-                  </a>
-                </li>
+                { app &&
+                  <div>
+                  <NavBreadCrumbListItem
+                    phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
+                    activePhase={this.state.phase}
+                    label='Clone' />
+                  <NavBreadCrumbListItem
+                    phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
+                    activePhase={this.state.phase}
+                    label='Branch' />
+                  <NavBreadCrumbListItem
+                    phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
+                    activePhase={this.state.phase}
+                    label='Code & Test' />
+                  <NavBreadCrumbListItem
+                    phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
+                    activePhase={this.state.phase}
+                    label='Commit & Push' />
+                  <NavBreadCrumbListItem
+                    phase={app.state.constants.APP_PHASE_PULL_REQUEST}
+                    activePhase={this.state.phase}
+                    label='Make Pull Request' />
+                  </div>
+                  }
+                {
+                  // <li>
+                  //   <a href="#" className="">
+                  //     <span>Clone</span>
+                  //   </a>
+                  // </li>
+                  // <li>
+                  //   <a href="#" className="active">
+                  //     <span>Branch</span>
+                  //   </a>
+                  // </li>
+                  // <li>
+                  //   <a href="#" className="">
+                  //     <span>Code & Test</span>
+                  //   </a>
+                  // </li>
+                  // <li>
+                  //   <a href="#" className="">
+                  //     <span>Commit & Push</span>
+                  //   </a>
+                  // </li>
+                  // <li>
+                  //   <a href="#" className="">
+                  //     <span>Make Pull Request</span>
+                  //   </a>
+                  // </li>
+                }
               </ul>
             </div>
           </div>
-
 
           <div className="collapse navbar-collapse" id="nav-menus">
             

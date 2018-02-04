@@ -19,19 +19,15 @@ import './lib/bootstrap/bootstrap.min.js';
 // 
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
-// import CloneRepoModalContent from './components/CloneRepoModalContent.js';
 import CreateBranchModalContent from './components/CreateBranchModalContent.js';
 import GitStatusModalContent from './components/GitStatusModalContent.js';
 import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
 import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
 import GitResetModalContent from './components/GitResetModalContent.js';
 import CreateFileModalContent from './components/CreateFileModalContent.js';
-// import CreateProjectModalContent from './components/CreateProjectModalContent.js';
-// import BrowseProjectsModalContent from './components/BrowseProjectsModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import WorkspacePane from './components/WorkspacePane.js';
-// import RepoToolBar from './components/RepoToolBar.js';
 import LoadingPane from './components/LoadingPane.js';
 
 // 
@@ -45,15 +41,17 @@ class App extends React.Component {
     // Can't use this.setState() before it's mounted.
     this.state = {
       constants: {
-        APP_PHASE_CLEAN_SLATE: 'clean_slate',
-        APP_PHASE_REPOSITORY_SELECTION: 'repository_selection',
-        APP_PHASE_BRANCH_SELECTION: 'branch_selection',
-        APP_PHASE_REPOSITORY_OPEN: 'repository_open',
-        APP_PHASE_BRANCH_OPEN: 'branch_open',
-        APP_PHASE_COMMIT_OPEN: 'commit_open'
+        APP_PHASE_CLEAN_SLATE: 10,
+        APP_PHASE_REPOSITORY_SELECTION: 20,
+        APP_PHASE_BRANCH_SELECTION: 30,
+        APP_PHASE_REPOSITORY_OPEN: 40,
+        APP_PHASE_BRANCH_OPEN: 50,
+        APP_PHASE_COMMIT_OPEN: 60,
+        APP_PHASE_COMMIT_AND_PUSH: 70,
+        APP_PHASE_PULL_REQUEST: 80
       },
 
-      phase: 'clean_slate',
+      phase: 10,
       repositories: [],
       repository: null,
       branches: [],
@@ -135,6 +133,7 @@ class App extends React.Component {
     let navbar = (
       <NavBar
         app={this}
+        phase={this.state.phase}
         repository={this.state.repository}
         branch={this.state.branch} />
     );
@@ -207,13 +206,6 @@ class App extends React.Component {
         {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>
     );
-
-    // let alert = (
-    //   <Alert
-    //     stack={{limit: 3, spacing: 50}}
-    //     timeout={5000} html={true}
-    //     effect='scale' position='bottom' />
-    // );
 
     switch(this.state.phase) {
       case this.state.constants.APP_PHASE_CLEAN_SLATE:
