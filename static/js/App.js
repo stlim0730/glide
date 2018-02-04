@@ -269,17 +269,6 @@ class App extends React.Component {
           <div className="full-height">
             {navbar}
             {modals}
-            {
-              // <RepoToolBar
-              //   app={this}
-              //   repository={this.state.repository}
-              //   branches={this.state.branches}
-              //   branch={this.state.branch}
-              //   commits={this.state.commits}
-              //   commit={this.state.commit}
-              //   changedFiles={this.state.changedFiles}
-              //   addedFiles={this.state.addedFiles} />
-            }
             <WorkspacePane
               app={this}
               repository={this.state.repository}
