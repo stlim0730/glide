@@ -14,7 +14,6 @@ class NavBreadCrumbListItem extends React.Component {
   componentDidMount() {
     this.setState({
       activePhase: this.props.activePhase,
-      label: this.props.label,
       disabled: this.props.phase > this.state.activePhase ? true: false
     });
   }
@@ -22,7 +21,6 @@ class NavBreadCrumbListItem extends React.Component {
   componentWillReceiveProps(nextProps) {
     this.setState({
       activePhase: nextProps.activePhase,
-      label: nextProps.label,
       disabled: nextProps.phase > nextProps.activePhase ? true: false
     });
   }
@@ -56,6 +54,7 @@ export default NavBreadCrumbListItem;
 //     <RegisterLookup onRegister={this.register} />
 //   );
 // }
+
 // Modal:
 
 // nameChange = (e) => {
