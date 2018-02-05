@@ -42,13 +42,17 @@ class RendererPane extends React.Component {
           }
           else {
             // Set state for changed files
-            let src = 
+            let src = null;
+            if(self.state.fileActive.path.endsWith('html') ||
+              self.state.fileActive.path.endsWith('htm')) {
+              src =
               window.location.protocol + '//' +
               window.location.host + '/media/repos/'
               + self.state.repository.full_name + '/'
               + self.state.branch.name + '/'
               + window.glide.username.split('@')[0] + '/'
               + self.state.fileActive.path;
+            }
 
             self.setState({
               srcDoc: response.srcDoc,
