@@ -20,7 +20,7 @@ button.btn.btn-link:hover { text-decoration: none; }
 .height-400 { height: 400px; }
 .height-600 { height: 600px; }
 .max-height-200 { max-height: 200px; }
-.max-height-400 { max-height: 400px; }
+.max-height-400 { max-height: 400px; }  
 /*.max-height-40 { max-height: 40%; }*/
 .max-height-50 { max-height: 49.15%; }
 .max-height-90 { max-height: 90%; }

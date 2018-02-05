@@ -247,9 +247,6 @@ class TabbedEditors extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let self = this;
-    let prevFileActive = this.state.fileActive;
-
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
@@ -306,32 +303,39 @@ class TabbedEditors extends React.Component {
         lineNumbers: true
       };
       let idStr = TabbedEditors._getEditorId(item);
-      tabbedEditors.push(
-        <div className={editorClassName} name={idStr} key={index}>
-          {
-            TabbedEditors._isTextFile(item) ?
-            <AceEditor
-              tabSize={2} mode="markdown" theme="github"
-              onChange={this.handleEditorChange.bind(this, item)}
-              value={item.modified ? item.newContent : item.originalContent}
-              name={"ace_" + idStr} enableBasicAutocompletion={false}
-              enableSnippets={false} enableLiveAutocompletion={false}
-              editorProps={{$blockScrolling: Infinity}} /> :
-            (
-              TabbedEditors._isImageFile(item) ?
-              <div>
-                <img src={TabbedEditors._getObjUrl(item)} />
-              </div>:
-              null
-            )
-          }
-        </div>
-      );
-    }.bind(this))
+      
+      // Handle height of editor:
+      //   The editor overflows the pane
+      let editorMaxHeight = $('#editor-wrapper').height() - 50;
+      $('div.ace_content').css('height', editorMaxHeight + 'px');
+      $('div.ace_layer').css('height', editorMaxHeight + 'px');
+
+      let editor = TabbedEditors._isTextFile(item) ?
+        <AceEditor
+          style={{height: editorMaxHeight}}
+          showPrintMargin={false}
+          tabSize={2} mode="markdown" theme="github"
+          width='100%' key={index} className={editorClassName}
+          onChange={this.handleEditorChange.bind(this, item)}
+          value={item.modified ? item.newContent : item.originalContent}
+          name={idStr} enableBasicAutocompletion={false}
+          enableSnippets={false} enableLiveAutocompletion={false}
+          editorProps={{$blockScrolling: Infinity}} /> :
+        (
+          TabbedEditors._isImageFile(item) ?
+          <div key={index}>
+            <img src={TabbedEditors._getObjUrl(item)} />
+          </div>:
+          null
+        );
+
+      tabbedEditors.push(editor);
+    }.bind(this));
 
     return (
-      <div className="full-height">
-        <ul className="nav nav-tabs">
+      
+      <div id="editor-wrapper" className="full-height">
+        <ul id="editor-tab-wrapper" className="nav nav-tabs">
           {tabs}
         </ul>
         <div className="tab-content">
