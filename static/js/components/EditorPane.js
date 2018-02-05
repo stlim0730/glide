@@ -147,7 +147,7 @@ class EditorPane extends React.Component {
                 <option value="tomorrow">Tomorrow</option>
                 <option value="twilight">Twilight</option>
                 <option value="vibrant_ink">Vibrant Ink</option>
-                <option value="xcode">Xcod</option>
+                <option value="xcode">Xcode</option>
               </select>
             </div>
           </div>

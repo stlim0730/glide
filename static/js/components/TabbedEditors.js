@@ -460,7 +460,7 @@ class TabbedEditors extends React.Component {
           showPrintMargin={false}
           style={{height: editorMaxHeight}}
           tabSize={2}
-          theme={this.props.theme}
+          theme={this.props.theme ? this.props.theme : 'textmate'}
           value={item.modified ? item.newContent : item.originalContent}
           width="100%" /> :
         (
