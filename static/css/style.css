@@ -26,6 +26,7 @@ button.btn.btn-link:hover { text-decoration: none; }
 .max-height-90 { max-height: 90%; }
 .auto-scroll { overflow-x: auto; overflow-y: auto; }
 .no-padding { padding: 0px; }
+.no-border { border: 0px; }
 .no-margin { margin: 0px; }
 .position-relative { position: relative; }
 /*.navbar button.btn-sm {
@@ -122,3 +123,12 @@ button[type="button"] { cursor: pointer; }
 div.s-alert-box-inner {
   text-align: center;
 }
+
+/*
+  Landing
+*/
+div.landing.container {
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+div.landing.lead { padding-bottom: 70px; }
