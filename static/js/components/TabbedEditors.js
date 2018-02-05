@@ -431,7 +431,20 @@ class TabbedEditors extends React.Component {
 
       // Set syntax highlighter of the editor
       let mode = TabbedEditors.getMode(item);
-      console.log(mode);
+
+      // let themes = [
+      //   'ambiance', 'chaos', 'chrome', 'clouds_midnight', 'clouds',
+      //   'cobalt', 'crimson_editor', 'dawn', 'dracula',
+      //   'dreamweaver', 'eclipse', 'github', 'gob', 'gruvbox',
+      //   'idle_fingers', 'iplastic', 'katzenmilch', 'kr_theme',
+      //   'kuroir', 'merbivore_soft', 'merbivore', 'mono_industrial',
+      //   'monokai', 'pastel_on_dark', 'solarized_dark', 'solarized_light',
+      //   'sqlserver', 'terminal', 'textmate', 'tomorrow_night_blue',
+      //   'tomorrow_night_bright', 'tomorrow_night_eighties',
+      //   'tomorrow_night', 'tomorrow', 'twilight', 'vibrant_ink', 'xcode'
+      // ];
+      // let theme = themes[Math.floor(Math.random() * 37)];
+      // console.log(mode, theme);
 
       let editor = TabbedEditors._isTextFile(item) ?
         <AceEditor
@@ -447,7 +460,7 @@ class TabbedEditors extends React.Component {
           showPrintMargin={false}
           style={{height: editorMaxHeight}}
           tabSize={2}
-          theme="github"
+          theme={this.props.theme}
           value={item.modified ? item.newContent : item.originalContent}
           width="100%" /> :
         (
