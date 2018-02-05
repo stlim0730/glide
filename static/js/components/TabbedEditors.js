@@ -1,7 +1,79 @@
 import brace from 'brace';
 import AceEditor from 'react-ace';
+
+// Syntax highlighing supported by Ace Editor
+import 'brace/mode/c_cpp';
+import 'brace/mode/coffee';
+import 'brace/mode/csharp';
+import 'brace/mode/css';
+import 'brace/mode/ejs';
+import 'brace/mode/haml';
+import 'brace/mode/handlebars';
+import 'brace/mode/html';
+import 'brace/mode/jade';
+import 'brace/mode/java';
+import 'brace/mode/javascript';
+import 'brace/mode/json';
+import 'brace/mode/latex';
+import 'brace/mode/less';
+import 'brace/mode/liquid';
+import 'brace/mode/lua';
 import 'brace/mode/markdown';
+import 'brace/mode/matlab';
+import 'brace/mode/perl';
+import 'brace/mode/php';
+import 'brace/mode/plain_text';
+import 'brace/mode/python';
+import 'brace/mode/r';
+import 'brace/mode/ruby';
+import 'brace/mode/sass';
+import 'brace/mode/scala';
+import 'brace/mode/svg';
+import 'brace/mode/swig';
+import 'brace/mode/text';
+import 'brace/mode/toml';
+import 'brace/mode/twig';
+import 'brace/mode/xml';
+import 'brace/mode/yaml';
+
+// Themes supported by Ace Editor
+import 'brace/theme/ambiance';
+import 'brace/theme/chaos';
+import 'brace/theme/chrome';
+import 'brace/theme/clouds_midnight';
+import 'brace/theme/clouds';
+import 'brace/theme/cobalt';
+import 'brace/theme/crimson_editor';
+import 'brace/theme/dawn';
+import 'brace/theme/dracula';
+import 'brace/theme/dreamweaver';
+import 'brace/theme/eclipse';
 import 'brace/theme/github';
+import 'brace/theme/gob';
+import 'brace/theme/gruvbox';
+import 'brace/theme/idle_fingers';
+import 'brace/theme/iplastic';
+import 'brace/theme/katzenmilch';
+import 'brace/theme/kr_theme';
+import 'brace/theme/kuroir';
+import 'brace/theme/merbivore_soft';
+import 'brace/theme/merbivore';
+import 'brace/theme/mono_industrial';
+import 'brace/theme/monokai';
+import 'brace/theme/pastel_on_dark';
+import 'brace/theme/solarized_dark';
+import 'brace/theme/solarized_light';
+import 'brace/theme/sqlserver';
+import 'brace/theme/terminal';
+import 'brace/theme/textmate';
+import 'brace/theme/tomorrow_night_blue';
+import 'brace/theme/tomorrow_night_bright';
+import 'brace/theme/tomorrow_night_eighties';
+import 'brace/theme/tomorrow_night';
+import 'brace/theme/tomorrow';
+import 'brace/theme/twilight';
+import 'brace/theme/vibrant_ink';
+import 'brace/theme/xcode';
 
 // Many code editor libraries are problematic, or not state-responsive,
 //   since they weren't originally made to work with React.
@@ -47,14 +119,14 @@ class TabbedEditors extends React.Component {
   
   static _isTextFile(fileObj) {
     const regexes = {
-      'textFileRegex'      : /\.txt/i,
-      'htmlFileRegex'      : /\.(htm|html)/i,
-      'webDevFileRegex'    : /\.(js|css|sass|less)/i,
-      'templateFisleRegex'  : /\.(swig|ejs|pug|haml|jade|mustache|handlebars|dust)/i,
-      'dataFileRegex'      : /\.(yaml|yml|json|csv)/i,
-      'markdownFileRegex'  : /\.(md|markdown|mdown|mkdn|mkd)/i,
-      'miscAppFileRegex'   : /\.(log|sh)/i,
-      'sourceCodeFileRegex': /\.(py|java|c|h|cpp|php|cs|r|pl|rb|m|mlx|latex|tex)/i
+      'textFileRegex'      : /\.txt$/i,
+      'htmlFileRegex'      : /\.(htm|html)$/i,
+      'webDevFileRegex'    : /\.(js|css|sass|less)$/i,
+      'templateFisleRegex'  : /\.(swig|ejs|pug|haml|jade|mustache|handlebars|dust)$/i,
+      'dataFileRegex'      : /\.(yaml|yml|json|csv)$/i,
+      'markdownFileRegex'  : /\.(md|markdown|mdown|mkdn|mkd)$/i,
+      'miscAppFileRegex'   : /\.(log|sh)$/i,
+      'sourceCodeFileRegex': /\.(py|java|c|h|cpp|php|cs|r|pl|rb|m|mlx|latex|tex)$/i
     };
 
     for(let key in regexes) {
@@ -75,6 +147,53 @@ class TabbedEditors extends React.Component {
     else {
       return false;
     }
+  }
+
+  static getMode(fileObj) {
+    const regexes = {
+      'c_cpp': /\.(c|cpp|h)$/,
+      'coffee': /\.coffee$/,
+      'csharp': /\.cs$/,
+      'css': /\.css$/,
+      'ejs': /\.ejs$/,
+      'haml': /\.haml$/,
+      'handlebars': /\.handlebars$/,
+      'html': /\.(html|htm)$/,
+      'jade': /\.jade$/,
+      'java': /\.java$/,
+      'javascript': /\.js$/,
+      'json': /\.json$/,
+      'latex': /\.(latex|tex)$/,
+      'less': /\.less$/,
+      'liquid': /\.liquid$/,
+      'lua': /\.lua$/,
+      'markdown': /\.(md|markdown|mdown|mkdn|mkd)$/,
+      'matlab': /\.(m|mlx)$/,
+      'perl': /\.pl$/,
+      'php': /\.php$/,
+      'plain_text': /\.txt$/,
+      'python': /\.py$/,
+      'r': /\.r$/,
+      'ruby': /\.rb$/,
+      'sass': /\.sass$/,
+      'scala': /\.scala$/,
+      'svg': /\.svg$/,
+      'swig': /\.swig$/,
+      // 'text': /\.txt$/,
+      'toml': /\.toml$/,
+      'twig': /\.twig$/,
+      'xml': /\.xml$/,
+      'yaml': /\.(yml|yaml)$/
+    };
+
+    for(let key in regexes) {
+      let regex = regexes[key];
+      if(regex.test(fileObj.name)) {
+        return key;
+      }
+    }
+
+    return 'plain_text';
   }
 
   static _getObjUrl(fileObj) {
@@ -310,17 +429,40 @@ class TabbedEditors extends React.Component {
       $('div.ace_content').css('height', editorMaxHeight + 'px');
       $('div.ace_layer').css('height', editorMaxHeight + 'px');
 
+      // Set syntax highlighter of the editor
+      let mode = TabbedEditors.getMode(item);
+
+      // let themes = [
+      //   'ambiance', 'chaos', 'chrome', 'clouds_midnight', 'clouds',
+      //   'cobalt', 'crimson_editor', 'dawn', 'dracula',
+      //   'dreamweaver', 'eclipse', 'github', 'gob', 'gruvbox',
+      //   'idle_fingers', 'iplastic', 'katzenmilch', 'kr_theme',
+      //   'kuroir', 'merbivore_soft', 'merbivore', 'mono_industrial',
+      //   'monokai', 'pastel_on_dark', 'solarized_dark', 'solarized_light',
+      //   'sqlserver', 'terminal', 'textmate', 'tomorrow_night_blue',
+      //   'tomorrow_night_bright', 'tomorrow_night_eighties',
+      //   'tomorrow_night', 'tomorrow', 'twilight', 'vibrant_ink', 'xcode'
+      // ];
+      // let theme = themes[Math.floor(Math.random() * 37)];
+      // console.log(mode, theme);
+
       let editor = TabbedEditors._isTextFile(item) ?
         <AceEditor
-          style={{height: editorMaxHeight}}
-          showPrintMargin={false}
-          tabSize={2} mode="markdown" theme="github"
-          width='100%' key={index} className={editorClassName}
+          className={editorClassName}
+          editorProps={{$blockScrolling: Infinity}}
+          enableBasicAutocompletion={false}
+          enableLiveAutocompletion={false}
+          enableSnippets={false}
+          key={index}
+          mode={mode}
+          name={idStr}
           onChange={this.handleEditorChange.bind(this, item)}
+          showPrintMargin={false}
+          style={{height: editorMaxHeight}}
+          tabSize={2}
+          theme={this.props.theme}
           value={item.modified ? item.newContent : item.originalContent}
-          name={idStr} enableBasicAutocompletion={false}
-          enableSnippets={false} enableLiveAutocompletion={false}
-          editorProps={{$blockScrolling: Infinity}} /> :
+          width="100%" /> :
         (
           TabbedEditors._isImageFile(item) ?
           <div key={index}>

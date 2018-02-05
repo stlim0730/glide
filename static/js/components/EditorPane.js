@@ -16,10 +16,12 @@ class EditorPane extends React.Component {
       changedFiles: [],
       addedFiles: [],
       filesOpened: [],
-      fileActive: null
+      fileActive: null,
+      theme: null
     };
 
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this.handleThemeOptionChange = this.handleThemeOptionChange.bind(this);
   }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
@@ -64,6 +66,13 @@ class EditorPane extends React.Component {
     }
   }
 
+  handleThemeOptionChange(e) {
+    let theme = e.target.value;
+    this.setState({
+      theme: theme
+    });
+  }
+
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
@@ -95,7 +104,54 @@ class EditorPane extends React.Component {
       <div className="col-lg-5 col-md-5 no-padding full-height">
 
         <div className="card full-height">
-          <h6 className="card-header">Editor</h6>
+          <div className="card-header" style={{paddingTop: 0, paddingBottom:0}}>
+            <h6 className="inline-block" style={{paddingTop: 11}}>Editor</h6>
+
+            <div className="form-group inline-block form-control-sm"
+              style={{marginBottom: 0, paddingTop: 3, paddingBottom: 2, float: 'right'}}>
+              <select className="custom-select" onChange={this.handleThemeOptionChange}>
+                <option value="">Select Your Favorite Editor Theme</option>
+                <option value="ambiance">Ambiance</option>
+                <option value="chaos">Chaos</option>
+                <option value="chrome">Chrome</option>
+                <option value="clouds_midnight">Clouds Midnight</option>
+                <option value="clouds">Clouds</option>
+                <option value="cobalt">Cobalt</option>
+                <option value="crimson_editor">Crimson Editor</option>
+                <option value="dawn">Dawn</option>
+                <option value="dracula">Dracula</option>
+                <option value="dreamweaver">Dreamweaver</option>
+                <option value="eclipse">Eclipse</option>
+                <option value="github">Github</option>
+                <option value="gob">Gob</option>
+                <option value="gruvbox">Gruvbox</option>
+                <option value="idle_fingers">Idle Fingers</option>
+                <option value="iplastic">Iplastic</option>
+                <option value="katzenmilch">Katzenmilch</option>
+                <option value="kr_theme">Kr Theme</option>
+                <option value="kuroir">Kuroir</option>
+                <option value="merbivore_soft">Merbivore Soft</option>
+                <option value="merbivore">Merbivore</option>
+                <option value="mono_industrial">Mono Industrial</option>
+                <option value="monokai">Monokai</option>
+                <option value="pastel_on_dark">Pastel On Dark</option>
+                <option value="solarized_dark">Solarized Dark</option>
+                <option value="solarized_light">Solarized Light</option>
+                <option value="sqlserver">Sqlserver</option>
+                <option value="terminal">Terminal</option>
+                <option value="textmate">Textmate</option>
+                <option value="tomorrow_night_blue">Tomorrow Night Blue</option>
+                <option value="tomorrow_night_bright">Tomorrow Night Bright</option>
+                <option value="tomorrow_night_eighties">Tomorrow Night Eighties</option>
+                <option value="tomorrow_night">Tomorrow Night</option>
+                <option value="tomorrow">Tomorrow</option>
+                <option value="twilight">Twilight</option>
+                <option value="vibrant_ink">Vibrant Ink</option>
+                <option value="xcode">Xcod</option>
+              </select>
+            </div>
+          </div>
+
           <TabbedEditors
             app={this.props.app}
             repository={this.state.repository}
@@ -105,7 +161,8 @@ class EditorPane extends React.Component {
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
-            fileActive={this.state.fileActive} />
+            fileActive={this.state.fileActive}
+            theme={this.state.theme} />
         </div>
       </div>
     );
