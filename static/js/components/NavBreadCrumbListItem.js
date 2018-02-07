@@ -47,6 +47,7 @@ class NavBreadCrumbListItem extends React.Component {
     this.setState({
       activePhase: nextProps.activePhase,
       disabled: nextProps.phase > nextProps.activePhase ? true : false
+      disabled: nextProps.phase > nextProps.activePhase ? true: false
     });
   }
 
