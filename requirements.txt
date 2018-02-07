@@ -1,10 +1,8 @@
 Django==2.0
-psycopg2
-asgi_redis
-channels
-daphne
-Jinja2
-django-webpack-loader
-djangorestframework
-markdown
-PyYaml
+psycopg2==2.7.3.2
+asgi_redis==1.4.3
+channels==1.1.8
+daphne==1.4.2
+django-webpack-loader==0.5.0
+djangorestframework==3.7.7
+Markdown==2.6.11
