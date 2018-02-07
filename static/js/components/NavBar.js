@@ -1,4 +1,7 @@
-import NavMenuList from './NavMenuList.js';
+import breadcrumb_style from "../../css/breadcrumb.css";
+import NavBreadCrumbListItem from "./NavBreadCrumbListItem.js";
+import Modal from "./Modal.js";
+import GoBackConfirmModalContent from "./GoBackConfirmModalContent.js";
 
 // 
 // NavBar component
@@ -8,52 +11,10 @@ class NavBar extends React.Component {
     super(props);
 
     this.state = {
+      phase: null,
+      targetPhase: null,
       repository: null,
-      branch: null,
-      // commit: null,
-      menu: [
-        {
-          // slug: 'projects',
-          label: 'Repository',
-          disabled: false,
-          children: [
-            // {
-            //   slug: 'browseProjects',
-            //   label: 'Browse Projects...',
-            //   targetModal: '#browse-projects-modal',
-            //   disabled: false
-            // },
-            // {
-            //   slug: 'createProject',
-            //   label: 'Create New...',
-            //   targetModal: '#create-project-modal',
-            //   disabled: false
-            // },
-            // {
-            //   label: 'Clone Repository...',
-            //   targetModal: '#clone-repository-modal',
-            //   disabled: false
-            // },
-            {
-              // slug: 'closeRepository',
-              label: 'Close',
-              disabled: true
-            }
-          ]
-        },
-        {
-          // slug: 'templates',
-          label: 'Templates',
-          disabled: false,
-          children: [
-            {
-              slug: 'browseTemplates',
-              label: 'Browse Templates...',
-              disabled: false
-            }
-          ]
-        }
-      ]
+      branch: null
     };
   }
   
@@ -68,74 +29,114 @@ class NavBar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
+      phase: nextProps.phase,
       repository: nextProps.repository,
-      branch: nextProps.branch//,
-      // commit: nextProps.commit
+      branch: nextProps.branch
     });
   }
 
   render () {
-    let menu = this.state.menu.map(function(item, index){
-      return (
-        <NavMenuList
-          key={index} label={item.label}
-          disabled={item.disabled} children={item.children} />
-      );
-    });
-
     let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
-        '/user/logout/' + this.state.repository.full_name + '/' + this.state.branch.name :
-        '/user/logout';
+        "/user/logout/" + this.state.repository.full_name + "/" + this.state.branch.name :
+        "/user/logout";
+    let app = this.props.app;
+    let confirmModalId = this.state.phase >= app.state.constants.APP_PHASE_COMMIT_OPEN ?
+      '#go-back-confirm-modal' : null;
 
     return (
-      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary"
+        style={{paddingTop:0, paddingBottom:0}}>
         <div className="container">
           
-          <a className="navbar-brand" href="../"
-            style={{fontFamily: 'Jura', letterSpacing: 3, fontWeight: 'bold'}}>
+          <a className="navbar-brand" href="/"
+            style={{fontFamily: "Jura", letterSpacing: 3, fontWeight: "bold"}}>
             <i className="icon-glide"></i> <strong>GLIDE</strong>
           </a>
+
           <button className="navbar-toggler"
             type="button" data-toggle="collapse"
             data-target="#nav-menus">
             <span className="navbar-toggler-icon"></span>
           </button>
 
+          <div className="breadcrumbs">
+            <div className="inner">
+              <ul className="cf">
+                <NavBreadCrumbListItem
+                  app={this.props.app} confirmModalToLeave={confirmModalId}
+                  phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
+                  activePhase={this.state.phase}
+                  label="Clone" navbar={this} />
+                <NavBreadCrumbListItem
+                  app={this.props.app} confirmModalToLeave={confirmModalId}
+                  phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
+                  activePhase={this.state.phase}
+                  label="Branch / Checkout" navbar={this} />
+                <NavBreadCrumbListItem
+                  app={this.props.app}
+                  phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
+                  activePhase={this.state.phase}
+                  label="Code & Test" navbar={this} />
+                <NavBreadCrumbListItem
+                  app={this.props.app}
+                  phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
+                  activePhase={this.state.phase}
+                  label="Commit & Push" navbar={this} />
+                <NavBreadCrumbListItem
+                  app={this.props.app}
+                  phase={app.state.constants.APP_PHASE_PULL_REQUEST}
+                  activePhase={this.state.phase}
+                  label="Make Pull Request" navbar={this} />
+              </ul>
+            </div>
+          </div>
+
+          <Modal id="go-back-confirm-modal"
+            modalContent={
+              <GoBackConfirmModalContent
+                app={this.props.app}
+                activePhase={this.state.phase}
+                targetPhase={this.state.targetPhase} />
+            }
+            large={false} />
+
           <div className="collapse navbar-collapse" id="nav-menus">
             
-            <ul className="navbar-nav mr-auto">
-
-              {
-                this.props.app.state.repository &&
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                    Repository: {this.props.app.state.repository.name} <span className="caret"></span>
-                  </a>
+            {
+              // <ul className="navbar-nav mr-auto">
+            
+              //   {
+              //     this.props.app.state.repository &&
+              //     <li className="nav-item dropdown">
+              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+              //         Repository: {this.props.app.state.repository.name} <span className="caret"></span>
+              //       </a>
+    
+              //       <div className="dropdown-menu">
+              //         <a className="dropdown-item" href="#">
+              //           Close
+              //         </a>
+              //       </div>
+              //     </li>
+              //   }
   
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Close
-                    </a>
-                  </div>
-                </li>
-              }
-
-              {
-                this.props.app.state.branch &&
-                <li className="nav-item dropdown">
-                  <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-                    Branch: {this.props.app.state.branch.name} <span className="caret"></span>
-                  </a>
+              //   {
+              //     this.props.app.state.branch &&
+              //     <li className="nav-item dropdown">
+              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
+              //         Branch: {this.props.app.state.branch.name} <span className="caret"></span>
+              //       </a>
+    
+              //       <div className="dropdown-menu">
+              //         <a className="dropdown-item" href="#">
+              //           Close
+              //         </a>
+              //       </div>
+              //     </li>
+              //   }
   
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Close
-                    </a>
-                  </div>
-                </li>
-              }
-
-            </ul>
+              // </ul>
+            }
 
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">
