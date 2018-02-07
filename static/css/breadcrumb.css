@@ -29,7 +29,7 @@ ul {
 
 .inner {
   /*max-width: 820px;*/
-  min-width: 740px;
+  min-width: 760px;
   margin: 0 auto;
 }
 
@@ -108,7 +108,7 @@ ul {
   height: 0;
   border-top: 21px solid transparent;
   border-bottom: 20px solid transparent;
-  border-left: 12px solid transparent;
+  border-left: 8px solid transparent;
 }
 
 .breadcrumbs a:before {
@@ -142,7 +142,6 @@ ul {
 .breadcrumbs li:last-child a:before,
 .breadcrumbs li:last-child a:after {
   display: none;
-  padding-right: 15 !important;
 }
 
 /*@media (max-width: 720px) {

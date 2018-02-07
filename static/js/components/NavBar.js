@@ -1,6 +1,7 @@
-import breadcrumb_style from '../../css/breadcrumb.css';
-import NavBreadCrumbListItem from './NavBreadCrumbListItem.js';
-// import NavMenuList from './NavMenuList.js';
+import breadcrumb_style from "../../css/breadcrumb.css";
+import NavBreadCrumbListItem from "./NavBreadCrumbListItem.js";
+import Modal from "./Modal.js";
+import GoBackConfirmModalContent from "./GoBackConfirmModalContent.js";
 
 // 
 // NavBar component
@@ -11,6 +12,7 @@ class NavBar extends React.Component {
 
     this.state = {
       phase: null,
+      targetPhase: null,
       repository: null,
       branch: null
     };
@@ -35,17 +37,19 @@ class NavBar extends React.Component {
 
   render () {
     let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
-        '/user/logout/' + this.state.repository.full_name + '/' + this.state.branch.name :
-        '/user/logout';
+        "/user/logout/" + this.state.repository.full_name + "/" + this.state.branch.name :
+        "/user/logout";
     let app = this.props.app;
+    let confirmModalId = this.state.phase >= app.state.constants.APP_PHASE_COMMIT_OPEN ?
+      '#go-back-confirm-modal' : null;
 
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary"
         style={{paddingTop:0, paddingBottom:0}}>
         <div className="container">
           
-          <a className="navbar-brand" href="../"
-            style={{fontFamily: 'Jura', letterSpacing: 3, fontWeight: 'bold'}}>
+          <a className="navbar-brand" href="/"
+            style={{fontFamily: "Jura", letterSpacing: 3, fontWeight: "bold"}}>
             <i className="icon-glide"></i> <strong>GLIDE</strong>
           </a>
 
@@ -55,32 +59,46 @@ class NavBar extends React.Component {
             <span className="navbar-toggler-icon"></span>
           </button>
 
-          <div className='breadcrumbs'>
-            <div className='inner'>
-              <ul className='cf'>
+          <div className="breadcrumbs">
+            <div className="inner">
+              <ul className="cf">
                 <NavBreadCrumbListItem
+                  app={this.props.app} confirmModalToLeave={confirmModalId}
                   phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
                   activePhase={this.state.phase}
-                  label='Clone' />
+                  label="Clone" navbar={this} />
                 <NavBreadCrumbListItem
+                  app={this.props.app} confirmModalToLeave={confirmModalId}
                   phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
                   activePhase={this.state.phase}
-                  label='Branch' />
+                  label="Branch / Checkout" navbar={this} />
                 <NavBreadCrumbListItem
+                  app={this.props.app}
                   phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
                   activePhase={this.state.phase}
-                  label='Code & Test' />
+                  label="Code & Test" navbar={this} />
                 <NavBreadCrumbListItem
+                  app={this.props.app}
                   phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
                   activePhase={this.state.phase}
-                  label='Commit & Push' />
+                  label="Commit & Push" navbar={this} />
                 <NavBreadCrumbListItem
+                  app={this.props.app}
                   phase={app.state.constants.APP_PHASE_PULL_REQUEST}
                   activePhase={this.state.phase}
-                  label='Make Pull Request' />
+                  label="Make Pull Request" navbar={this} />
               </ul>
             </div>
           </div>
+
+          <Modal id="go-back-confirm-modal"
+            modalContent={
+              <GoBackConfirmModalContent
+                app={this.props.app}
+                activePhase={this.state.phase}
+                targetPhase={this.state.targetPhase} />
+            }
+            large={false} />
 
           <div className="collapse navbar-collapse" id="nav-menus">
             
