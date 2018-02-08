@@ -309,14 +309,13 @@ class RepositoryPane extends React.Component {
                 </a>
               </div>
             }
-
           </div>
 
         </div>
 
         <Alert
-          stack={{limit: 3, spacing: 50}}
-          timeout={4000} html={true}
+          stack={{limit: 1}}
+          timeout={3000} html={true}
           effect='stackslide' position='top' />
       </div>
     );

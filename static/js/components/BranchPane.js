@@ -386,7 +386,7 @@ class BranchPane extends React.Component {
       <div className="container">
 
         <div className="row">
-          <div className="col">
+          <div className="col offset-lg-1 offset-md-1">
             <div className="h3" style={{paddingTop: 30}}>
               Checkout a Branch
               <button
@@ -397,27 +397,18 @@ class BranchPane extends React.Component {
                 <i className="info circle icon"></i>
               </button>
             </div>
-            {
-              // <button
-              //   type="button" onClick={this.handlePreviousClick.bind(this)}
-              //   className="btn btn-secondary btn-sm phase-previous">
-              //   <i className="chevron left icon"></i> Repository Selection
-              // </button>
-            }
           </div>
         </div>
 
         <div className="row">
 
-          <div className="col-lg-3 col-md-3">
+          <div className="col-lg-4 col-md-4 offset-lg-1 offset-md-1">
 
             {
               this.state.repository &&
               <h4>
-                Branches in<br />
-                <a
-                  target="_blank"
-                  href={this.state.repository.html_url}>
+                Branches in&nbsp;
+                <a target="_blank" href={this.state.repository.html_url}>
                   {this.state.repository.name}
                 </a>
               </h4>
@@ -467,7 +458,7 @@ class BranchPane extends React.Component {
                 Create a New Branch
                 <div className="form-group">
                   <input
-                    type="text"
+                    type="text" size="26"
                     className="form-control form-control-lg margin-top-15"
                     placeholder="Be concise and descriptive"
                     onKeyUp={this.handleBranchNameKeyUp} />

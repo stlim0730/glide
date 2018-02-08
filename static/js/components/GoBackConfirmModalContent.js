@@ -53,13 +53,8 @@ class GoBackConfirmModalContent extends React.Component {
         </div>
         
         <div className="modal-body">
-<<<<<<< HEAD
           <p className="lead">You will <strong className="text-danger">lose all the changes</strong> in the code that are not pushed to GitHub.</p>
           <p className="lead">Are you sure you want to go back?</p>
-=======
-          <p>You will <strong className="text-danger">lose all the changes</strong> in the code that are not pushed to GitHub.</p>
-          <p>Are you sure you want to go back?</p>
->>>>>>> 3e3acdf57b40ad5d131bfda36a352772015cb894
         </div>
         
         <div className="modal-footer">

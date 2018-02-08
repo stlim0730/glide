@@ -14,7 +14,10 @@ class NavBar extends React.Component {
       phase: null,
       targetPhase: null,
       repository: null,
-      branch: null
+      branch: null,
+      commit: null,
+      changedFiles: [],
+      addedFiles: []
     };
   }
   
@@ -31,17 +34,23 @@ class NavBar extends React.Component {
     this.setState({
       phase: nextProps.phase,
       repository: nextProps.repository,
-      branch: nextProps.branch
+      branch: nextProps.branch,
+      commit: nextProps.commit,
+      changedFiles: nextProps.changedFiles,
+      addedFiles: nextProps.addedFiles
     });
   }
 
-  render () {
+  render() {
+    let app = this.props.app;
     let logoutUrl = this.state.repository && this.state.branch && window.glide.username ?
         "/user/logout/" + this.state.repository.full_name + "/" + this.state.branch.name :
         "/user/logout";
-    let app = this.props.app;
     let confirmModalId = this.state.phase >= app.state.constants.APP_PHASE_COMMIT_OPEN ?
       '#go-back-confirm-modal' : null;
+    let commitable = this.state.changedFiles.length > 0 || this.state.addedFiles.length > 0;
+    let pullRequestable = app.state.initialCommit && this.state.commit
+      && app.state.initialCommit.sha != this.state.commit.sha && !commitable;
 
     return (
       <nav className="navbar navbar-expand-lg navbar-dark bg-primary"
@@ -63,29 +72,34 @@ class NavBar extends React.Component {
             <div className="inner">
               <ul className="cf">
                 <NavBreadCrumbListItem
-                  app={this.props.app} confirmModalToLeave={confirmModalId}
+                  app={this.props.app} navbar={this} confirmModalToLeave={confirmModalId}
                   phase={app.state.constants.APP_PHASE_REPOSITORY_SELECTION}
                   activePhase={this.state.phase}
-                  label="Clone" navbar={this} />
+                  disabled={false}
+                  label="Clone" />
                 <NavBreadCrumbListItem
-                  app={this.props.app} confirmModalToLeave={confirmModalId}
+                  app={this.props.app} navbar={this} confirmModalToLeave={confirmModalId}
                   phase={app.state.constants.APP_PHASE_BRANCH_SELECTION}
                   activePhase={this.state.phase}
-                  label="Branch / Checkout" navbar={this} />
+                  disabled={this.state.phase < app.state.constants.APP_PHASE_BRANCH_SELECTION}
+                  label="Branch / Checkout" />
                 <NavBreadCrumbListItem
-                  app={this.props.app}
+                  app={this.props.app} navbar={this}
                   phase={app.state.constants.APP_PHASE_COMMIT_OPEN}
                   activePhase={this.state.phase}
-                  label="Code & Test" navbar={this} />
+                  disabled={this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
+                  label="Code & Test" />
                 <NavBreadCrumbListItem
                   app={this.props.app}
                   phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
                   activePhase={this.state.phase}
+                  disabled={!commitable || this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
                   label="Commit & Push" navbar={this} />
                 <NavBreadCrumbListItem
                   app={this.props.app}
                   phase={app.state.constants.APP_PHASE_PULL_REQUEST}
                   activePhase={this.state.phase}
+                  disabled={!pullRequestable || this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
                   label="Make Pull Request" navbar={this} />
               </ul>
             </div>
@@ -101,42 +115,6 @@ class NavBar extends React.Component {
             large={false} />
 
           <div className="collapse navbar-collapse" id="nav-menus">
-            
-            {
-              // <ul className="navbar-nav mr-auto">
-            
-              //   {
-              //     this.props.app.state.repository &&
-              //     <li className="nav-item dropdown">
-              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-              //         Repository: {this.props.app.state.repository.name} <span className="caret"></span>
-              //       </a>
-    
-              //       <div className="dropdown-menu">
-              //         <a className="dropdown-item" href="#">
-              //           Close
-              //         </a>
-              //       </div>
-              //     </li>
-              //   }
-  
-              //   {
-              //     this.props.app.state.branch &&
-              //     <li className="nav-item dropdown">
-              //       <a className="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown">
-              //         Branch: {this.props.app.state.branch.name} <span className="caret"></span>
-              //       </a>
-    
-              //       <div className="dropdown-menu">
-              //         <a className="dropdown-item" href="#">
-              //           Close
-              //         </a>
-              //       </div>
-              //     </li>
-              //   }
-  
-              // </ul>
-            }
 
             <ul className="navbar-nav ml-auto">
               <li className="nav-item">

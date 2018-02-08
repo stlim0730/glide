@@ -28,6 +28,7 @@ import CreateFileModalContent from './components/CreateFileModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import WorkspacePane from './components/WorkspacePane.js';
+import CommitPushPane from './components/CommitPushPane.js';
 import LoadingPane from './components/LoadingPane.js';
 
 // 
@@ -135,7 +136,10 @@ class App extends React.Component {
         app={this}
         phase={this.state.phase}
         repository={this.state.repository}
-        branch={this.state.branch} />
+        branch={this.state.branch}
+        commit={this.state.commit}
+        changedFiles={this.state.changedFiles}
+        addedFiles={this.state.addedFiles} />
     );
 
     let modals = (
@@ -285,6 +289,27 @@ class App extends React.Component {
             <LoadingPane
               messages={this.state.loadingMessages} />
           </div>
+        );
+
+      case this.state.constants.APP_PHASE_COMMIT_AND_PUSH:
+        return (
+          <div>
+            {navbar}
+            {modals}
+            <CommitPushPane
+              app={this}
+              repository={this.state.repository}
+              branch={this.state.branch}
+              commits={this.state.commits}
+              commit={this.state.commit} />
+            <LoadingPane
+              messages={this.state.loadingMessages} />
+          </div>
+        );
+
+      case this.state.constants.APP_PHASE_PULL_REQUEST:
+        return (
+          <div>APP_PHASE_PULL_REQUEST</div>
         );
 
       default:
