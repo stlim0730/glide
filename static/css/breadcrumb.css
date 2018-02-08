@@ -50,7 +50,7 @@ ul {
   /* important overrides media queries */
   font-size: 14px;
   text-align: center;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
 }
 
@@ -60,7 +60,7 @@ ul {
 }
 
 .breadcrumbs a.active {
-  background-color: #30c2f4;
+  background-color: #5ebfdd;
 }
 .breadcrumbs a.active:hover {
   color: #dbdbdb;
@@ -95,7 +95,7 @@ ul {
 }
 
 .breadcrumbs a.active:after {
-  border-left-color: #30c2f4;
+  border-left-color: #5ebfdd;
 }
 
 .breadcrumbs a.disabled {

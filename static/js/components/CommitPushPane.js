@@ -8,69 +8,311 @@ class CommitPushPane extends React.Component {
     super(props);
 
     this.state = {
+      repository: null,
+      branch: null,
+      branches: [],
+      commit: null,
+      tree: null,
+      recursiveTree: null,
       commitMessage: ''
     };
 
-    this.handleCloneClick = this.handleCloneClick.bind(this);
+    this.pushLoadingMsg = this.pushLoadingMsg.bind(this);
+    this.popLoadingMsg = this.popLoadingMsg.bind(this);
+    this.handleCommitMessageChange = this.handleCommitMessageChange.bind(this);
+    this.updateFileContentInTree = this.updateFileContentInTree.bind(this);
+    this.handleCommitClick = this.handleCommitClick.bind(this);
+    this.openCommit = this.openCommit.bind(this);
+    this.hardClone = this.hardClone.bind(this);
   }
 
-  handleCloneClick() {
-    // // POST repository url to clone from
-    // let url = '/api/project/clone';
-    // // let suffix = this.state.repoUrl.replace(prefix, '');
-    // let owner = this.state.repository.owner.login;//suffix.split('/')[0];
-    // let repo = this.state.repository.name;//suffix.split('/')[1].replace('.git', '');
-    // let repoUrl = this.state.repository.html_url;
-    // let self = this;
-    // $.ajax({
-    //   url: url,
-    //   method: 'POST',
-    //   headers: { 'X-CSRFToken': window.glide.csrfToken },
-    //   dataType: 'json',
-    //   data: JSON.stringify({
-    //     repoUrl: repoUrl,
-    //     owner: owner,
-    //     repo: repo
-    //   }),
-    //   contentType: 'application/json; charset=utf-8',
-    //   success: function(response) {
-    //     // console.info(response);
-    //     if('error' in response) {
-    //       // TODO
-    //     }
-    //     else {
-    //       self._reset();
-    //       let repository = JSON.parse(response.repository);
-    //       let app = self.props.app;
-    //       app.setState({
-    //         // phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
-    //         phase: app.state.constants.APP_PHASE_BRANCH_SELECTION,
-    //         repository: repository,
-    //         branches: [],
-    //         branch: null,
-    //         commits: [],
-    //         commit: null
-    //       });
+  pushLoadingMsg(msg) {
+    let app = this.props.app;
+    let messageKey =  Date.now().toString();
+    let message = {};
+    message[messageKey] = msg;
+    let loadingMessages = _.merge(app.state.loadingMessages, message);
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+
+    return messageKey;
+  }
+
+  popLoadingMsg(msgKey) {
+    let app = this.props.app;
+    let loadingMessages = app.state.loadingMessages;
+    delete loadingMessages[msgKey]
+    app.setState({
+      loadingMessages: loadingMessages
+    });
+  }
+
+  handleCommitMessageChange(e) {
+    let msg = e.target.value.trim();
+    this.setState({
+      commitMessage: msg
+    });
+  }
+
+  updateFileContentInTree(tree, recursiveTree) {
+    // 
+    // This recursive function copies the new file content
+    //   from recursiveTree to tree
+    // Commit operation works with tree. recursiveTree is UI friendly version of tree.
+    // 
+
+    for(let i in recursiveTree.nodes) {
+      let file = recursiveTree.nodes[i];
+
+      let existsInTree = _.find(tree.tree, function(treeFile) {
+        return (('/' + treeFile.path) == file.path) || (treeFile.path == file.path);
+      });
+
+      if(!existsInTree) {
+        console.log('file path only found in recursiveTree', file);
+      }
+
+      if(file.type == 'tree') {
+        // Folder: go deeper
+        this.updateFileContentInTree(tree, file);
+      }
+      else {
+        // File: update file.content in tree
+        let treeFile = _.find(tree.tree, function(f) {
+          return (('/' + f.path) == file.path) || (f.path == file.path);
+        });
+
+        // Remove potential leading / from treeFile.path
+        // treeFile.path = treeFile.path.startsWith('/') ? treeFile.path.substring(1) : treeFile.path;
+
+        // GitHub API doc says
+        //   Use either tree.content or tree.sha
+        //   We go with content if the file has been touched
+        treeFile.content = file.newContent ? file.newContent : file.originalContent;
+        if(treeFile.content) {
+          delete treeFile.sha;
+        }
+        else {
+          delete treeFile.content;
+        }
+
+        // if(file.newContent) {
+        //   // Modified file
+        //   // Update this file in tree
+        //   let treeFile = _.find(tree.tree, function(f) {
+        //     return f.path == file.path;
+        //   });
+
+        //   treeFile.content = file.newContent;
+        //   delete treeFile.sha;
+        // }
+        // else {
+        //   // Do nothing
+        // }
+      }
+    }
+  }
+
+  handleCommitClick() {
+    // POST tree to make a create tree request
+    let tree = this.state.tree;
+    let recursiveTree = this.state.recursiveTree;
+
+    this.updateFileContentInTree(tree, recursiveTree);
+
+    // TODO??? Comment out for now: it looks working fine without this process
+    // Clean up the tree to submit as GitHub API wants
+    // "tree": [
+    //   {
+    //     "path": "file.rb",
+    //     "mode": "100644",
+    //     "type": "blob",
+    //     "content": "..."
+    //   }
+    // ]
+    // GitHub API doc says
+    //   Use either tree.content or tree.sha
+    //   We go with content
+    // let essentialKeys = ['path', 'mode', 'type', 'content', 'sha'];
+    // for(let i in tree.tree) {
+    //   let file = tree.tree[i];
+    //   for(let key in file) {
+    //     if(!_.includes(essentialKeys, key)) {
+    //       delete file[key];
     //     }
     //   }
-    // });
+    // }
+
+    // Remove potential leading / from treeFile.path
+    _.forEach(tree.tree, function(file) {
+      if(file.path.startsWith('/')) {
+        file.path = file.path.substring(1);
+      }
+    });
+
+    // TODO: One suspicious thing: empty subfolders cause some trouble sometimes?
+
+    // Remove tree type files with null value of sha
+    //   These are subfolders created by the user
+    _.remove(tree.tree, function(file) {
+      return file.type == 'tree' && file.sha == null;
+    });
+
+    console.debug('tree optimized before commit & push', tree);
+    
+    let repository = this.state.repository;
+    let branch = this.state.branch;
+    let commit = this.state.commit;
+    let message = this.state.commitMessage;
+    let url = '/api/project/commit';
+    let self = this;
+    let app = this.props.app;
+    let loadingMsgHandle = this.pushLoadingMsg('Commiting changes and pushing the branch to the remote repository');
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        repository: repository.full_name,
+        branch: branch.name,
+        commit: commit.sha,
+        tree: tree.tree,
+        message: message
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        // console.debug(response);
+        if('error' in response) {
+          //
+        }
+        else {
+          self.setState({
+            changedFiles: [],
+            addedFiles: [],
+            commitMessage: ''
+          }, function() {
+            app.setState({
+              changedFiles: [],
+              addedFiles: []
+            }, function() {
+              self.openCommit(branch);
+              self.popLoadingMsg(loadingMsgHandle);
+            });
+          });
+        }
+      }
+    });
+  }
+
+  openCommit(branch) {
+    // GET commits on the branch
+    let url = '/api/project/commits/'
+      + this.state.repository.full_name
+      + '/' + branch.name;
+    let app = this.props.app;
+    let self = this;
+
+    $.ajax({
+      url: url,
+      method: 'GET',
+      success: function(response) {
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          // Set the current branches, branch, commits, and commit
+          //   as specified
+          let commits = response.commits;
+          let latestCommit = commits[0];
+          let branches = self.state.branches;
+          let isExisting = _.find(branches, function(b) {
+            return b.name == branch.name;
+          });
+          if(!isExisting) {
+            branches.push(branch);
+          }
+
+          app.setState({
+            branches: branches,
+            branch: branch,
+            commits: commits,
+            commit: latestCommit,
+            filesOpened: [],
+            fileActive: null
+          }, function() {
+            self.hardClone(
+              self.state.repository,
+              branch
+            );
+          });
+        }
+      }
+    });
+  }
+
+  hardClone(repository, branch) {
+    // POST request for Hexo initialization
+    let url = '/api/project/hardclone';
+    let self = this;
+    let loadingMsgHandle = this.pushLoadingMsg('Updating your workspace after commit & push');
+
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        cloneUrl: repository.clone_url,
+        repository: repository.full_name,
+        branch: branch.name
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        // console.debug(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          self.popLoadingMsg(loadingMsgHandle);
+          $('a.nav-link[data-command=log]').click();
+          let msg = 'Your changes have been successfully commited & pushed!';
+          Alert.success(msg);
+        }
+      }
+    });
   }
 
   componentDidMount() {
     this.setState({
-      // activePhase: this.props.activePhase,
-      // disabled: this.props.disabled//this.props.phase > this.state.activePhase ? true : false
+      repository: this.props.repository,
+      branch: this.props.branch,
+      branches: this.props.branches,
+      commit: this.props.commit,
+      tree: this.props.tree,
+      recursiveTree: this.props.recursiveTree
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      // activePhase: nextProps.activePhase,
-      // disabled: nextProps.disabled//nextProps.phase > nextProps.activePhase ? true : false
+      repository: nextProps.repository,
+      branch: nextProps.branch,
+      branches: nextProps.branches,
+      commit: nextProps.commit,
+      tree: nextProps.tree,
+      recursiveTree: nextProps.recursiveTree
     });
   }
 
   render() {
+    let app = this.props.app;
+    let commitable = app.state.changedFiles.length > 0 || app.state.addedFiles.length > 0;
+    let pullRequestable = app.state.initialCommit && this.state.commit &&
+      app.state.initialCommit.sha != this.state.commit.sha && !commitable;
+
     return (
       <div className="container">
 
@@ -101,7 +343,7 @@ class CommitPushPane extends React.Component {
               <label className="col-form-label col-form-label-lg">Commit Message</label>
               <input
                 className="form-control form-control-lg" type="text"
-                // onChange={this.handleCommitMessageChange}
+                onChange={this.handleCommitMessageChange}
                 placeholder="What does this commit do to your repository?" />
             </div>
 
@@ -112,26 +354,41 @@ class CommitPushPane extends React.Component {
               Commit & Push
             </button>
 
+            {
+              pullRequestable &&
+              <div style={{marginTop: 16}}>
+                <p className="lead">
+                  Now, you may go back to <span className="text-primary">Code & Test</span> step and continue to work on your code.
+                </p>
+                <p className="lead">
+                  If you're done with your branch, go to <span className="text-primary">Make Pull Request</span> step to notify the repository owner.
+                </p>
+              </div>
+            }
+
           </div>
 
           <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1">
             <p className="lead">
-              <em>Commit</em> makes a checkpoint where the content is saved along with a message that describes what changes have been made.
+              <em className="text-info">Commit</em> makes a checkpoint where the content is saved along with a message that describes what changes have been made.
             </p>
             <p className="lead">
-              <em>Commit</em> message is a short description of the commit you're making.
-              This helps you and collaboraors understand what changes are made on the repository later on.
+              <em className="text-info">Commit message</em> is a short description of the commit you're making.
+              This helps you and the collaboraors understand what changes are made on your branch later on.
             </p>
             <p className="lead">
-              <em>Push</em> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
+              <em className="text-info">Push</em> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
+            </p>
+            <p className="lead">
+              <em className="text-info">Commit</em> and <em className="text-info">push</em> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
             </p>
           </div>
 
         </div>
 
         <Alert
-          stack={{limit: 3, spacing: 50}}
-          timeout={4000} html={true}
+          stack={{limit: 1, spacing: 2}}
+          timeout={3000} html={true}
           effect='stackslide' position='top' />
       </div>
     );
