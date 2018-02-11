@@ -25,6 +25,8 @@ class CommitPushPane extends React.Component {
     this.handleCommitClick = this.handleCommitClick.bind(this);
     this.openCommit = this.openCommit.bind(this);
     this.hardClone = this.hardClone.bind(this);
+    this.handleGoBackClick = this.handleGoBackClick.bind(this);
+    this.handleProceedClick = this.handleProceedClick.bind(this);
   }
 
   reset() {
@@ -316,6 +318,20 @@ class CommitPushPane extends React.Component {
     });
   }
 
+  handleGoBackClick(e) {
+    let app = this.props.app;
+    app.setState({
+      phase: app.state.constants.APP_PHASE_COMMIT_OPEN
+    });
+  }
+
+  handleProceedClick(e) {
+    let app = this.props.app;
+    app.setState({
+      phase: app.state.constants.APP_PHASE_PULL_REQUEST
+    });
+  }
+
   render() {
     let app = this.props.app;
     let commitable = app.state.changedFiles.length > 0 || app.state.addedFiles.length > 0;
@@ -371,29 +387,74 @@ class CommitPushPane extends React.Component {
                 <p className="lead">
                   Now, you may go back to <strong className="text-primary">Code & Test</strong> step and continue to work on your code.
                 </p>
+                <button
+                  type="button" onClick={this.handleGoBackClick}
+                  className="btn btn-secondary btn-lg btn-block">
+                  Go Back to Code & Test
+                </button>
+                <p><br /></p>
                 <p className="lead">
                   If you're done with your branch, go to <strong className="text-primary">Make Pull Request</strong> step to notify the repository owner.
                 </p>
+                <button
+                  type="button" onClick={this.handleProceedClick}
+                  disabled={!pullRequestable}
+                  className="btn btn-success btn-lg btn-block">
+                  Proceed to Pull Request
+                </button>
               </div>
             }
 
           </div>
 
-          <div className="col-lg-7 col-md-7 helper-text">
-            <p className="lead">
-              <strong className="text-info">Commit</strong> is a checkpoint where the content is saved along with a message that describes what changes have been made.
-            </p>
-            <p className="lead">
-              <strong className="text-info">Commit message</strong> is a short description of the commit you're making.
-              This helps you and the collaboraors understand what changes are made on your branch later on.
-            </p>
-            <p className="lead">
-              <strong className="text-info">Push</strong> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
-            </p>
-            <p className="lead">
-              <strong className="text-info">Commit</strong> and <strong className="text-info">push</strong> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
-            </p>
-          </div>
+          {
+            commitable &&
+            <div className="col-lg-7 col-md-7">
+              <div className="helper-text">
+                <p className="lead">
+                  <strong className="text-info">Commit</strong> is a checkpoint where the content is saved along with a message that describes what changes have been made.
+                </p>
+                <p className="lead">
+                  <strong className="text-info">Commit message</strong> is a short description of the commit you're making.
+                  This helps you and the collaboraors understand what changes are made on your branch later on.
+                </p>
+                <p className="lead">
+                  <strong className="text-info">Push</strong> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
+                </p>
+                <p className="lead">
+                  <strong className="text-info">Commit</strong> and <strong className="text-info">push</strong> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
+                </p>
+              </div>
+            </div>
+          }
+
+          {
+            !commitable &&
+            app.state.commits &&
+            <div className="col-lg-7 col-md-7" style={{maxHeight: '65vh', overflow: 'scroll'}}>
+              <label className="col-form-label col-form-label-lg">Commit Log</label>
+              <div className="list-group">
+                {
+                  app.state.commits.map(function(item, index) {
+                    return (
+                      <div key={index} className="list-group">
+                        <div className={"list-group-item list-group-item-action flex-column align-items-start" + (index == 0 ? " active" : "")}>
+                          <h5 className="mb-1">{item.commit.message}</h5>
+                          <div className="d-flex w-100 justify-content-between">
+                            <small>by <strong>{item.commit.author.name}</strong></small>
+                            <small>
+                              at {new Date(item.commit.author.date).toLocaleTimeString()}&nbsp;
+                              on {new Date(item.commit.author.date).toLocaleDateString()}
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }.bind(this))
+                }
+              </div>
+            </div>
+          }
 
         </div>
 

@@ -110,6 +110,8 @@ class PullRequestPane extends React.Component {
               $('a.nav-link[data-command=status]').click();
               let msg = 'Pull request for branch <strong>' + head + '</strong> already exists. All your commits on this branch are covered!';
               Alert.info(msg);
+              self.reset();
+              // TODO: Where to lead the user?
             });
           }
           else {
@@ -179,12 +181,7 @@ class PullRequestPane extends React.Component {
 
             <p className="h4">
               <span className="text-muted">
-                The repository owner will decide on the merge of this branch into master branch, after discussion.
-              </span>
-            </p>
-            <p className="h4">
-              <span className="text-muted">
-                Write a short message that describes what your pull request will do to the shared repository.
+                You will have a chance to discuss merging this branch into master branch.
               </span>
             </p>
 
@@ -205,7 +202,7 @@ class PullRequestPane extends React.Component {
               <button
                 type="button" onClick={this.handlePRClick}
                 disabled={this.state.pullReqTitle == ''}
-                style={{ marginTop: 16 }}
+                style={{marginTop: 16}}
                 className="btn btn-success btn-lg btn-block">
                 Make a Pull Request
               </button>
@@ -213,20 +210,22 @@ class PullRequestPane extends React.Component {
 
           </div>
 
-          <div className="col-lg-7 col-md-7 helper-text">
-            <p className="lead">
-              <strong className="text-info">Pull request</strong> is notyfying the repository owner that your branch is done, so it's ready to be merged into master branch.
-            </p>
-            <p className="lead">
-              <strong className="text-info">Merge</strong> is a process where your work is incorporated into master branch through code review and discussion with the collaborators. Once your branch is merged into master branch, this means your project became a new version. After merge process, your local branch may be deleted.
-            </p>
+          <div className="col-lg-7 col-md-7">
+            <div className="helper-text">
+              <p className="lead">
+                <strong className="text-info">Pull request</strong> is notyfying the repository owner that your branch is done, so it's ready to be merged into master branch.
+              </p>
+              <p className="lead">
+                <strong className="text-info">Merge</strong> is a process where your work is incorporated into master branch through code review and discussion with the collaborators. Once your branch is merged into master branch, this means your project became a new version. After merge process, your local branch may be deleted.
+              </p>
+            </div>
           </div>
 
         </div>
 
         <Alert
           stack={{limit: 1, spacing: 2}}
-          timeout={3000} html={true}
+          timeout={4000} html={true}
           effect='stackslide' position='top' />
       </div>
     );

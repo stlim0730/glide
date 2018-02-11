@@ -312,7 +312,7 @@ class RepositoryPane extends React.Component {
 
             {
               !this.state.repository &&
-              <div className="col helper-text" style={{paddingBottom: 16}}>
+              <div className="helper-text">
                 <p className="lead">
                   <strong className="text-info">Repository</strong> is a storage for your project. It may contain several versions of your files.
                 </p>
@@ -320,7 +320,7 @@ class RepositoryPane extends React.Component {
                   <strong className="text-info">Remote repository</strong> means a repository that lives online. There are many remote repository providers. GLIDE works with remote repositories on GitHub.
                 </p>
                 <p className="lead">
-                  <strong className="text-info">Clone</strong> means downloading a specific version of a repository for you to work on.
+                  <strong className="text-info">Clone</strong> means downloading a specific version (usually, the latest) of a repository for you to work on.
                 </p>
                 <p className="lead">
                   <strong className="text-info">Local repository</strong> is a downloaded copy of a remote repository.

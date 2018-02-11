@@ -45,7 +45,12 @@ class StatusPane extends React.Component {
 
     return (
       <div className="card" style={{height: '45vh'}}>
-        <h6 className="card-header">Status</h6>
+        <div className="card-header">
+          <h6 className="inline-block" style={{marginBottom: 0}}>Status</h6>
+          <span style={{float: 'right'}}>
+            {this.state.repository && this.state.repository.name} / {this.state.branch && this.state.branch.name}
+          </span>
+        </div>
 
         <ul className="list-group">
           

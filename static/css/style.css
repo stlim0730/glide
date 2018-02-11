@@ -33,7 +33,7 @@ button.btn.btn-link:hover { text-decoration: none; }
 }
 div.helper-text {
   background-color: #f2f2f2;
-  padding-top: 16px;
+  padding: 16px;
 }
 
 /*.page-thumbnail-wrapper {
@@ -63,7 +63,8 @@ button.new-file-button:hover { background-color: #eee; }
   top: 50%;
   transform: translateY(-50%);
 }
-h6.card-header { font-weight: 500; }
+h6.card-header,
+.card-header h6 { font-weight: 500; }
 .card-body.files:hover { background-color: #f5f5f5; }
 .upload-image-thumbnail {
   max-height: 80px;

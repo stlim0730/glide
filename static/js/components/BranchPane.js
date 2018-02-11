@@ -550,7 +550,7 @@ class BranchPane extends React.Component {
 
             {
               !this.state.branch &&
-              <div className="col helper-text" style={{paddingBottom: 16}}>
+              <div className="helper-text">
                 <p className="lead">
                   <strong className="text-info">(Local) Branch</strong> represents a separate edition of a repository. Each collaborator will independently work on one's own branch. All the individual works on the branches are supposed to incorporated into master branch, once they're done.
                 </p>
