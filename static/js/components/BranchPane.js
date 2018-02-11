@@ -381,7 +381,11 @@ class BranchPane extends React.Component {
     console.debug('BranchPane WRP');
   }
 
-  render () {
+  render() {
+    let self = this;
+    let duplicateBranchName = _.find(this.state.branches, function(branch) {
+      return branch.name == self.state.newBranchName;
+    });
     return (
       <div className="container">
 
@@ -472,9 +476,16 @@ class BranchPane extends React.Component {
                   <div className="margin-top-15">
                     <button type="button"
                       onClick={this.handleCheckoutClick.bind(this)}
+                      disabled={duplicateBranchName}
                       className="btn btn-success btn-lg btn-block">
                       Create Branch
                     </button>
+                    {
+                      duplicateBranchName &&
+                      <p className="text-danger">
+                        The branch name already exists.<br />Try different name.
+                      </p>
+                    }
                   </div>
                 }
               </label>
@@ -515,10 +526,18 @@ class BranchPane extends React.Component {
               <div className="margin-top-20">
                 <button
                   type="button"
+                  disabled={this.state.branch.name == 'master'}
                   onClick={this.handleCheckoutClick.bind(this)}
                   className="btn btn-success btn-lg btn-block">
                   Checkout Branch
                 </button>
+
+                {
+                  this.state.branch.name == 'master' &&
+                  <p className="text-danger">
+                    GLIDE doesn't allow you to checkout <code>master</code> branch.
+                  </p>
+                }
 
                 <a
                   target="_blank" href={this.state.branch._links.html}
@@ -526,6 +545,21 @@ class BranchPane extends React.Component {
                   <i className="external icon"></i>&nbsp;
                   Open Branch on GitHub
                 </a>
+              </div>
+            }
+
+            {
+              !this.state.branch &&
+              <div className="col helper-text" style={{paddingBottom: 16}}>
+                <p className="lead">
+                  <em className="text-info">Branch</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Checkout</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Master branch</em>...
+                </p>
               </div>
             }
 

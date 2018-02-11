@@ -17,6 +17,7 @@ class CommitPushPane extends React.Component {
       commitMessage: ''
     };
 
+    this.reset = this.reset.bind(this);
     this.pushLoadingMsg = this.pushLoadingMsg.bind(this);
     this.popLoadingMsg = this.popLoadingMsg.bind(this);
     this.handleCommitMessageChange = this.handleCommitMessageChange.bind(this);
@@ -24,6 +25,13 @@ class CommitPushPane extends React.Component {
     this.handleCommitClick = this.handleCommitClick.bind(this);
     this.openCommit = this.openCommit.bind(this);
     this.hardClone = this.hardClone.bind(this);
+  }
+
+  reset() {
+    this.setState({
+      commitMessage: ''
+    });
+    this.commitMessageInput.value = '';
   }
 
   pushLoadingMsg(msg) {
@@ -280,6 +288,7 @@ class CommitPushPane extends React.Component {
           $('a.nav-link[data-command=log]').click();
           let msg = 'Your changes have been successfully commited & pushed!';
           Alert.success(msg);
+          self.reset();
         }
       }
     });
@@ -336,12 +345,14 @@ class CommitPushPane extends React.Component {
           <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1">
 
             <p className="h4">
-              <span className="text-muted">Changes Will Be Confirmed and Saved</span>
+              <span className="text-muted">Changes will be confirmed and saved</span>
             </p>
 
             <div className="form-group">
               <label className="col-form-label col-form-label-lg">Commit Message</label>
               <input
+                ref={(c) => this.commitMessageInput = c}
+                disabled={!commitable}
                 className="form-control form-control-lg" type="text"
                 onChange={this.handleCommitMessageChange}
                 placeholder="What does this commit do to your repository?" />
@@ -358,17 +369,17 @@ class CommitPushPane extends React.Component {
               pullRequestable &&
               <div style={{marginTop: 16}}>
                 <p className="lead">
-                  Now, you may go back to <span className="text-primary">Code & Test</span> step and continue to work on your code.
+                  Now, you may go back to <strong className="text-primary">Code & Test</strong> step and continue to work on your code.
                 </p>
                 <p className="lead">
-                  If you're done with your branch, go to <span className="text-primary">Make Pull Request</span> step to notify the repository owner.
+                  If you're done with your branch, go to <strong className="text-primary">Make Pull Request</strong> step to notify the repository owner.
                 </p>
               </div>
             }
 
           </div>
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1">
+          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1 helper-text">
             <p className="lead">
               <em className="text-info">Commit</em> makes a checkpoint where the content is saved along with a message that describes what changes have been made.
             </p>

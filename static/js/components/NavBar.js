@@ -61,7 +61,7 @@ class NavBar extends React.Component {
             style={{fontFamily: "Jura", letterSpacing: 3, fontWeight: "bold"}}>
             <i className="icon-glide"></i> <strong>GLIDE</strong>
           </a>
-
+          
           <button className="navbar-toggler"
             type="button" data-toggle="collapse"
             data-target="#nav-menus">

@@ -29,6 +29,7 @@ import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import WorkspacePane from './components/WorkspacePane.js';
 import CommitPushPane from './components/CommitPushPane.js';
+import PullRequestPane from './components/PullRequestPane.js';
 import LoadingPane from './components/LoadingPane.js';
 
 // 
@@ -42,17 +43,15 @@ class App extends React.Component {
     // Can't use this.setState() before it's mounted.
     this.state = {
       constants: {
-        APP_PHASE_CLEAN_SLATE: 10,
-        APP_PHASE_REPOSITORY_SELECTION: 20,
-        APP_PHASE_BRANCH_SELECTION: 30,
-        APP_PHASE_REPOSITORY_OPEN: 40,
-        APP_PHASE_BRANCH_OPEN: 50,
-        APP_PHASE_COMMIT_OPEN: 60,
-        APP_PHASE_COMMIT_AND_PUSH: 70,
-        APP_PHASE_PULL_REQUEST: 80
+        APP_PHASE_CLEAN_SLATE: 100,
+        APP_PHASE_REPOSITORY_SELECTION: 200,
+        APP_PHASE_BRANCH_SELECTION: 300,
+        APP_PHASE_COMMIT_OPEN: 400,
+        APP_PHASE_COMMIT_AND_PUSH: 500,
+        APP_PHASE_PULL_REQUEST: 600
       },
 
-      phase: 10,
+      phase: 100,
       repositories: [],
       repository: null,
       branches: [],
@@ -165,47 +164,55 @@ class App extends React.Component {
               scaffold={this.state.scaffold} />
           }
           large={false} />
-        <Modal id="git-status-modal"
-          modalContent={
-            <GitStatusModalContent
-              app={this}
-              branch={this.state.branch}
-              changedFiles={this.state.changedFiles}
-              addedFiles={this.state.addedFiles} />
-          }
-          large={false} />
-        <Modal id="git-commit-push-modal"
-          modalContent={
-            <GitCommitPushModalContent
-              app={this}
-              repository={this.state.repository}
-              branch={this.state.branch}
-              commits={this.state.commits}
-              commit={this.state.commit}
-              tree={this.state.tree}
-              recursiveTree={this.state.recursiveTree}
-              changedFiles={this.state.changedFiles}
-              addedFiles={this.state.addedFiles} />
-          }
-          large={false} />
-        <Modal id="git-pull-request-modal"
-          modalContent={
-            <GitPullRequestModalContent
-              app={this}
-              repository={this.state.repository}
-              branch={this.state.branch}
-              commit={this.state.commit} />
-          }
-          large={false} />
-        <Modal id="git-reset-modal"
-          modalContent={
-            <GitResetModalContent
-              app={this}
-              commit={this.state.commit}
-              changedFiles={this.state.changedFiles}
-              addedFiles={this.state.addedFiles} />
-          }
-          large={false} />
+        {
+          // <Modal id="git-status-modal"
+          //   modalContent={
+          //     <GitStatusModalContent
+          //       app={this}
+          //       branch={this.state.branch}
+          //       changedFiles={this.state.changedFiles}
+          //       addedFiles={this.state.addedFiles} />
+          //   }
+          //   large={false} />
+        }
+        {
+          // <Modal id="git-commit-push-modal"
+          //   modalContent={
+          //     <GitCommitPushModalContent
+          //       app={this}
+          //       repository={this.state.repository}
+          //       branch={this.state.branch}
+          //       commits={this.state.commits}
+          //       commit={this.state.commit}
+          //       tree={this.state.tree}
+          //       recursiveTree={this.state.recursiveTree}
+          //       changedFiles={this.state.changedFiles}
+          //       addedFiles={this.state.addedFiles} />
+          //   }
+          //   large={false} />
+        }
+        {
+          // <Modal id="git-pull-request-modal"
+          //   modalContent={
+          //     <GitPullRequestModalContent
+          //       app={this}
+          //       repository={this.state.repository}
+          //       branch={this.state.branch}
+          //       commit={this.state.commit} />
+          //   }
+          //   large={false} />
+        }
+        {
+          // <Modal id="git-reset-modal"
+          //   modalContent={
+          //     <GitResetModalContent
+          //       app={this}
+          //       commit={this.state.commit}
+          //       changedFiles={this.state.changedFiles}
+          //       addedFiles={this.state.addedFiles} />
+          //   }
+          //   large={false} />
+        }
         {/*<Modal id="create-project-modal" modalContent={<CreateProjectModalContent themeCols={3} app={this} />} large={true} />*/}
         {/*<Modal id="browse-projects-modal" modalContent={<BrowseProjectsModalContent app={this} projects={this.state.projects}/>} large={true} />*/}
       </div>
@@ -251,22 +258,6 @@ class App extends React.Component {
           </div>
         );
 
-      // case this.state.constants.APP_PHASE_REPOSITORY_OPEN:
-      // case this.state.constants.APP_PHASE_BRANCH_OPEN:
-      //   return (
-      //     <div className="row full-height">
-      //       <NavBar app={this} repository={this.state.repository} branch={this.state.branch} />
-      //       {modals}
-      //       <RepoToolBar
-      //         app={this}
-      //         repository={this.state.repository}
-      //         branches={this.state.branches}
-      //         branch={this.state.branch}
-      //         commits={this.state.commits}
-      //         commit={this.state.commit} />
-      //     </div>
-      //   );
-
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         
         return (
@@ -311,7 +302,18 @@ class App extends React.Component {
 
       case this.state.constants.APP_PHASE_PULL_REQUEST:
         return (
-          <div>APP_PHASE_PULL_REQUEST</div>
+          <div>
+            {navbar}
+            {modals}
+            <PullRequestPane
+              app={this}
+              repository={this.state.repository}
+              branches={this.state.branches}
+              branch={this.state.branch}
+              commit={this.state.commit} />
+            <LoadingPane
+              messages={this.state.loadingMessages} />
+          </div>
         );
 
       default:
