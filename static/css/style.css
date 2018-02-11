@@ -1,19 +1,12 @@
 html, body {
-  height:100%;
-  overflow: hidden;
+  height: 100vh;
 }
-/*body { padding-top: 70px; padding-bottom: 21px;}*/
 /**:focus { outline: none !important; }*/  /* To disable web browser's highlight box */
-@media screen and (max-width: 768px) {
-  html,body{ height:100%; overflow: auto; }
-  /*body { padding-top: 0px; }*/
-}
 a.navbar-brand:hover { color: rgba(255, 255, 255, 0.7) !important;  }
 button.btn.btn-link:hover { text-decoration: none; }
 .full-height { height: 98.3%; }
 .height-95 { height: 95%; }
 .height-90 { height: 90%; }
-.height-60 { height: 59%; }
 .height-50 { height: 49.15%; }
 /*.height-40 { height: 39.3%; }*/
 .height-200 { height: 200px; }
@@ -52,9 +45,10 @@ button.btn.btn-link:hover { text-decoration: none; }
   background-color: rgba(255, 255, 255, 0.8);
 }
 div.helper-text {
-  background-color: #fffce8;
+  background-color: #fffdf2;
   padding-top: 16px;
 }
+
 /*.page-thumbnail-wrapper {
   margin-bottom: 10px;
 }

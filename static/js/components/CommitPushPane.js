@@ -326,7 +326,7 @@ class CommitPushPane extends React.Component {
       <div className="container">
 
         <div className="row">
-          <div className="col offset-lg-1 offset-md-1">
+          <div className="col">
             <div className="h3" style={{paddingTop: 30}}>
               Commit Changes and Push the Branch
               <button
@@ -342,7 +342,7 @@ class CommitPushPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1">
+          <div className="col-lg-5 col-md-5">
 
             <p className="h4">
               <span className="text-muted">Changes will be confirmed and saved</span>
@@ -352,7 +352,7 @@ class CommitPushPane extends React.Component {
               <label className="col-form-label col-form-label-lg">Commit Message</label>
               <input
                 ref={(c) => this.commitMessageInput = c}
-                disabled={!commitable}
+                disabled={!commitable}  
                 className="form-control form-control-lg" type="text"
                 onChange={this.handleCommitMessageChange}
                 placeholder="What does this commit do to your repository?" />
@@ -379,19 +379,19 @@ class CommitPushPane extends React.Component {
 
           </div>
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1 helper-text">
+          <div className="col-lg-7 col-md-7 helper-text">
             <p className="lead">
-              <em className="text-info">Commit</em> makes a checkpoint where the content is saved along with a message that describes what changes have been made.
+              <strong className="text-info">Commit</strong> is a checkpoint where the content is saved along with a message that describes what changes have been made.
             </p>
             <p className="lead">
-              <em className="text-info">Commit message</em> is a short description of the commit you're making.
+              <strong className="text-info">Commit message</strong> is a short description of the commit you're making.
               This helps you and the collaboraors understand what changes are made on your branch later on.
             </p>
             <p className="lead">
-              <em className="text-info">Push</em> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
+              <strong className="text-info">Push</strong> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
             </p>
             <p className="lead">
-              <em className="text-info">Commit</em> and <em className="text-info">push</em> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
+              <strong className="text-info">Commit</strong> and <strong className="text-info">push</strong> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
             </p>
           </div>
 

@@ -159,7 +159,7 @@ class PullRequestPane extends React.Component {
       <div className="container">
 
         <div className="row">
-          <div className="col offset-lg-1 offset-md-1">
+          <div className="col">
             <div className="h3" style={{paddingTop: 30}}>
               Make a Request for Review and Merge of the Branch
               <button
@@ -175,7 +175,7 @@ class PullRequestPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1">
+          <div className="col-lg-5 col-md-5">
 
             <p className="h4">
               <span className="text-muted">
@@ -213,15 +213,12 @@ class PullRequestPane extends React.Component {
 
           </div>
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1 helper-text">
+          <div className="col-lg-7 col-md-7 helper-text">
             <p className="lead">
-              <em className="text-info">Pull request</em> ...
+              <strong className="text-info">Pull request</strong> is notyfying the repository owner that your branch is done, so it's ready to be merged into master branch.
             </p>
             <p className="lead">
-              <em className="text-info">Master branch</em> ...
-            </p>
-            <p className="lead">
-              <em className="text-info">Merge</em> ...
+              <strong className="text-info">Merge</strong> is a process where your work is incorporated into master branch through code review and discussion with the collaborators. Once your branch is merged into master branch, this means your project became a new version. After merge process, your local branch may be deleted.
             </p>
           </div>
 

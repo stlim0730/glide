@@ -390,7 +390,7 @@ class BranchPane extends React.Component {
       <div className="container">
 
         <div className="row">
-          <div className="col offset-lg-1 offset-md-1">
+          <div className="col">
             <div className="h3" style={{paddingTop: 30}}>
               Checkout a Branch
               <button
@@ -406,7 +406,7 @@ class BranchPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-4 col-md-4 offset-lg-1 offset-md-1">
+          <div className="col-lg-4 col-md-4">
 
             {
               this.state.repository &&
@@ -432,7 +432,7 @@ class BranchPane extends React.Component {
                   <i className="refresh icon"></i> Refresh
                 </button>
 
-                <div className="list-group max-height-200 auto-scroll margin-top-15">
+                <div className="list-group auto-scroll margin-top-15" style={{maxHeight: '60vh'}}>
                   {
                     this.state.branches.map(function(item, index) {
                       let className = this.state.branch && this.state.branch.name==item.name
@@ -493,7 +493,7 @@ class BranchPane extends React.Component {
 
           </div>
 
-          <div className="col-lg-5 col-md-5 offset-lg-1 offset-md-1 margin-top-50">
+          <div className="col-lg-7 col-md-7 margin-top-50">
             {
               this.state.branch &&
               <div>
@@ -552,13 +552,13 @@ class BranchPane extends React.Component {
               !this.state.branch &&
               <div className="col helper-text" style={{paddingBottom: 16}}>
                 <p className="lead">
-                  <em className="text-info">Branch</em>...
+                  <strong className="text-info">(Local) Branch</strong> represents a separate edition of a repository. Each collaborator will independently work on one's own branch. All the individual works on the branches are supposed to incorporated into master branch, once they're done.
                 </p>
                 <p className="lead">
-                  <em className="text-info">Checkout</em>...
+                  <strong className="text-info">Master branch</strong> is the representative branch of a repository. You'll incrementally make progress in this project by incorporating your work on your branch into master branch.
                 </p>
                 <p className="lead">
-                  <em className="text-info">Master branch</em>...
+                  <strong className="text-info">Checkout</strong> means choosing an existing branch to work on. You may need to create a new branch for your work.
                 </p>
               </div>
             }
