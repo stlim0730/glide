@@ -511,8 +511,8 @@ class CreateFileModalContent extends React.Component {
         </div>
 
         <Alert
-          stack={{limit: 3, spacing: 50}}
-          timeout={4000} html={true}
+          stack={{limit: 1, spacing: 2}}
+          timeout={3000} html={true}
           effect='stackslide' position='top' />
       </div>
     );

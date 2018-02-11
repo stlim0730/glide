@@ -42,14 +42,14 @@ class NavBreadCrumbListItem extends React.Component {
   componentDidMount() {
     this.setState({
       activePhase: this.props.activePhase,
-      disabled: this.props.phase > this.state.activePhase ? true : false
+      disabled: this.props.disabled//this.props.phase > this.state.activePhase ? true : false
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       activePhase: nextProps.activePhase,
-      disabled: nextProps.phase > nextProps.activePhase ? true : false
+      disabled: nextProps.disabled//nextProps.phase > nextProps.activePhase ? true : false
     });
   }
 

@@ -381,12 +381,16 @@ class BranchPane extends React.Component {
     console.debug('BranchPane WRP');
   }
 
-  render () {
+  render() {
+    let self = this;
+    let duplicateBranchName = _.find(this.state.branches, function(branch) {
+      return branch.name == self.state.newBranchName;
+    });
     return (
       <div className="container">
 
         <div className="row">
-          <div className="col">
+          <div className="col offset-lg-1 offset-md-1">
             <div className="h3" style={{paddingTop: 30}}>
               Checkout a Branch
               <button
@@ -397,27 +401,18 @@ class BranchPane extends React.Component {
                 <i className="info circle icon"></i>
               </button>
             </div>
-            {
-              // <button
-              //   type="button" onClick={this.handlePreviousClick.bind(this)}
-              //   className="btn btn-secondary btn-sm phase-previous">
-              //   <i className="chevron left icon"></i> Repository Selection
-              // </button>
-            }
           </div>
         </div>
 
         <div className="row">
 
-          <div className="col-lg-3 col-md-3">
+          <div className="col-lg-4 col-md-4 offset-lg-1 offset-md-1">
 
             {
               this.state.repository &&
               <h4>
-                Branches in<br />
-                <a
-                  target="_blank"
-                  href={this.state.repository.html_url}>
+                Branches in&nbsp;
+                <a target="_blank" href={this.state.repository.html_url}>
                   {this.state.repository.name}
                 </a>
               </h4>
@@ -467,7 +462,7 @@ class BranchPane extends React.Component {
                 Create a New Branch
                 <div className="form-group">
                   <input
-                    type="text"
+                    type="text" size="26"
                     className="form-control form-control-lg margin-top-15"
                     placeholder="Be concise and descriptive"
                     onKeyUp={this.handleBranchNameKeyUp} />
@@ -481,9 +476,16 @@ class BranchPane extends React.Component {
                   <div className="margin-top-15">
                     <button type="button"
                       onClick={this.handleCheckoutClick.bind(this)}
+                      disabled={duplicateBranchName}
                       className="btn btn-success btn-lg btn-block">
                       Create Branch
                     </button>
+                    {
+                      duplicateBranchName &&
+                      <p className="text-danger">
+                        The branch name already exists.<br />Try different name.
+                      </p>
+                    }
                   </div>
                 }
               </label>
@@ -524,10 +526,18 @@ class BranchPane extends React.Component {
               <div className="margin-top-20">
                 <button
                   type="button"
+                  disabled={this.state.branch.name == 'master'}
                   onClick={this.handleCheckoutClick.bind(this)}
                   className="btn btn-success btn-lg btn-block">
                   Checkout Branch
                 </button>
+
+                {
+                  this.state.branch.name == 'master' &&
+                  <p className="text-danger">
+                    GLIDE doesn't allow you to checkout <code>master</code> branch.
+                  </p>
+                }
 
                 <a
                   target="_blank" href={this.state.branch._links.html}
@@ -535,6 +545,21 @@ class BranchPane extends React.Component {
                   <i className="external icon"></i>&nbsp;
                   Open Branch on GitHub
                 </a>
+              </div>
+            }
+
+            {
+              !this.state.branch &&
+              <div className="col helper-text" style={{paddingBottom: 16}}>
+                <p className="lead">
+                  <em className="text-info">Branch</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Checkout</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Master branch</em>...
+                </p>
               </div>
             }
 

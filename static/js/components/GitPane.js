@@ -22,8 +22,8 @@ class GitPane extends React.Component {
       pullReqBody: ''
     };
 
-    this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
-    this._popLoadingMsg = this._popLoadingMsg.bind(this);
+    this.pushLoadingMsg = this.pushLoadingMsg.bind(this);
+    this.popLoadingMsg = this.popLoadingMsg.bind(this);
     this._updateFileContentInTree = this._updateFileContentInTree.bind(this);
     this._openCommit = this._openCommit.bind(this);
     this._hardClone = this._hardClone.bind(this);
@@ -35,7 +35,7 @@ class GitPane extends React.Component {
     this.handlePRClick = this.handlePRClick.bind(this);
   }
 
-  _pushLoadingMsg(msg) {
+  pushLoadingMsg(msg) {
     let app = this.props.app;
     let messageKey =  Date.now().toString();
     let message = {};
@@ -48,7 +48,7 @@ class GitPane extends React.Component {
     return messageKey;
   }
 
-  _popLoadingMsg(msgKey) {
+  popLoadingMsg(msgKey) {
     let app = this.props.app;
     let loadingMessages = app.state.loadingMessages;
     delete loadingMessages[msgKey]
@@ -165,7 +165,7 @@ class GitPane extends React.Component {
     // POST request for Hexo initialization
     let url = '/api/project/hardclone';
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Updating your workspace after commit & push');
+    let loadingMsgHandle = this.pushLoadingMsg('Updating your workspace after commit & push');
 
     $.ajax({
       url: url,
@@ -184,7 +184,7 @@ class GitPane extends React.Component {
           // TODO: Duplicated branch name is used
         }
         else {
-          self._popLoadingMsg(loadingMsgHandle);
+          self.popLoadingMsg(loadingMsgHandle);
           $('a.nav-link[data-command=log]').click();
           let msg = 'Your changes have been successfully commited & pushed!';
           Alert.success(msg);
@@ -261,7 +261,7 @@ class GitPane extends React.Component {
     let url = '/api/project/commit';
     let self = this;
     let app = this.props.app;
-    let loadingMsgHandle = this._pushLoadingMsg('Commiting and pushing the changes to the remote repository');
+    let loadingMsgHandle = this.pushLoadingMsg('Commiting and pushing the changes to the remote repository');
 
     $.ajax({
       url: url,
@@ -292,7 +292,7 @@ class GitPane extends React.Component {
               addedFiles: []
             }, function() {
               self._openCommit(branch);
-              self._popLoadingMsg(loadingMsgHandle);
+              self.popLoadingMsg(loadingMsgHandle);
             });
           });
         }
@@ -326,7 +326,7 @@ class GitPane extends React.Component {
     let base = 'master';
     let app = this.props.app;
     let self = this;
-    let loadingMsgHandle = this._pushLoadingMsg('Making a pull request');
+    let loadingMsgHandle = this.pushLoadingMsg('Making a pull request');
 
     $.ajax({
       url: url,
@@ -352,7 +352,7 @@ class GitPane extends React.Component {
               pullReqTitle: '',
               pullReqBody: ''
             }, function() {
-              self._popLoadingMsg(loadingMsgHandle);
+              self.popLoadingMsg(loadingMsgHandle);
               $('a.nav-link[data-command=status]').click();
               let msg = 'Pull request for branch <strong>' + head + '</strong> already exists. All your commits on this branch are covered!';
               Alert.info(msg);
@@ -366,7 +366,7 @@ class GitPane extends React.Component {
               app.setState({
                 initialCommit: self.state.commit
               }, function() {
-                self._popLoadingMsg(loadingMsgHandle);
+                self.popLoadingMsg(loadingMsgHandle);
                 $('a.nav-link[data-command=status]').click();
                 let msg = 'Pull request for branch <strong>' + head + '</strong> has been successfully made!';
                 Alert.success(msg);
@@ -436,8 +436,8 @@ class GitPane extends React.Component {
             </li>
             <li className="nav-item">
               <a
-                data-command="commit_push" data-toggle="tab"
-                href="#git-command-commit_push"
+                data-command="commitpush" data-toggle="tab"
+                href="#git-command-commitpush"
                 className={commitable ? "nav-link" : "nav-link disabled"}>
                 Commit & Push
               </a>
@@ -555,7 +555,7 @@ class GitPane extends React.Component {
               commitable &&
               <div
                 className="card-body tab-pane fade"
-                id="git-command-commit_push">
+                id="git-command-commitpush">
                 <h5 className="card-title">
                   Changes Will Be Confirmed and Saved
                 </h5>
@@ -694,8 +694,8 @@ class GitPane extends React.Component {
         </div>
 
         <Alert
-          stack={{limit: 3, spacing: 50}}
-          timeout={5000} html={true}
+          stack={{limit: 1, spacing: 2}}
+          timeout={3000} html={true}
           effect='stackslide' position='top' />
       </div>
     );

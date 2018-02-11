@@ -158,7 +158,6 @@ class RepositoryPane extends React.Component {
           let repository = JSON.parse(response.repository);
           let app = self.props.app;
           app.setState({
-            // phase: app.state.constants.APP_PHASE_REPOSITORY_OPEN,
             phase: app.state.constants.APP_PHASE_BRANCH_SELECTION,
             repository: repository,
             branches: [],
@@ -310,13 +309,28 @@ class RepositoryPane extends React.Component {
               </div>
             }
 
+            {
+              !this.state.repository &&
+              <div className="col helper-text" style={{paddingBottom: 16}}>
+                <p className="lead">
+                  <em className="text-info">Repository</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Remote repository</em>...
+                </p>
+                <p className="lead">
+                  <em className="text-info">Clone</em>...
+                </p>
+              </div>
+            }
+
           </div>
 
         </div>
 
         <Alert
-          stack={{limit: 3, spacing: 50}}
-          timeout={4000} html={true}
+          stack={{limit: 1}}
+          timeout={3000} html={true}
           effect='stackslide' position='top' />
       </div>
     );

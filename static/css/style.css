@@ -51,7 +51,10 @@ button.btn.btn-link:hover { text-decoration: none; }
   z-index: 99998;
   background-color: rgba(255, 255, 255, 0.8);
 }
-
+div.helper-text {
+  background-color: #fffce8;
+  padding-top: 16px;
+}
 /*.page-thumbnail-wrapper {
   margin-bottom: 10px;
 }
@@ -67,9 +70,7 @@ button.btn.btn-link:hover { text-decoration: none; }
   min-height: 70px;
   text-align: center;
 }*/
-ul.subtree {
-  padding-left: 15px;
-}
+ul.subtree { padding-left: 15px; }
 .file-node-file { color: #222222 !important; }
 .new-file-button { color: #3fb618 !important; }
 button.file-node-folder:hover,
@@ -86,23 +87,9 @@ button.new-file-button:hover { background-color: #eee; }
   max-height: 80px;
   max-width: 80px;
 }
-div.CodeMirror.cm-s-default { height: 100%; }
-.red-bg { background-color: red; } /* for debugging */
-.right-border { border-right: 1px solid #e5e5e5; }
 button[type="button"] { cursor: pointer; }
 .pointer { cursor: pointer; }
-.phase-previous {
-  position: relative;
-  top: -50px;
-  left: -200px;
-}
-@media screen and (max-width: 768px) {
-  .phase-previous {
-    position: relative;
-    top: -130px;
-    left: -12px;
-  }
-}
+textarea.no-resize { resize: none; }
 .dropdown-menu.dropdown-menu-class {
   position: absolute;
   transform: translate3d(0px, 36px, 0px);
@@ -111,14 +98,8 @@ button[type="button"] { cursor: pointer; }
   will-change: transform;
 }
 
-/* s-alert */
 /*
-<div class="s-alert-box s-alert-success s-alert-top s-alert-is-effect s-alert-effect-stackslide s-alert-show" id="d3kl5fgcul7" style="top: 0px;">
-  <div class="s-alert-box-inner">
-    <span>Hi, stlim0730. Welcome to GLIDE!</span>
-  </div>
-  <span class="s-alert-close"></span>
-</div>
+  s-alert
 */
 div.s-alert-box-inner {
   text-align: center;
