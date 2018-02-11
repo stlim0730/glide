@@ -261,7 +261,7 @@ class App extends React.Component {
       case this.state.constants.APP_PHASE_COMMIT_OPEN:
         
         return (
-          <div className="full-height">
+          <div style={{height: '95vh'}}>
             {navbar}
             {modals}
             <WorkspacePane

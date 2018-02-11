@@ -96,12 +96,12 @@ class RendererPane extends React.Component {
     let src = this.state.src;
 
     return (
-      <div className="height-50 card">
+      <div className="card" style={{height: '50vh'}}>
         <h6 className="card-header">Preview</h6>
         {
           srcDoc &&
           <iframe
-            className="auto-scroll height-90 panel-body" style={{border:'none'}}
+            className="auto-scroll panel-body" style={{border:'none', height: '90vh'}}
             srcDoc={srcDoc} width="100%" sandbox="allow-scripts">
           </iframe>
         }
@@ -110,7 +110,7 @@ class RendererPane extends React.Component {
           src &&
           <iframe
             ref={(c) => this.srcIFrame = c}
-            className="auto-scroll height-90 panel-body" style={{border:'none'}}
+            className="auto-scroll panel-body" style={{border:'none', height: '90vh'}}
             src={src} width="100%" sandbox="allow-scripts allow-same-origin">
           </iframe>
         }

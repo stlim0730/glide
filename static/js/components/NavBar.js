@@ -61,12 +61,6 @@ class NavBar extends React.Component {
             style={{fontFamily: "Jura", letterSpacing: 3, fontWeight: "bold"}}>
             <i className="icon-glide"></i> <strong>GLIDE</strong>
           </a>
-          
-          <button className="navbar-toggler"
-            type="button" data-toggle="collapse"
-            data-target="#nav-menus">
-            <span className="navbar-toggler-icon"></span>
-          </button>
 
           <div className="breadcrumbs">
             <div className="inner">
@@ -90,7 +84,7 @@ class NavBar extends React.Component {
                   disabled={this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
                   label="Code & Test" />
                 <NavBreadCrumbListItem
-                  app={this.props.app}
+                  app={this.props.app} id="commit-push-breadcrumb"
                   phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
                   activePhase={this.state.phase}
                   disabled={!commitable || this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
@@ -104,6 +98,12 @@ class NavBar extends React.Component {
               </ul>
             </div>
           </div>
+
+          <button className="navbar-toggler"
+            type="button" data-toggle="collapse"
+            data-target="#nav-menus">
+            <span className="navbar-toggler-icon"></span>
+          </button>
 
           <Modal id="go-back-confirm-modal"
             modalContent={

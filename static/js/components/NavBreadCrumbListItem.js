@@ -59,7 +59,7 @@ class NavBreadCrumbListItem extends React.Component {
 
     return (
       <li>
-        <a href="#" data-toggle="modal"
+        <a href="#" data-toggle="modal" id={this.props.id}
           data-target={this.props.confirmModalToLeave ? this.props.confirmModalToLeave : null}
           className={className} onClick={this.handleBreadCrumbClick.bind(this, this.props.phase)}>
           <span>{this.props.label}</span>

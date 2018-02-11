@@ -197,26 +197,25 @@ class RepositoryPane extends React.Component {
         </div>
 
         <div className="row">
-          <div style={{marginLeft: -12}}
-            className="col-lg-1 col-md-1">
+          <div className="col-lg-1 col-md-1">
             <button
-              type="button" className="btn btn-link"
+              type="button" className="btn btn-sm btn-link"
               onClick={this.handleRefreshClick.bind(this)}>
               <i className="refresh icon"></i> Refresh
             </button>
           </div>
 
-          <div className="col offset-lg-1 offset-md-1">
-            Sort by:
+          <div className="col-lg-4 col-md-4" style={{textAlign: 'right'}}>
+            <small>Sort by:</small>
             <button
               onClick={this.handleSortRepo.bind(this, 'date')}
-              className="btn btn-link" type="button">Date</button>
+              className="btn btn-sm btn-link" type="button">Date</button>
             <button
               onClick={this.handleSortRepo.bind(this, 'name')}
-              className="btn btn-link" type="button">Name</button>
+              className="btn btn-sm btn-link" type="button">Name</button>
             <button
               onClick={this.handleSortRepo.bind(this, 'owner')}
-              className="btn btn-link" type="button">Owner</button>
+              className="btn btn-sm btn-link" type="button">Owner</button>
           </div>
         </div>
 
@@ -224,7 +223,9 @@ class RepositoryPane extends React.Component {
 
           <div className="col-lg-5 col-md-5">
 
-            <div className="list-group height-600 auto-scroll margin-top-15">
+            <div
+              className="list-group auto-scroll margin-top-15"
+              style={{height: '70vh'}}>
               {
                 this.state.repositories.map(function(item, index) {
                   let className = this.state.repository && this.state.repository.full_name==item.full_name
@@ -281,9 +282,9 @@ class RepositoryPane extends React.Component {
 
             {
               this.state.liveHtml &&
-              <div className="card height-400 margin-top-15">
+              <div className="card margin-top-15" style={{height: '50vh'}}>
                 <h5 className="card-header">README.md</h5>
-                <div className="card-body max-height-400 auto-scroll">
+                <div className="card-body auto-scroll" style={{height: '50vh'}}>
                   <div
                     className=""
                     dangerouslySetInnerHTML={{__html: this.state.liveHtml}}>
@@ -311,15 +312,18 @@ class RepositoryPane extends React.Component {
 
             {
               !this.state.repository &&
-              <div className="col helper-text" style={{paddingBottom: 16}}>
+              <div className="helper-text">
                 <p className="lead">
-                  <em className="text-info">Repository</em>...
+                  <strong className="text-info">Repository</strong> is a storage for your project. It may contain several versions of your files.
                 </p>
                 <p className="lead">
-                  <em className="text-info">Remote repository</em>...
+                  <strong className="text-info">Remote repository</strong> means a repository that lives online. There are many remote repository providers. GLIDE works with remote repositories on GitHub.
                 </p>
                 <p className="lead">
-                  <em className="text-info">Clone</em>...
+                  <strong className="text-info">Clone</strong> means downloading a specific version (usually, the latest) of a repository for you to work on.
+                </p>
+                <p className="lead">
+                  <strong className="text-info">Local repository</strong> is a downloaded copy of a remote repository.
                 </p>
               </div>
             }
