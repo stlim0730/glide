@@ -187,13 +187,13 @@ class FileSideBar extends React.Component {
   render () {
     // console.debug('FileSideBar', this.state);
     return (
-      <div className="col-lg-2 col-md-2 no-padding full-height">
+      <div className="col-lg-2 col-md-2 no-padding" style={{height: '95vh'}}>
 
-        <div className="card full-height">
+        <div className="card" style={{height: '95vh'}}>
           <h6 className="card-header">Files</h6>
           {
             this.state.recursiveTree &&
-            <div className="auto-scroll height-90">
+            <div className="auto-scroll" style={{height: '90vh'}}>
               <FileNode
                 app={this.props.app}
                 repository={this.state.repository}

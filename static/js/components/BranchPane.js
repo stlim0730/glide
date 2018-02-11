@@ -406,7 +406,7 @@ class BranchPane extends React.Component {
 
         <div className="row">
 
-          <div className="col-lg-4 col-md-4">
+          <div className="col-lg-5 col-md-5">
 
             {
               this.state.repository &&

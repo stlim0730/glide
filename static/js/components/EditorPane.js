@@ -101,9 +101,9 @@ class EditorPane extends React.Component {
 
   render () {
     return (
-      <div className="col-lg-5 col-md-5 no-padding full-height">
+      <div className="col-lg-5 col-md-5 no-padding" style={{height: '95vh'}}>
 
-        <div className="card full-height">
+        <div className="card" style={{height: '95vh'}}>
           <div className="card-header" style={{paddingTop: 0, paddingBottom:0}}>
             <h6 className="inline-block" style={{paddingTop: 11}}>Editor</h6>
 

@@ -476,8 +476,8 @@ class TabbedEditors extends React.Component {
 
     return (
       
-      <div id="editor-wrapper" className="full-height">
-        <ul id="editor-tab-wrapper" className="nav nav-tabs">
+      <div id="editor-wrapper" style={{height: '95vh'}}>
+        <ul id="editor-tab-wrapper" className="nav nav-tabs" style={{backgroundColor: '#ededed'}}>
           {tabs}
         </ul>
         <div className="tab-content">

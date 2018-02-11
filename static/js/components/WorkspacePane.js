@@ -76,9 +76,9 @@ class WorkspacePane extends React.Component {
 
   render () {
     return (
-      <div className="container-fluid full-height">
+      <div className="container-fluid" style={{height: '95vh'}}>
 
-        <div className="row full-height">
+        <div className="row" style={{height: '95vh'}}>
           <FileSideBar
             app={this.props.app}
             repository={this.state.repository}

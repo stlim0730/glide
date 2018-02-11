@@ -84,7 +84,7 @@ class NavBar extends React.Component {
                   disabled={this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}
                   label="Code & Test" />
                 <NavBreadCrumbListItem
-                  app={this.props.app}
+                  app={this.props.app} id="commit-push-breadcrumb"
                   phase={app.state.constants.APP_PHASE_COMMIT_AND_PUSH}
                   activePhase={this.state.phase}
                   disabled={!commitable || this.state.phase < app.state.constants.APP_PHASE_COMMIT_OPEN}

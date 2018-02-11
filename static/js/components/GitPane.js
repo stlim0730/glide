@@ -413,9 +413,9 @@ class GitPane extends React.Component {
       && app.state.initialCommit.sha != this.state.commit.sha && !commitable;
 
     return (
-      <div className="card no-padding height-50">
+      <div className="card no-padding" style={{height: '50vh'}}>
         <h6 className="card-header">Git Operations</h6>
-        <div className="card-body auto-scroll full-height">
+        <div className="card-body auto-scroll" style={{height: '95vh'}}>
           
           <ul className="nav nav-pills">
             <li className="nav-item">
