@@ -1,7 +1,8 @@
 import Alert from 'react-s-alert';
 import Files from 'react-files';
-import FileUploadThumbnail from './FileUploadThumbnail.js';
 import Serializers from '../util/Serializers.js';
+import FileUtil from '../util/FileUtil.js';
+import FileUploadThumbnail from './FileUploadThumbnail.js';
 
 // 
 // CreateFileModalContent component
@@ -260,8 +261,15 @@ class CreateFileModalContent extends React.Component {
             // To match encoding / decoding scheme to blobs through GitHub API
             if(self.state.fileCreationMode != 'file' || self.state.fileOrFolder != 'folder') {
               // When the created object is a file, not a folder
-              createdFile.originalContent = Serializers.b64DecodeUnicode(createdFile.originalContent);
-              
+              if(FileUtil.isBinary(createdFile)) {
+                // For binary files: atob decodes
+                createdFile.originalContent = atob(createdFile.originalContent);
+              }
+              else {
+                // For text files
+                createdFile.originalContent = Serializers.b64DecodeUnicode(createdFile.originalContent);
+              }
+
               // Update addedFiles
               //   Just remove potentially existing duplicate
               //   and just push the new file.
