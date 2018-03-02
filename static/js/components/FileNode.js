@@ -95,6 +95,13 @@ class FileNode extends React.Component {
     $(e.target).children('i.folder.icon').toggleClass('open');
   }
 
+  static b64DecodeUnicode(str) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(atob(str).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+
   handleFileClick(file, e) {
     // Folders don't call this event handler: yay
     let app = this.props.app;
@@ -134,7 +141,15 @@ class FileNode extends React.Component {
               // response.blob.content is always encoded in base64
               //   https://developer.github.com/v3/git/blobs/#get-a-blob
               // atob() decodes
+
+              let raw = response.blob.content;
+              let newDecoder = FileNode.b64DecodeUnicode(raw);
+
               file.originalContent = atob(response.blob.content);
+
+              console.debug('raw', raw);
+              console.debug('newDecoder', newDecoder);
+              console.debug('atob', file.originalContents);
               
               filesOpened.push(file);
               self.setState({

@@ -166,6 +166,13 @@ class CreateFileModalContent extends React.Component {
     //   4. Maximum file count reached
   }
 
+  static b64DecodeUnicode(base64) {
+    // Going backwards: from bytestream, to percent-encoding, to original string.
+    return decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+
   handleSubmit() {
     let self = this;
     let tree = this.state.tree;
@@ -259,8 +266,15 @@ class CreateFileModalContent extends React.Component {
             // To match encoding / decoding scheme to blobs through GitHub API
             if(self.state.fileCreationMode != 'file' || self.state.fileOrFolder != 'folder') {
               // When the created object is a file, not a folder
+
+              let raw = createdFile.originalContent;//response.blob.content;
+              let newDecoder = CreateFileModalContent.b64DecodeUnicode(raw);
               
-              createdFile.originalContent = atob(createdFile.originalContent);
+              createdFile.originalContent = atob(raw);
+
+              console.debug('raw', raw);
+              console.debug('newDecoder', newDecoder);
+              console.debug('atob', createdFile.originalContents);
 
               // Update addedFiles
               //   Just remove potentially existing duplicate
