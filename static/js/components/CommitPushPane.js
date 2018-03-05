@@ -1,4 +1,5 @@
 import Alert from 'react-s-alert';
+import FileUtil from '../util/FileUtil.js';
 
 // 
 // CommitPushPane component
@@ -98,12 +99,22 @@ class CommitPushPane extends React.Component {
 
         // GitHub API doc says
         //   Use either tree.content or tree.sha
-        //   We go with content if the file has been touched
+        //   We go with content for text files if the file has been touched
+        //   We go with sha for binary files if the file is newly uploaded;
+        //     because GLIDE currently doesn't support image editing
+
+        // Use the latest version of content
         treeFile.content = file.newContent ? file.newContent : file.originalContent;
-        if(treeFile.content) {
+
+        // For text file that was opened on GLIDE
+        if(treeFile.content && FileUtil.isText(treeFile)) {
+          // Use content that could have been potentially updated
           delete treeFile.sha;
         }
         else {
+          // Just use the sha;
+          //   this file has never been opened on GLIDE
+          //   or this file's blob has been created on GitHub
           delete treeFile.content;
         }
 
@@ -143,7 +154,7 @@ class CommitPushPane extends React.Component {
     // ]
     // GitHub API doc says
     //   Use either tree.content or tree.sha
-    //   We go with content
+    //   We go with content for text files sha for binary files
     // let essentialKeys = ['path', 'mode', 'type', 'content', 'sha'];
     // for(let i in tree.tree) {
     //   let file = tree.tree[i];
@@ -161,7 +172,7 @@ class CommitPushPane extends React.Component {
       }
     });
 
-    // TODO: One suspicious thing: empty subfolders cause some trouble sometimes?
+    // TODO: One suspicious thing: empty subfolders sometimes cause troubles?
 
     // Remove tree type files with null value of sha
     //   These are subfolders created by the user
@@ -169,7 +180,7 @@ class CommitPushPane extends React.Component {
       return file.type == 'tree' && file.sha == null;
     });
 
-    console.debug('tree optimized before commit & push', tree);
+    // console.debug('tree optimized before commit & push', tree);
     
     let repository = this.state.repository;
     let branch = this.state.branch;

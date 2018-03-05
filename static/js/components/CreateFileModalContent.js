@@ -33,6 +33,7 @@ class CreateFileModalContent extends React.Component {
     this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
     this.handleUploadFilesError = this.handleUploadFilesError.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.createBinaryBlob = this.createBinaryBlob.bind(this);
   }
 
   _reset() {
@@ -298,6 +299,7 @@ class CreateFileModalContent extends React.Component {
               tree: tree,
               addedFiles: addedFiles
             }, function() {
+              self.createBinaryBlob(addedFiles);
               self._reset();
             });
           });
@@ -310,6 +312,41 @@ class CreateFileModalContent extends React.Component {
     //   Blob is automatically created on GitHub
     //   when the branch is pushed and tree has blob content.
     // 
+  }
+
+  createBinaryBlob(addedFiles) {
+    let self = this;
+
+    _.forEach(addedFiles, function(f) {
+      if(FileUtil.isBinary(f)) {
+        console.info(f);
+        let url = '/api/project/blob/' + self.state.repository.full_name + '/';
+        
+        $.ajax({
+          url: url,
+          method: 'POST',
+          headers: { 'X-CSRFToken': window.glide.csrfToken },
+          dataType: 'json',
+          data: JSON.stringify({
+            originalContent: btoa(f.originalContent),
+            encoding: 'base64'
+          }),
+          contentType: 'application/json; charset=utf-8',
+          success: function(response) {
+            // console.debug(response);
+            if('error' in response) {
+              //
+            }
+            else {
+              // Update the file;
+              //   Not sure if it's required
+              f.sha = response.sha;
+              f.url = response.url;
+            }
+          }
+        });
+      }
+    });
   }
 
   componentDidMount() {

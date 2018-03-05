@@ -118,7 +118,7 @@ class FileNode extends React.Component {
     else {
       // Toggle the file icon of this FileNode
       $(e.target).children('i.file.icon').toggleClass('outline');
-
+      
       if(file.originalContent == null) {
         // Initial loading of an existing file in the repository:
         //   Request server to load remote resources

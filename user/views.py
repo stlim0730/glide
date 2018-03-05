@@ -143,10 +143,10 @@ def logout(request, owner=None, repo=None, branch=None):
     input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
   )
   if owner and repo and branch:
-    userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo, branch, username)
-    branchPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo, branch)
-    repoPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner, repo)
-    ownerPathStr = os.path.join(settings.MEDIA_ROOT, 'hexo', owner)
+    userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch, username)
+    branchPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch)
+    repoPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo)
+    ownerPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner)
     
     userBasePath = pathlib.Path(userBasePathStr)
     if userBasePath.exists():

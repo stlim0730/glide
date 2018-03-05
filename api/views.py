@@ -619,7 +619,7 @@ def tree(request, owner, repo, branch, commit):
 
 
 @api_view(['GET', 'POST'])
-def blob(request, owner, repo, sha):
+def blob(request, owner, repo, sha=None):
   """
   GET a blob specified and return it
   POST a blob to create it on GitHub
@@ -649,9 +649,10 @@ def blob(request, owner, repo, sha):
     createBlobData = json.dumps(createBlobData).encode('utf-8')
     with urlopen(createBlobUrl, createBlobData) as createBlobRes:
       resStr = createBlobRes.read().decode('utf-8')
+      createBlobRes = json.loads(resStr)
       return Response({
-        'createBlobRes': json.loads(resStr),
-        'code': createBlobRes.getcode()
+        'url': createBlobRes['url'],
+        'sha': createBlobRes['sha']
       })
 
 
