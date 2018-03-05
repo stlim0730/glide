@@ -1,6 +1,8 @@
-import Files from 'react-files';
-import FileUploadThumbnail from './FileUploadThumbnail.js';
 import Alert from 'react-s-alert';
+import Files from 'react-files';
+import Serializers from '../util/Serializers.js';
+import FileUtil from '../util/FileUtil.js';
+import FileUploadThumbnail from './FileUploadThumbnail.js';
 
 // 
 // CreateFileModalContent component
@@ -31,6 +33,7 @@ class CreateFileModalContent extends React.Component {
     this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
     this.handleUploadFilesError = this.handleUploadFilesError.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.createBinaryBlob = this.createBinaryBlob.bind(this);
   }
 
   _reset() {
@@ -259,8 +262,14 @@ class CreateFileModalContent extends React.Component {
             // To match encoding / decoding scheme to blobs through GitHub API
             if(self.state.fileCreationMode != 'file' || self.state.fileOrFolder != 'folder') {
               // When the created object is a file, not a folder
-              
-              createdFile.originalContent = atob(createdFile.originalContent);
+              if(FileUtil.isBinary(createdFile)) {
+                // For binary files: atob decodes
+                createdFile.originalContent = atob(createdFile.originalContent);
+              }
+              else {
+                // For text files
+                createdFile.originalContent = Serializers.b64DecodeUnicode(createdFile.originalContent);
+              }
 
               // Update addedFiles
               //   Just remove potentially existing duplicate
@@ -290,6 +299,7 @@ class CreateFileModalContent extends React.Component {
               tree: tree,
               addedFiles: addedFiles
             }, function() {
+              self.createBinaryBlob(addedFiles);
               self._reset();
             });
           });
@@ -302,6 +312,41 @@ class CreateFileModalContent extends React.Component {
     //   Blob is automatically created on GitHub
     //   when the branch is pushed and tree has blob content.
     // 
+  }
+
+  createBinaryBlob(addedFiles) {
+    let self = this;
+
+    _.forEach(addedFiles, function(f) {
+      if(FileUtil.isBinary(f)) {
+        console.info(f);
+        let url = '/api/project/blob/' + self.state.repository.full_name + '/';
+        
+        $.ajax({
+          url: url,
+          method: 'POST',
+          headers: { 'X-CSRFToken': window.glide.csrfToken },
+          dataType: 'json',
+          data: JSON.stringify({
+            originalContent: btoa(f.originalContent),
+            encoding: 'base64'
+          }),
+          contentType: 'application/json; charset=utf-8',
+          success: function(response) {
+            // console.debug(response);
+            if('error' in response) {
+              //
+            }
+            else {
+              // Update the file;
+              //   Not sure if it's required
+              f.sha = response.sha;
+              f.url = response.url;
+            }
+          }
+        });
+      }
+    });
   }
 
   componentDidMount() {

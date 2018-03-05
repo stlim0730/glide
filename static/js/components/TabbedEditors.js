@@ -1,5 +1,6 @@
 import brace from 'brace';
 import AceEditor from 'react-ace';
+import FileUtil from '../util/FileUtil.js';
 
 // Syntax highlighing supported by Ace Editor
 import 'brace/mode/c_cpp';
@@ -116,38 +117,6 @@ class TabbedEditors extends React.Component {
     this.handleTabClick = this.handleTabClick.bind(this);
     this.handleEditorChange = this.handleEditorChange.bind(this);
   }
-  
-  static _isTextFile(fileObj) {
-    const regexes = {
-      'textFileRegex'      : /\.txt$/i,
-      'htmlFileRegex'      : /\.(htm|html)$/i,
-      'webDevFileRegex'    : /\.(js|css|sass|less)$/i,
-      'templateFisleRegex'  : /\.(swig|ejs|pug|haml|jade|mustache|handlebars|dust)$/i,
-      'dataFileRegex'      : /\.(yaml|yml|json|csv)$/i,
-      'markdownFileRegex'  : /\.(md|markdown|mdown|mkdn|mkd)$/i,
-      'miscAppFileRegex'   : /\.(log|sh)$/i,
-      'sourceCodeFileRegex': /\.(py|java|c|h|cpp|php|cs|r|pl|rb|m|mlx|latex|tex)$/i
-    };
-
-    for(let key in regexes) {
-      let regex = regexes[key];
-      if(regex.test(fileObj.name)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  static _isImageFile(fileObj) {
-    const imgFileRegex = /\.(jpg|jpeg|gif|png|svg|bmp|ico)$/i;
-    if(imgFileRegex.test(fileObj.name)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
 
   static getMode(fileObj) {
     const regexes = {
@@ -168,7 +137,7 @@ class TabbedEditors extends React.Component {
       'liquid': /\.liquid$/,
       'lua': /\.lua$/,
       'markdown': /\.(md|markdown|mdown|mkdn|mkd)$/,
-      'matlab': /\.(m|mlx)$/,
+      'matlab': /\.m$/,
       'perl': /\.pl$/,
       'php': /\.php$/,
       'plain_text': /\.txt$/,
@@ -196,7 +165,7 @@ class TabbedEditors extends React.Component {
     return 'plain_text';
   }
 
-  static _getObjUrl(fileObj) {
+  static getInlineImgUrl(fileObj) {
     return 'data:image/png;base64,' + btoa(fileObj.originalContent);
   }
 
@@ -205,7 +174,7 @@ class TabbedEditors extends React.Component {
   //   return prefix + fileObj.sha;
   // }
 
-  static _getEditorId(fileObj) {
+  static getEditorId(fileObj) {
     let prefix = 'editor_';
     return prefix + fileObj.sha;
   }
@@ -393,7 +362,7 @@ class TabbedEditors extends React.Component {
         <li key={index} className="nav-item">
           <a
             style={{paddingRight:8}} title={item.path}
-            href={"#" + TabbedEditors._getEditorId(item)}
+            href={"#" + TabbedEditors.getEditorId(item)}
             data-toggle="tab" className={tabClassName}
             onMouseEnter={this.handleTabMouseOver.bind(this)}
             onMouseLeave={this.handleTabMouseOut.bind(this)}
@@ -421,7 +390,7 @@ class TabbedEditors extends React.Component {
       let options = {
         lineNumbers: true
       };
-      let idStr = TabbedEditors._getEditorId(item);
+      let idStr = TabbedEditors.getEditorId(item);
       
       // Handle height of editor:
       //   The editor overflows the pane
@@ -432,21 +401,7 @@ class TabbedEditors extends React.Component {
       // Set syntax highlighter of the editor
       let mode = TabbedEditors.getMode(item);
 
-      // let themes = [
-      //   'ambiance', 'chaos', 'chrome', 'clouds_midnight', 'clouds',
-      //   'cobalt', 'crimson_editor', 'dawn', 'dracula',
-      //   'dreamweaver', 'eclipse', 'github', 'gob', 'gruvbox',
-      //   'idle_fingers', 'iplastic', 'katzenmilch', 'kr_theme',
-      //   'kuroir', 'merbivore_soft', 'merbivore', 'mono_industrial',
-      //   'monokai', 'pastel_on_dark', 'solarized_dark', 'solarized_light',
-      //   'sqlserver', 'terminal', 'textmate', 'tomorrow_night_blue',
-      //   'tomorrow_night_bright', 'tomorrow_night_eighties',
-      //   'tomorrow_night', 'tomorrow', 'twilight', 'vibrant_ink', 'xcode'
-      // ];
-      // let theme = themes[Math.floor(Math.random() * 37)];
-      // console.log(mode, theme);
-
-      let editor = TabbedEditors._isTextFile(item) ?
+      let editor = FileUtil.isText(item) ?
         <AceEditor
           className={editorClassName}
           editorProps={{$blockScrolling: Infinity}}
@@ -464,9 +419,9 @@ class TabbedEditors extends React.Component {
           value={item.modified ? item.newContent : item.originalContent}
           width="100%" /> :
         (
-          TabbedEditors._isImageFile(item) ?
-          <div key={index}>
-            <img src={TabbedEditors._getObjUrl(item)} />
+          FileUtil.isImage(item) ?
+          <div key={index} className={editorClassName} id={idStr}>
+            <img src={TabbedEditors.getInlineImgUrl(item)} />
           </div>:
           null
         );

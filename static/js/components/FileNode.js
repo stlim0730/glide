@@ -1,3 +1,6 @@
+import Serializers from '../util/Serializers.js';
+import FileUtil from '../util/FileUtil.js';
+
 // 
 // FileNode component
 // 
@@ -115,7 +118,7 @@ class FileNode extends React.Component {
     else {
       // Toggle the file icon of this FileNode
       $(e.target).children('i.file.icon').toggleClass('outline');
-
+      
       if(file.originalContent == null) {
         // Initial loading of an existing file in the repository:
         //   Request server to load remote resources
@@ -133,8 +136,15 @@ class FileNode extends React.Component {
             else {
               // response.blob.content is always encoded in base64
               //   https://developer.github.com/v3/git/blobs/#get-a-blob
-              // atob() decodes
-              file.originalContent = atob(response.blob.content);
+              
+              if(FileUtil.isBinary(file)) {
+                // For binary files: atob decodes
+                file.originalContent = atob(response.blob.content);
+              }
+              else {
+                // For text files
+                file.originalContent = Serializers.b64DecodeUnicode(response.blob.content);
+              }
               
               filesOpened.push(file);
               self.setState({
@@ -151,6 +161,7 @@ class FileNode extends React.Component {
         });
       }
       else {
+        // Loading file that was newly created on GLIDE
         // Use local content:
         //   Just set the state
         filesOpened.push(file);
