@@ -46,6 +46,8 @@ sudo pip3 install --upgrade pip
 # 
 sudo apt-get install -y nginx
 sudo rm -rf /etc/nginx/sites-enabled/default
+# Note that you should upload the local settings file
+# scp deployment/nginx_conf_digitalocean root@104.236.50.12:/glide/deployment
 sudo cp /$PROJECT_NAME/deployment/nginx_conf_digitalocean /etc/nginx/sites-available/$PROJECT_NAME
 sudo ln -s /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled/
 sudo pip3 install uwsgi
@@ -154,7 +156,6 @@ sudo swapon /swapfile
 # 
 cd /$PROJECT_NAME && sudo npm install
 # cd /$PROJECT_NAME && sudo npm install pm2 -g
-cd /$PROJECT_NAME && sudo npm install hexo-cli -g
 
 
 # 
