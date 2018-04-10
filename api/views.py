@@ -65,7 +65,7 @@ def repositories(request):
     that are accessible to the authenticated user
   """
   accessToken = request.session['accessToken']
-  getAllReposUrl = 'https://api.github.com/user/repos?access_token={}'
+  getAllReposUrl = 'https://api.github.com/user/repos?&per_page=100&access_token={}'
   getAllReposUrl = getAllReposUrl.format(accessToken)
   getAllReposUrl = getAuthUrl(getAllReposUrl)
   with urlopen(getAllReposUrl) as allReposRes:
@@ -147,7 +147,7 @@ def branches(request, repositoryFullName):
   Responds with a list of branches in the specified project
   """
   accessToken = request.session['accessToken']
-  getBranchesUrl = 'https://api.github.com/repos/{}/branches?access_token={}'
+  getBranchesUrl = 'https://api.github.com/repos/{}/branches?&per_page=100&access_token={}'
   getBranchesUrl = getBranchesUrl.format(repositoryFullName, accessToken)
   getBranchesUrl = getAuthUrl(getBranchesUrl)
   with urlopen(getBranchesUrl) as branchesRes:
