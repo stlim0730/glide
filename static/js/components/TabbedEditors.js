@@ -347,7 +347,7 @@ class TabbedEditors extends React.Component {
     });
   }
 
-  render () {
+  render() {
     let tabs = [];
     let tabbedEditors = [];
 
@@ -362,8 +362,12 @@ class TabbedEditors extends React.Component {
         <li key={index} className="nav-item">
           <a
             style={{paddingRight:8}} title={item.path}
-            href={"#" + TabbedEditors.getEditorId(item)}
-            data-toggle="tab" className={tabClassName}
+            href="#"
+            // Now handling bootstrap tab behavior in React-controlled way,
+            //   so comment them out
+            // href={"#" + TabbedEditors.getEditorId(item)}
+            // data-toggle="tab"
+            className={tabClassName}
             onMouseEnter={this.handleTabMouseOver.bind(this)}
             onMouseLeave={this.handleTabMouseOut.bind(this)}
             onClick={this.handleTabClick.bind(this, item)}>
