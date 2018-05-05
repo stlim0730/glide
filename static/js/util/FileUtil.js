@@ -10,6 +10,18 @@ class FileUtil extends React.Component {
     };
   }
 
+  static validateFileName(fileName) {
+    // Validate the file name
+    // TODO: Allow unicode word characters
+    let fileNameRegex = /^([\w\s\.-]+)$/i;
+    if(fileNameRegex.test(fileName)) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
   static isText(fileObj) {
     const regexes = {
       'textFileRegex'      : /\.txt$/i,

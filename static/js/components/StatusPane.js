@@ -8,8 +8,9 @@ class StatusPane extends React.Component {
     this.state = {
       repository: null,
       branch: null,
+      addedFiles: [],
       changedFiles: [],
-      addedFiles: []
+      removedFiles: []
     };
 
     this.handleProceedClick = this.handleProceedClick.bind(this);
@@ -26,8 +27,9 @@ class StatusPane extends React.Component {
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
+      addedFiles: this.props.addedFiles,
       changedFiles: this.props.changedFiles,
-      addedFiles: this.props.addedFiles
+      removedFiles: this.props.removedFiles
     });
   }
 
@@ -35,8 +37,9 @@ class StatusPane extends React.Component {
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
+      addedFiles: nextProps.addedFiles,
       changedFiles: nextProps.changedFiles,
-      addedFiles: nextProps.addedFiles
+      removedFiles: nextProps.removedFiles
     });
   }
 
@@ -110,14 +113,22 @@ class StatusPane extends React.Component {
             className="list-group-item d-flex justify-content-between align-items-center">
             <span><i className="red erase icon"></i> Removed Files</span>
             <span className="badge badge-danger badge-pill">
-              0
+              {this.state.removedFiles.length}
             </span>
           </button>
           <div
             style={{maxHeight: '15vh', overflow: 'scroll'}}
             id="status-removed-files" className="collapse">
             {
-              //
+              this.state.removedFiles.map(function(item, index) {
+                return (
+                  <button
+                    key={item.path} type="button" style={{marginLeft:30, textDecoration: 'line-through'}}
+                    className="btn btn-link block file-node-file">
+                    <i className="text file outline icon"></i> {item.path}
+                  </button>
+                );
+              }.bind(this))
             }
           </div>
         </ul>

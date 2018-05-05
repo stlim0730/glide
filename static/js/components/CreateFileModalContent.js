@@ -63,17 +63,17 @@ class CreateFileModalContent extends React.Component {
   //     .trim();
   // }
 
-  static validateFileName(fileName) {
-    // Validate the file name
-    // TODO: Allow unicode word characters
-    let fileNameRegex = /^([\w\s\.-]+)$/i;
-    if(fileNameRegex.test(fileName)) {
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
+  // static validateFileName(fileName) {
+  //   // Validate the file name
+  //   // TODO: Allow unicode word characters
+  //   let fileNameRegex = /^([\w\s\.-]+)$/i;
+  //   if(fileNameRegex.test(fileName)) {
+  //     return true;
+  //   }
+  //   else {
+  //     return false;
+  //   }
+  // }
 
   _addFileToRecursiveTree(recursiveTree, newFile, folders) {
     if(folders.length == 1) {
@@ -126,7 +126,7 @@ class CreateFileModalContent extends React.Component {
   handleFileNameChange(e) {
     let fileName = e.target.value.trim();
 
-    if(CreateFileModalContent.validateFileName(fileName)) {
+    if(FileUtil.validateFileName(fileName)) {
       this.setState({
         fileName: fileName
       });
@@ -548,7 +548,7 @@ class CreateFileModalContent extends React.Component {
               ) ||
               (
                 this.state.fileCreationMode != 'upload' &&
-                !CreateFileModalContent.validateFileName(this.state.fileName)
+                !FileUtil.validateFileName(this.state.fileName)
               )
             }>
             Submit

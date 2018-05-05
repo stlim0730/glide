@@ -19,12 +19,13 @@ import './lib/bootstrap/bootstrap.min.js';
 // 
 import NavBar from './components/NavBar.js';
 import Modal from './components/Modal.js';
-import CreateBranchModalContent from './components/CreateBranchModalContent.js';
-import GitStatusModalContent from './components/GitStatusModalContent.js';
-import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
-import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
-import GitResetModalContent from './components/GitResetModalContent.js';
+// import CreateBranchModalContent from './components/CreateBranchModalContent.js';
+// import GitStatusModalContent from './components/GitStatusModalContent.js';
+// import GitCommitPushModalContent from './components/GitCommitPushModalContent.js';
+// import GitPullRequestModalContent from './components/GitPullRequestModalContent.js';
+// import GitResetModalContent from './components/GitResetModalContent.js';
 import CreateFileModalContent from './components/CreateFileModalContent.js';
+import FileManipulationModalContent from './components/FileManipulationModalContent.js';
 import RepositoryPane from './components/RepositoryPane.js';
 import BranchPane from './components/BranchPane.js';
 import WorkspacePane from './components/WorkspacePane.js';
@@ -61,12 +62,13 @@ class App extends React.Component {
       initialCommit: null,
       tree: null,
       recursiveTree: null,
-      scaffolds: [],
-      scaffold: null,
+      fileManipulation: null,
+      fileToManipulate: null,
       filesOpened: [],
       fileActive: null,
-      changedFiles: [],
       addedFiles: [],
+      changedFiles: [],
+      removedFiles: [],
       loadingMessages: {}
     };
   }
@@ -159,9 +161,19 @@ class App extends React.Component {
               repository={this.state.repository}
               branch={this.state.branch}
               tree={this.state.tree}
+              recursiveTree={this.state.recursiveTree} />
+          }
+          large={false} />
+        <Modal id="file-manipulation-modal"
+          modalContent={
+            <FileManipulationModalContent
+              app={this}
+              repository={this.state.repository}
+              branch={this.state.branch}
+              tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
-              scaffolds={this.state.scaffolds}
-              scaffold={this.state.scaffold} />
+              fileManipulation={this.state.fileManipulation}
+              fileToManipulate={this.state.fileToManipulate} />
           }
           large={false} />
         {
@@ -273,8 +285,9 @@ class App extends React.Component {
               commit={this.state.commit}
               tree={this.state.tree}
               recursiveTree={this.state.recursiveTree}
-              changedFiles={this.state.changedFiles}
               addedFiles={this.state.addedFiles}
+              changedFiles={this.state.changedFiles}
+              removedFiles={this.state.removedFiles}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened} />
             <LoadingPane

@@ -17,8 +17,9 @@ class WorkspacePane extends React.Component {
       commit: null,
       tree: null,
       recursiveTree: null,
-      changedFiles: [],
       addedFiles: [],
+      changedFiles: [],
+      removedFiles: [],
       fileActive: null,
       filesOpened: []
     };
@@ -51,8 +52,9 @@ class WorkspacePane extends React.Component {
       commit: this.props.commit,
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
-      changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
+      changedFiles: this.props.changedFiles,
+      removedFiles: this.props.removedFiles,
       fileActive: this.props.fileActive,
       filesOpened: this.props.filesOpened
     });
@@ -67,8 +69,9 @@ class WorkspacePane extends React.Component {
       commit: nextProps.commit,
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
-      changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
+      changedFiles: nextProps.changedFiles,
+      removedFiles: nextProps.removedFiles,
       fileActive: nextProps.fileActive,
       filesOpened: nextProps.filesOpened
     });
@@ -105,8 +108,9 @@ class WorkspacePane extends React.Component {
             commit={this.state.commit}
             tree={this.state.tree}
             recursiveTree={this.state.recursiveTree}
-            changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
+            changedFiles={this.state.changedFiles}
+            removedFiles={this.state.removedFiles}
             fileActive={this.state.fileActive} />
         </div>
 

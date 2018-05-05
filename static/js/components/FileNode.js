@@ -23,7 +23,7 @@ class FileNode extends React.Component {
     // this._getEditorId = this._getEditorId.bind(this);
     this.handleFileMouseOver = this.handleFileMouseOver.bind(this);
     this.handleFileMouseOut = this.handleFileMouseOut.bind(this);
-    this.handleFileManClick = this.handleFileManClick.bind(this);
+    this.handleFileManipulationClick = this.handleFileManipulationClick.bind(this);
     this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
     this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
@@ -80,18 +80,24 @@ class FileNode extends React.Component {
     $(e.target).children('.file-manipulation.icon').addClass('invisible');
   }
 
-  handleFileManClick(operation, e) {
-    console.log(operation, this);
+  handleFileManipulationClick(manipulation, file, e) {
+    console.log(manipulation, file);
     e.stopPropagation();
     
-    // switch(operation) {
-    //   case 'rename':
-    //     break;
-    //   case 'remove':
-    //     break;
-    //   case 'copy':
-    //     break;
-    // }
+    switch(manipulation) {
+      case 'Rename':
+        break;
+      case 'Delete':
+        break;
+      case 'Copy':
+        break;
+    }
+
+    let app = this.props.app;
+    app.setState({
+      fileManipulation: manipulation,
+      fileToManipulate: file
+    });
   }
 
   handleFolderClick(e) {
@@ -273,18 +279,24 @@ class FileNode extends React.Component {
                   } {item.name}
                   {
                     <i
-                      style={{ marginLeft: 20 }} onClick={this.handleFileManClick.bind(this, 'rename')}
-                      className="olive write icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Rename', item)}
+                      className="olive write icon invisible file-manipulation"
+                      title="Rename this file" style={{ marginLeft: 20 }}></i>
                   }
                   {
                     <i
-                      onClick={this.handleFileManClick.bind(this, 'remove')}
-                      className="red remove icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Delete', item)}
+                      className="red remove icon invisible file-manipulation"
+                      title="Delete this file"></i>
                   }
                   {
                     <i
-                      onClick={this.handleFileManClick.bind(this, 'copy')}
-                      className="teal copy icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Copy', item)}
+                      className="teal copy icon invisible file-manipulation"
+                      title="Copy this file to..."></i>
                   }
                 </button>
               );
