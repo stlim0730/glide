@@ -1,3 +1,5 @@
+private.key
+cert_chain.crt
 webpack-stats.json
 glide/local_settings_digitalocean.py
 media/repos/**/
