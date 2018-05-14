@@ -319,7 +319,7 @@ class CreateFileModalContent extends React.Component {
 
     _.forEach(addedFiles, function(f) {
       if(FileUtil.isBinary(f)) {
-        console.info(f);
+        // console.info(f);
         let url = '/api/project/blob/' + self.state.repository.full_name + '/';
         
         $.ajax({

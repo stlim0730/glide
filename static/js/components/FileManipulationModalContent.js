@@ -1,8 +1,7 @@
 import Alert from 'react-s-alert';
 // import Files from 'react-files';
-// import Serializers from '../util/Serializers.js';
+import Serializers from '../util/Serializers.js';
 import FileUtil from '../util/FileUtil.js';
-// import FileUploadThumbnail from './FileUploadThumbnail.js';
 
 // 
 // FileManipulationModalContent component
@@ -77,9 +76,18 @@ class FileManipulationModalContent extends React.Component {
   }
 
   handleFileNameChange(e) {
+    let tree = this.state.tree;
     let fileName = e.target.value.trim();
+    let fileToManipulate = this.state.fileToManipulate;
+    let fileNameRegex = new RegExp(fileToManipulate.name + '$');
+    let path = fileToManipulate.path.replace(fileNameRegex, '');
+    let duplicate = _.find(tree.tree, function (f) {
+      return f.path === path + fileName;
+    });
 
-    if(FileUtil.validateFileName(fileName)) {
+    if(FileUtil.validateFileName(fileName)
+      && this.oldFileNameInput.value != fileName
+      && !duplicate) {
       this.setState({
         newFileName: fileName
       });
@@ -108,42 +116,114 @@ class FileManipulationModalContent extends React.Component {
     let fileToManipulate = this.state.fileToManipulate;
     let oldFileDummy = JSON.parse(JSON.stringify(fileToManipulate));
 
-    switch(this.state.fileManipulation) {
+    // TODO: Get ready for Ajax call
+    let manipulation = this.state.fileManipulation;
+    let source = null;
+    let target = null;
+    switch(manipulation) {
       case 'Rename':
-        // Update tree
-        let targetFile = _.find(tree.tree, function(f) {
-          return f.path === fileToManipulate.path;
-        });
-        let fileNameRegex = new RegExp(targetFile.name + '$');
-        targetFile.path = targetFile.path.replace(fileNameRegex, this.state.newFileName);
-        targetFile.name = this.state.newFileName;
-        // Update recursiveTree
-        let folders = fileToManipulate.path.split('/');
-        this.updateRecursiveTree(recursiveTree, this.state.fileManipulation, fileToManipulate, folders);
-        if(!_.find(removedFiles, function(f) { 
-          return f.path === oldFileDummy.path; })) {
-          removedFiles.push(oldFileDummy);
-        }
-        if(!_.find(addedFiles, function(f) { 
-          return f.path === targetFile.path; })) {
-          addedFiles.push(targetFile);
-        }
-        // TODO: Original file remains when committed and pushed
-        app.setState({
-          tree: tree,
-          recursiveTree: recursiveTree,
-          addedFiles: addedFiles,
-          changedFiles: changedFiles,
-          removedFiles: removedFiles
-        }, function() {
-          // console.log(removedFiles, app.state.removedFiles);
-        });
+        source = fileToManipulate;
+        let fileNameRegex = new RegExp(source.name + '$');
+        target = source.path.replace(fileNameRegex, this.state.newFileName);
         break;
       case 'Delete':
         break;
       case 'Copy':
         break;
     }
+
+    // TODO: Ajax call for server side file manipulation
+    let url = '/api/project/file/manipulate';
+    let self = this;
+    $.ajax({
+      url: url,
+      method: 'POST',
+      headers: { 'X-CSRFToken': window.glide.csrfToken },
+      dataType: 'json',
+      data: JSON.stringify({
+        'manipulation': this.state.fileManipulation.toLowerCase(),
+        'source': source.path,
+        'target': target,
+        'repository': this.state.repository.full_name,
+        'branch': this.state.branch.name
+      }),
+      contentType: 'application/json; charset=utf-8',
+      success: function(response) {
+        console.debug(response);
+        if('error' in response) {
+          // TODO
+        }
+        else {
+          switch(manipulation) {
+            case 'Rename':
+              // Update tree
+              let targetFile = _.find(tree.tree, function(f) {
+                return f.path === source.path;
+              });
+              // TODO: Get blob content
+              let url = '/api/project/blob/'
+                + self.state.repository.full_name
+                + '/' + targetFile.sha;
+
+              $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                  if('error' in response) {
+                    // TODO
+                  }
+                  else {
+                    // response.blob.content is always encoded in base64
+                    //   https://developer.github.com/v3/git/blobs/#get-a-blob
+                    if(FileUtil.isBinary(targetFile)) {
+                      // For binary files: atob decodes
+                      targetFile.originalContent = atob(response.blob.content);
+                    }
+                    else {
+                      // For text files
+                      targetFile.originalContent = Serializers.b64DecodeUnicode(response.blob.content);
+                    }
+                  }
+                }
+              });
+              targetFile.path = target;
+              targetFile.name = self.state.newFileName;
+              // Update recursiveTree
+              let folders = fileToManipulate.path.split('/');
+              self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
+              // Update Git status
+              if(!_.find(removedFiles, function(f) { 
+                return f.path === oldFileDummy.path; })) {
+                removedFiles.push(oldFileDummy);
+              }
+              if(!_.find(addedFiles, function(f) { 
+                return f.path === targetFile.path; })) {
+                addedFiles.push(targetFile);
+              }
+              // TODO: Original file remains when committed and pushed
+              self.setState({
+                newFileName: ''
+              }, function() {
+                app.setState({
+                  tree: tree,
+                  recursiveTree: recursiveTree,
+                  fileToManipulate: null,
+                  addedFiles: addedFiles,
+                  changedFiles: changedFiles,
+                  removedFiles: removedFiles
+                }, function() {
+                  console.log(self.state.tree, self.state.recursiveTree);
+                });
+              });
+              break;
+            case 'Delete':
+              break;
+            case 'Copy':
+              break;
+          }
+        }
+      }
+    });
   }
 
   // handleSubmit() {
@@ -340,7 +420,7 @@ class FileManipulationModalContent extends React.Component {
                   <input
                     type="text" maxLength="255" disabled
                     ref={(c) => this.oldFileNameInput = c}
-                    className="form-control" value={this.state.fileToManipulate.name} />
+                    className="form-control" value={this.state.fileToManipulate ? this.state.fileToManipulate.name : ''} />
                 </div>
                 <label className="control-label">
                   New Name

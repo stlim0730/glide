@@ -900,3 +900,29 @@ def updateFile(request):
     'res': actualPath.exists(),
     'size': os.stat(str(actualPath)).st_size
   })
+
+@api_view(['POST'])
+def manipulateFile(request):
+  manipulation = request.data['manipulation']
+  source = request.data['source']
+  target = request.data['target']
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  username = request.session['username'].split('@')[0]
+  # Create dirs
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
+  userBasePath = pathlib.Path(userBasePathStr)
+  # Manipulate file
+  if manipulation == 'rename':
+    sourcePath = str(userBasePath / source)
+    targetPath = str(userBasePath / target)
+    shutil.move(sourcePath, targetPath)
+  elif manipulation == 'delete':
+    pass
+  elif manipulation == 'copy':
+    pass
+  return Response({
+    'manipulation': manipulation,
+    'source': source,
+    'target': target
+  })

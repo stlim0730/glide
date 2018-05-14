@@ -24,7 +24,7 @@ class FileNode extends React.Component {
     this.handleFileMouseOver = this.handleFileMouseOver.bind(this);
     this.handleFileMouseOut = this.handleFileMouseOut.bind(this);
     this.handleFileManipulationClick = this.handleFileManipulationClick.bind(this);
-    this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
+    // this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
     this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
   }
@@ -57,19 +57,19 @@ class FileNode extends React.Component {
   //   return fileObj.sha + suffix;
   // }
 
-  _loadScaffoldsFiles(tree) {
-    if(!tree) return [];
+  // _loadScaffoldsFiles(tree) {
+  //   if(!tree) return [];
 
-    let scaffolds = _.filter(tree.tree, function(file) {
-      let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
-      return scaffoldsPathRegex.test(file.path);
-    });
+  //   let scaffolds = _.filter(tree.tree, function(file) {
+  //     let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
+  //     return scaffoldsPathRegex.test(file.path);
+  //   });
 
-    let app = this.props.app;
-    app.setState({
-      scaffolds: scaffolds
-    });
-  }
+  //   let app = this.props.app;
+  //   app.setState({
+  //     scaffolds: scaffolds
+  //   });
+  // }
 
   handleFileMouseOver(e) {
     $('.file-manipulation.icon').addClass('invisible');
@@ -81,7 +81,7 @@ class FileNode extends React.Component {
   }
 
   handleFileManipulationClick(manipulation, file, e) {
-    console.log(manipulation, file);
+    // console.log(manipulation, file);
     e.stopPropagation();
     
     switch(manipulation) {
@@ -190,7 +190,7 @@ class FileNode extends React.Component {
     $('#create-file-modal input.pathInput').val(path);
 
     // Load Hexo-provided scaffolds
-    this._loadScaffoldsFiles(this.state.tree);
+    // this._loadScaffoldsFiles(this.state.tree);
   }
 
   componentDidMount() {

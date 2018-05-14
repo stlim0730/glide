@@ -22,5 +22,6 @@ urlpatterns = [
   url(r'^project/file/new$', views.newFile, name='newFile'),
   url(r'^project/file/upload$', views.uploadFile, name='uploadFile'),
   url(r'^project/file/update$', views.updateFile, name='updateFile'),
-  url(r'^project/file/render$', views.renderFile, name='renderFile')
+  url(r'^project/file/render$', views.renderFile, name='renderFile'),
+  url(r'^project/file/manipulate$', views.manipulateFile, name='manipulateFile')
 ]
