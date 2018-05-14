@@ -94,9 +94,6 @@ class CommitPushPane extends React.Component {
           return (('/' + f.path) == file.path) || (f.path == file.path);
         });
 
-        // Remove potential leading / from treeFile.path
-        // treeFile.path = treeFile.path.startsWith('/') ? treeFile.path.substring(1) : treeFile.path;
-
         // GitHub API doc says
         //   Use either tree.content or tree.sha
         //   We go with content for text files if the file has been touched
@@ -165,8 +162,8 @@ class CommitPushPane extends React.Component {
     //   }
     // }
 
-    // Remove potential leading / from treeFile.path
     _.forEach(tree.tree, function(file) {
+      // Remove potential leading / from treeFile.path
       if(file.path.startsWith('/')) {
         file.path = file.path.substring(1);
       }
@@ -211,13 +208,12 @@ class CommitPushPane extends React.Component {
         }
         else {
           self.setState({
-            changedFiles: [],
-            addedFiles: [],
             commitMessage: ''
           }, function() {
             app.setState({
               changedFiles: [],
-              addedFiles: []
+              addedFiles: [],
+              removedFiles: []
             }, function() {
               self.openCommit(branch);
               self.popLoadingMsg(loadingMsgHandle);
