@@ -20,7 +20,7 @@ class FileManipulationModalContent extends React.Component {
       newFileName: ''
     };
 
-    // this._reset = this._reset.bind(this);
+    this.reset = this.reset.bind(this);
     this.updateRecursiveTree = this.updateRecursiveTree.bind(this);
     // this.handleFileCreationModeChange = this.handleFileCreationModeChange.bind(this);
     // this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
@@ -32,22 +32,15 @@ class FileManipulationModalContent extends React.Component {
     // this.createBinaryBlob = this.createBinaryBlob.bind(this);
   }
 
-  // _reset() {
-  //   let self = this;
+  reset() {
+    let self = this;
 
-  //   this.setState({
-  //     fileOrFolder: null,
-  //     fileName: '',
-  //     fileCreationMode: null,
-  //     filesToUpload: [],
-  //     filesFailedToUpload: []
-  //   }, function() {
-  //     self.fileNameInput.value = '';
-  //     $('.file-creation-tabs').removeClass('active');
-  //     $('.file-creation-panes').removeClass('active show in');
-  //     document.getElementById('fileFormToReset').reset();
-  //   });
-  // }
+    this.setState({
+      fileManipulation: null,
+      fileToManipulate: null,
+      newFileName: ''
+    });
+  }
 
   updateRecursiveTree(recursiveTree, manipulation, fileToManipulate, folders) {
     if(folders.length == 1) {
@@ -119,12 +112,12 @@ class FileManipulationModalContent extends React.Component {
     // TODO: Get ready for Ajax call
     let manipulation = this.state.fileManipulation;
     let source = null;
-    let target = null;
+    let targetPath = '';
     switch(manipulation) {
       case 'Rename':
         source = fileToManipulate;
         let fileNameRegex = new RegExp(source.name + '$');
-        target = source.path.replace(fileNameRegex, this.state.newFileName);
+        targetPath = source.path.replace(fileNameRegex, this.state.newFileName);
         break;
       case 'Delete':
         break;
@@ -132,7 +125,7 @@ class FileManipulationModalContent extends React.Component {
         break;
     }
 
-    // TODO: Ajax call for server side file manipulation
+    // Ajax call for server side file manipulation
     let url = '/api/project/file/manipulate';
     let self = this;
     $.ajax({
@@ -142,14 +135,14 @@ class FileManipulationModalContent extends React.Component {
       dataType: 'json',
       data: JSON.stringify({
         'manipulation': this.state.fileManipulation.toLowerCase(),
-        'source': source.path,
-        'target': target,
+        'source': source,
+        'targetPath': targetPath,
         'repository': this.state.repository.full_name,
         'branch': this.state.branch.name
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        console.debug(response);
+        // console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -160,33 +153,15 @@ class FileManipulationModalContent extends React.Component {
               let targetFile = _.find(tree.tree, function(f) {
                 return f.path === source.path;
               });
-              // TODO: Get blob content
-              let url = '/api/project/blob/'
-                + self.state.repository.full_name
-                + '/' + targetFile.sha;
-
-              $.ajax({
-                url: url,
-                method: 'GET',
-                success: function(response) {
-                  if('error' in response) {
-                    // TODO
-                  }
-                  else {
-                    // response.blob.content is always encoded in base64
-                    //   https://developer.github.com/v3/git/blobs/#get-a-blob
-                    if(FileUtil.isBinary(targetFile)) {
-                      // For binary files: atob decodes
-                      targetFile.originalContent = atob(response.blob.content);
-                    }
-                    else {
-                      // For text files
-                      targetFile.originalContent = Serializers.b64DecodeUnicode(response.blob.content);
-                    }
-                  }
-                }
-              });
-              targetFile.path = target;
+              if(FileUtil.isBinary(targetFile)) {
+                // For binary files: atob decodes
+                targetFile.originalContent = atob(response.content);
+              }
+              else {
+                // For text files
+                targetFile.originalContent = Serializers.b64DecodeUnicode(response.content);
+              }
+              targetFile.path = targetPath;
               targetFile.name = self.state.newFileName;
               // Update recursiveTree
               let folders = fileToManipulate.path.split('/');
@@ -212,7 +187,8 @@ class FileManipulationModalContent extends React.Component {
                   changedFiles: changedFiles,
                   removedFiles: removedFiles
                 }, function() {
-                  console.log(self.state.tree, self.state.recursiveTree);
+                  self.reset();
+                  // console.log(self.state.tree, self.state.recursiveTree);
                 });
               });
               break;

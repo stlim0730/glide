@@ -903,9 +903,10 @@ def updateFile(request):
 
 @api_view(['POST'])
 def manipulateFile(request):
+  accessToken = request.session['accessToken']
   manipulation = request.data['manipulation']
   source = request.data['source']
-  target = request.data['target']
+  targetPath = request.data['targetPath']
   repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
   branch = request.data['branch']
   username = request.session['username'].split('@')[0]
@@ -914,9 +915,17 @@ def manipulateFile(request):
   userBasePath = pathlib.Path(userBasePathStr)
   # Manipulate file
   if manipulation == 'rename':
-    sourcePath = str(userBasePath / source)
-    targetPath = str(userBasePath / target)
+    sourcePath = str(userBasePath / source['path'])
+    targetPath = str(userBasePath / targetPath)
     shutil.move(sourcePath, targetPath)
+    # Return content to update the new file
+    fileContent = None
+    with open(targetPath, 'rb') as f:
+      fileContent = f.read()
+    content = base64.b64encode(fileContent).decode('utf-8')
+    return Response({
+      'content': content
+    })
   elif manipulation == 'delete':
     pass
   elif manipulation == 'copy':
@@ -924,5 +933,5 @@ def manipulateFile(request):
   return Response({
     'manipulation': manipulation,
     'source': source,
-    'target': target
+    'targetPath': targetPath
   })

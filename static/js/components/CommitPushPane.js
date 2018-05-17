@@ -167,6 +167,10 @@ class CommitPushPane extends React.Component {
       if(file.path.startsWith('/')) {
         file.path = file.path.substring(1);
       }
+
+      // Remove some fields to properly update the tree
+      delete file.url;
+      delete file.size;
     });
 
     // TODO: One suspicious thing: empty subfolders sometimes cause troubles?
@@ -174,7 +178,7 @@ class CommitPushPane extends React.Component {
     // Remove tree type files with null value of sha
     //   These are subfolders created by the user
     _.remove(tree.tree, function(file) {
-      return file.type == 'tree' && file.sha == null;
+      return file.type == 'tree';// && file.sha == null;
     });
 
     // console.debug('tree optimized before commit & push', tree);
