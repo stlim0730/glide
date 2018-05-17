@@ -194,7 +194,7 @@ class FileManipulationModalContent extends React.Component {
                   removedFiles: removedFiles
                 }, function() {
                   self.reset();
-                  console.log(self.state.tree, self.state.recursiveTree);
+                  // console.log(self.state.tree, self.state.recursiveTree);
                 });
               });
               break;
@@ -207,7 +207,7 @@ class FileManipulationModalContent extends React.Component {
               folders = fileToManipulate.path.split('/');
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // TODO: Git status
-              // TODO: Update app state
+              // Update app state
               app.setState({
                 tree: tree,
                 recursiveTree: recursiveTree,

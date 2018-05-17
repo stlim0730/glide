@@ -928,6 +928,13 @@ def manipulateFile(request):
     })
   elif manipulation == 'delete':
     targetPath = str(userBasePath / targetPath)
+    if os.path.isfile(targetPath):
+      os.remove(targetPath)
+    else:
+      shutil.rmtree(targetPath, ignore_errors=True)
+    return Response({
+      'targetPath': targetPath
+    })
   elif manipulation == 'copy':
     pass
   return Response({
