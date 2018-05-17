@@ -54,6 +54,10 @@ class FileManipulationModalContent extends React.Component {
           targetFile.name = this.state.newFileName;
           break;
         case 'Delete':
+          let targetPath = fileToManipulate.path
+          let removed = _.remove(recursiveTree.nodes, function(f) {
+            return f.path === targetPath || f.path.startsWith(targetPath + '/');
+          });
           break;
         case 'Copy':
           break;
@@ -120,6 +124,7 @@ class FileManipulationModalContent extends React.Component {
         targetPath = source.path.replace(fileNameRegex, this.state.newFileName);
         break;
       case 'Delete':
+        targetPath = this.state.fileToManipulate.path;
         break;
       case 'Copy':
         break;
@@ -147,6 +152,7 @@ class FileManipulationModalContent extends React.Component {
           // TODO
         }
         else {
+          let folders;
           switch(manipulation) {
             case 'Rename':
               // Update tree
@@ -164,7 +170,7 @@ class FileManipulationModalContent extends React.Component {
               targetFile.path = targetPath;
               targetFile.name = self.state.newFileName;
               // Update recursiveTree
-              let folders = fileToManipulate.path.split('/');
+              folders = fileToManipulate.path.split('/');
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // Update Git status
               if(!_.find(removedFiles, function(f) { 
@@ -175,7 +181,7 @@ class FileManipulationModalContent extends React.Component {
                 return f.path === targetFile.path; })) {
                 addedFiles.push(targetFile);
               }
-              // TODO: Original file remains when committed and pushed
+              // Update app state
               self.setState({
                 newFileName: ''
               }, function() {
@@ -188,11 +194,29 @@ class FileManipulationModalContent extends React.Component {
                   removedFiles: removedFiles
                 }, function() {
                   self.reset();
-                  // console.log(self.state.tree, self.state.recursiveTree);
+                  console.log(self.state.tree, self.state.recursiveTree);
                 });
               });
               break;
             case 'Delete':
+              // Update tree
+              _.remove(tree.tree, function(f) {
+                return f.path === targetPath || f.path.startsWith(targetPath + '/');
+              });
+              // Update recursiveTree
+              folders = fileToManipulate.path.split('/');
+              self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
+              // TODO: Git status
+              // TODO: Update app state
+              app.setState({
+                tree: tree,
+                recursiveTree: recursiveTree,
+                fileToManipulate: null,
+                removedFiles: removedFiles
+              }, function() {
+                self.reset();
+                console.log(self.state.tree, self.state.recursiveTree);
+              });
               break;
             case 'Copy':
               break;
@@ -411,6 +435,15 @@ class FileManipulationModalContent extends React.Component {
             </fieldset>
           }
 
+          {
+            this.state.fileManipulation == 'Delete' &&
+            <fieldset>
+              <div className="form-group">
+                Are you sure you want to delete {this.state.fileToManipulate ? this.state.fileToManipulate.path : ''}?
+              </div>
+            </fieldset>
+          }
+
         </div>
         
         <div className="modal-footer">
@@ -424,7 +457,7 @@ class FileManipulationModalContent extends React.Component {
             className="btn btn-primary" onClick={this.handleConfirm}
             data-dismiss="modal" disabled={
               (
-                this.state.fileCreationMode != 'Rename' &&
+                this.state.fileManipulation == 'Rename' &&
                 !FileUtil.validateFileName(this.state.newFileName)
               )
             }>

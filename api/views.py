@@ -927,7 +927,7 @@ def manipulateFile(request):
       'content': content
     })
   elif manipulation == 'delete':
-    pass
+    targetPath = str(userBasePath / targetPath)
   elif manipulation == 'copy':
     pass
   return Response({
