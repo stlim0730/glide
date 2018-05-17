@@ -345,7 +345,9 @@ class CommitPushPane extends React.Component {
 
   render() {
     let app = this.props.app;
-    let commitable = app.state.changedFiles.length > 0 || app.state.addedFiles.length > 0;
+    let commitable = app.state.changedFiles.length > 0
+      || app.state.addedFiles.length > 0
+      || app.state.removedFiles.length > 0;
     let pullRequestable = app.state.initialCommit && this.state.commit &&
       app.state.initialCommit.sha != this.state.commit.sha && !commitable;
 

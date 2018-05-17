@@ -177,6 +177,9 @@ class FileManipulationModalContent extends React.Component {
                 return f.path === oldFileDummy.path; })) {
                 removedFiles.push(oldFileDummy);
               }
+              _.remove(changedFiles, function(f) {
+                return f.path === oldFileDummy.path;
+              });
               if(!_.find(addedFiles, function(f) { 
                 return f.path === targetFile.path; })) {
                 addedFiles.push(targetFile);
@@ -207,15 +210,27 @@ class FileManipulationModalContent extends React.Component {
               folders = fileToManipulate.path.split('/');
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // TODO: Git status
+              if(!_.find(removedFiles, function(f) { 
+                return f.path === oldFileDummy.path; })) {
+                removedFiles.push(oldFileDummy);
+              }
+              _.remove(changedFiles, function(f) {
+                return f.path === oldFileDummy.path;
+              });
+              _.remove(addedFiles, function(f) {
+                return f.path === oldFileDummy.path;
+              });
               // Update app state
               app.setState({
                 tree: tree,
                 recursiveTree: recursiveTree,
                 fileToManipulate: null,
+                addedFiles: addedFiles,
+                changedFiles: changedFiles,
                 removedFiles: removedFiles
               }, function() {
                 self.reset();
-                console.log(self.state.tree, self.state.recursiveTree);
+                // console.log(self.state.tree, self.state.recursiveTree);
               });
               break;
             case 'Copy':

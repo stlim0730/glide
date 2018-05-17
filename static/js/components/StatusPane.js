@@ -44,7 +44,9 @@ class StatusPane extends React.Component {
   }
 
   render() {
-    let commitable = this.state.changedFiles.length > 0 || this.state.addedFiles.length > 0;
+    let commitable = this.state.changedFiles.length > 0
+      || this.state.addedFiles.length > 0
+      || this.state.removedFiles.length > 0;
 
     return (
       <div className="card" style={{height: '45vh'}}>
