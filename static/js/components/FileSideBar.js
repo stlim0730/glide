@@ -185,6 +185,8 @@ class FileSideBar extends React.Component {
                 app={this.props.app}
                 repository={this.state.repository}
                 tree={this.state.tree}
+                folderOnly={false}
+                fileControlUi={true}
                 filesOpened={this.state.filesOpened}
                 fileActive={this.state.fileActive}
                 currentPath=''

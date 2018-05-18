@@ -1,7 +1,9 @@
 import Alert from 'react-s-alert';
 // import Files from 'react-files';
+import FileNode from './FileNode.js';
 import Serializers from '../util/Serializers.js';
 import FileUtil from '../util/FileUtil.js';
+
 
 // 
 // FileManipulationModalContent component
@@ -241,151 +243,6 @@ class FileManipulationModalContent extends React.Component {
     });
   }
 
-  // handleSubmit() {
-  //   let self = this;
-  //   let tree = this.state.tree;
-  //   let recursiveTree = this.state.recursiveTree;
-  //   let fileName = this.state.fileName;
-
-  //   // Must remove leading '/'
-  //   let path = this.pathInput.value.trim();
-  //   path = (path.startsWith('/') ? path.substring(1) : path);
-    
-  //   // Duplicate check
-  //   let exists = false;
-  //   if(self.state.fileCreationMode=='upload') {
-  //     _.forEach(self.state.filesToUpload, function(fileToUpload) {
-  //       exists = exists || _.find(tree.tree, function(file) {
-  //         return _.lowerCase(file.path) === _.lowerCase(path + fileToUpload.name);
-  //       });
-  //     });
-  //   }
-  //   else {
-  //     exists = _.find(tree.tree, function(file) {
-  //       return _.lowerCase(file.path) === _.lowerCase(path + fileName);
-  //     });
-  //   }
-
-  //   if(exists) {
-  //     console.error('GLIDE: The same file name already exists!');
-  //     this._reset();
-  //     let msg = 'The same file name already exists!';
-  //     Alert.error(msg);
-  //     return;
-  //   }
-
-  //   // Upload the data
-  //   let data = {
-  //     repository: this.state.repository.full_name,
-  //     branch: this.state.branch.name,
-  //     path: path
-  //   };
-    
-  //   let contentType = 'application/json; charset=utf-8';
-  //   let processData = true;
-
-  //   switch(this.state.fileCreationMode) {
-  //     case 'file':
-  //       data.fileOrFolder = this.state.fileOrFolder;
-  //       data.fileName = fileName;
-  //       data = JSON.stringify(data);
-  //       break;
-  //     case 'upload':
-  //       let formData = new FormData();
-  //       processData = false;
-  //       contentType = false;
-  //       _.forEach(this.state.filesToUpload, function(f) {
-  //         formData.append('files', f, f.name);
-  //         // formData.append(f.name + '-type', f.type);
-  //       });
-  //       formData.append('repository', data.repository);
-  //       formData.append('branch', data.branch);
-  //       formData.append('path', data.path);
-  //       data = formData;
-  //       break;
-  //   }
-
-  //   // POST new file to GLIDE server
-  //   let app = this.props.app;
-  //   let url = this.state.fileCreationMode == 'upload' ?
-  //     '/api/project/file/upload' :
-  //     '/api/project/file/new';
-
-  //   $.ajax({
-  //     url: url,
-  //     method: 'POST',
-  //     headers: { 'X-CSRFToken': window.glide.csrfToken },
-  //     dataType: 'json',
-  //     processData: processData,
-  //     contentType: contentType,
-  //     data: data,
-  //     success: function(response) {
-  //       // console.debug(response);
-  //       if('error' in response) {
-  //         // TODO
-  //       }
-  //       else {
-
-  //         // Create the new file objects created on the server
-  //         let createdFiles = response.createdFiles;
-  //         let addedFiles = app.state.addedFiles;
-
-  //         _.forEach(createdFiles, function(createdFile) {
-  //           // To match encoding / decoding scheme to blobs through GitHub API
-  //           if(self.state.fileCreationMode != 'file' || self.state.fileOrFolder != 'folder') {
-  //             // When the created object is a file, not a folder
-  //             if(FileUtil.isBinary(createdFile)) {
-  //               // For binary files: atob decodes
-  //               createdFile.originalContent = atob(createdFile.originalContent);
-  //             }
-  //             else {
-  //               // For text files
-  //               createdFile.originalContent = Serializers.b64DecodeUnicode(createdFile.originalContent);
-  //             }
-
-  //             // Update addedFiles
-  //             //   Just remove potentially existing duplicate
-  //             //   and just push the new file.
-  //             _.remove(addedFiles, function(file) {
-  //               return file.path == createdFile.path;
-  //             });
-  //             addedFiles.push(createdFile);
-  //           }
-            
-  //           // Push the file into tree
-  //           //   Duplicate check not required: UI has addressed it
-  //           //   (c.f., EditorPane)
-  //           tree.tree.push(createdFile);
-
-  //           // Push the file into recursiveTree
-  //           let folders = createdFile.path.split('/');
-  //           self.updateRecursiveTree(recursiveTree, createdFile, folders);
-  //         });
-
-  //         self.setState({
-  //           recursiveTree: recursiveTree,
-  //           tree: tree
-  //         }, function() {
-  //           app.setState({
-  //             recursiveTree: recursiveTree,
-  //             tree: tree,
-  //             addedFiles: addedFiles
-  //           }, function() {
-  //             self.createBinaryBlob(addedFiles);
-  //             self._reset();
-  //           });
-  //         });
-  //       }
-  //     }
-  //   });
-
-  //   //
-  //   // Note:
-  //   //   Blob is automatically created on GitHub
-  //   //   when the branch is pushed and tree has blob content.
-  //   // 
-  // }
-
   componentDidMount() {
     this.setState({
       repository: this.props.repository,
@@ -455,6 +312,45 @@ class FileManipulationModalContent extends React.Component {
             <fieldset>
               <div className="form-group">
                 Are you sure you want to delete {this.state.fileToManipulate ? this.state.fileToManipulate.path : ''}?
+              </div>
+            </fieldset>
+          }
+
+          {
+            this.state.fileManipulation == 'Copy' &&
+            <fieldset>
+              <div className="form-group">
+                <label className="control-label">
+                  Source
+                </label>
+                <div>
+                  <input
+                    type="text" maxLength="255" disabled
+                    ref={(c) => this.sourcePathInput = c}
+                    className="form-control" value={this.state.fileToManipulate ? this.state.fileToManipulate.path : ''} />
+                </div>
+                <label className="control-label">
+                  Target
+                </label>
+                <div>
+                  <input
+                    type="text" maxLength="255" disabled
+                    ref={(c) => this.targetPathInput = c}
+                    className="form-control" />
+                </div>
+                {
+                  this.state.recursiveTree &&
+                  <div style={{maxHeight: '60vh', overflow: 'auto'}}>
+                    <FileNode
+                      app={this.props.app}
+                      repository={this.state.repository}
+                      tree={this.state.tree}
+                      folderOnly={true}
+                      fileControlUi={false}
+                      currentPath=''
+                      nodes={this.state.recursiveTree.nodes} />
+                  </div>
+                }
               </div>
             </fieldset>
           }

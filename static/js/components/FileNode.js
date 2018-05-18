@@ -11,6 +11,8 @@ class FileNode extends React.Component {
     this.state = {
       repository: null,
       tree: null,
+      folderOnly: null,
+      fileControlUi: null,
       filesOpened: [],
       fileActive: null,
       currentPath: '',
@@ -203,6 +205,8 @@ class FileNode extends React.Component {
     this.setState({
       repository: this.props.repository,
       tree: this.props.tree,
+      folderOnly: this.props.folderOnly,
+      fileControlUi: this.props.fileControlUi,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive,
       currentPath: this.props.currentPath
@@ -222,6 +226,8 @@ class FileNode extends React.Component {
     this.setState({
       repository: nextProps.repository,
       tree: nextProps.tree,
+      folderOnly: nextProps.folderOnly,
+      fileControlUi: nextProps.fileControlUi,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive,
       currentPath: nextProps.currentPath
@@ -254,6 +260,8 @@ class FileNode extends React.Component {
                       app={this.props.app}
                       repository={this.state.repository}
                       tree={this.state.tree}
+                      folderOnly={this.state.folderOnly}
+                      fileControlUi={this.state.fileControlUi}
                       filesOpened={this.state.filesOpened}
                       fileActive={this.state.fileActive}
                       currentPath={item.path}
@@ -262,7 +270,7 @@ class FileNode extends React.Component {
                 </div>
               );
             }
-            else {
+            else if(!this.state.folderOnly) {
               // Render a file.
               return (
                 <button
@@ -278,6 +286,7 @@ class FileNode extends React.Component {
                     <i className="file text outline icon"></i>
                   } {item.name}
                   {
+                    this.state.fileControlUi &&
                     <i
                       data-target="#file-manipulation-modal" data-toggle="modal"
                       onClick={this.handleFileManipulationClick.bind(this, 'Rename', item)}
@@ -285,6 +294,7 @@ class FileNode extends React.Component {
                       title="Rename this file" style={{ marginLeft: 20 }}></i>
                   }
                   {
+                    this.state.fileControlUi &&
                     <i
                       data-target="#file-manipulation-modal" data-toggle="modal"
                       onClick={this.handleFileManipulationClick.bind(this, 'Delete', item)}
@@ -292,6 +302,7 @@ class FileNode extends React.Component {
                       title="Delete this file"></i>
                   }
                   {
+                    this.state.fileControlUi &&
                     <i
                       data-target="#file-manipulation-modal" data-toggle="modal"
                       onClick={this.handleFileManipulationClick.bind(this, 'Copy', item)}
@@ -303,13 +314,16 @@ class FileNode extends React.Component {
             }
           }.bind(this))
         }
-        <button
-          className="btn btn-link new-file-button block"
-          onClick={this.handleCreateNewClick.bind(this)}
-          data-toggle="modal" type="button"
-          data-target="#create-file-modal">
-          <i className="add square icon"></i> Create New...
-        </button>
+        {
+          this.state.fileControlUi &&
+          <button
+            className="btn btn-link new-file-button block"
+            onClick={this.handleCreateNewClick.bind(this)}
+            data-toggle="modal" type="button"
+            data-target="#create-file-modal">
+            <i className="add square icon"></i> Create New...
+          </button>
+        }
       </div>
     );
   }
