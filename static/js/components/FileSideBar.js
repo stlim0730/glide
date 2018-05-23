@@ -145,7 +145,7 @@ class FileSideBar extends React.Component {
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
-      console.debug('FileSideBar WRP', this.state, nextProps);
+      // console.debug('FileSideBar WRP', this.state, nextProps);
       // self._ajaxTree(
       //   self.state.repository,
       //   self.state.branch,
@@ -187,6 +187,7 @@ class FileSideBar extends React.Component {
                 tree={this.state.tree}
                 folderOnly={false}
                 fileControlUi={true}
+                componentPrefix=''
                 filesOpened={this.state.filesOpened}
                 fileActive={this.state.fileActive}
                 currentPath=''

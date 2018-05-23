@@ -936,9 +936,11 @@ def manipulateFile(request):
       'targetPath': targetPath
     })
   elif manipulation == 'copy':
-    pass
-  return Response({
-    'manipulation': manipulation,
-    'source': source,
-    'targetPath': targetPath
-  })
+    sourcePath = str(userBasePath / source['path'])
+    targetPath = str(userBasePath / targetPath)
+    res = shutil.copy(sourcePath, targetPath)
+    return Response({
+      'manipulation': manipulation,
+      'sourcePath': sourcePath,
+      'targetPath': res
+    })

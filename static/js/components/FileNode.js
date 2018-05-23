@@ -13,6 +13,7 @@ class FileNode extends React.Component {
       tree: null,
       folderOnly: null,
       fileControlUi: null,
+      componentPrefix: '',
       filesOpened: [],
       fileActive: null,
       currentPath: '',
@@ -102,8 +103,12 @@ class FileNode extends React.Component {
     });
   }
 
-  handleFolderClick(e) {
+  handleFolderClick(folder, e) {
+    let app = this.props.app;
     $(e.target).children('i.folder.icon').toggleClass('open');
+    app.setState({
+      fileManipulationTarget: folder
+    });
   }
 
   handleFileClick(file, e) {
@@ -207,6 +212,7 @@ class FileNode extends React.Component {
       tree: this.props.tree,
       folderOnly: this.props.folderOnly,
       fileControlUi: this.props.fileControlUi,
+      componentPrefix: this.props.componentPrefix,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive,
       currentPath: this.props.currentPath
@@ -228,6 +234,7 @@ class FileNode extends React.Component {
       tree: nextProps.tree,
       folderOnly: nextProps.folderOnly,
       fileControlUi: nextProps.fileControlUi,
+      componentPrefix: nextProps.componentPrefix,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive,
       currentPath: nextProps.currentPath
@@ -250,11 +257,11 @@ class FileNode extends React.Component {
                   <button
                     className="btn btn-link file-node-folder block"
                     data-toggle="collapse" type="button"
-                    onClick={this.handleFolderClick}
-                    data-target={"#" + this._getFolderId(item) + "-list-group"}>
+                    onClick={this.handleFolderClick.bind(this, item)}
+                    data-target={"#" + this.state.componentPrefix + this._getFolderId(item) + "-list-group"}>
                     <i className="folder icon"></i> {item.name}
                   </button>
-                  <ul id={this._getFolderId(item) + "-list-group"}
+                  <ul id={this.state.componentPrefix + this._getFolderId(item) + "-list-group"}
                     className="collapse subtree">
                     <FileNode
                       app={this.props.app}

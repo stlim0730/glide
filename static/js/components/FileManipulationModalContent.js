@@ -19,6 +19,7 @@ class FileManipulationModalContent extends React.Component {
       recursiveTree: null,
       fileManipulation: null,
       fileToManipulate: null,
+      fileManipulationTarget: null,
       newFileName: ''
     };
 
@@ -27,6 +28,7 @@ class FileManipulationModalContent extends React.Component {
     // this.handleFileCreationModeChange = this.handleFileCreationModeChange.bind(this);
     // this.handleFileOrFolderChange = this.handleFileOrFolderChange.bind(this);
     this.handleFileNameChange = this.handleFileNameChange.bind(this);
+    this.handleRootFolderClick = this.handleRootFolderClick.bind(this);
     // this.handleKeyUp = this.handleKeyUp.bind(this);
     // this.handleUploadFilesChange = this.handleUploadFilesChange.bind(this);
     // this.handleUploadFilesError = this.handleUploadFilesError.bind(this);
@@ -38,8 +40,8 @@ class FileManipulationModalContent extends React.Component {
     let self = this;
 
     this.setState({
-      fileManipulation: null,
-      fileToManipulate: null,
+      // fileManipulation: null,
+      // fileToManipulate: null,
       newFileName: ''
     });
   }
@@ -98,6 +100,13 @@ class FileManipulationModalContent extends React.Component {
     }
   }
 
+  handleRootFolderClick(e) {
+    let app = this.props.app;
+    app.setState({
+      fileManipulationTarget: null
+    });
+  }
+
   handleKeyUp(e) {
     let keyCode = e.keyCode;
     if(keyCode == 13) {
@@ -129,6 +138,9 @@ class FileManipulationModalContent extends React.Component {
         targetPath = this.state.fileToManipulate.path;
         break;
       case 'Copy':
+        source = fileToManipulate;
+        targetPath = this.state.fileManipulationTarget
+          ? this.state.fileManipulationTarget.path.replace('/', '') : '';
         break;
     }
 
@@ -149,7 +161,7 @@ class FileManipulationModalContent extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        // console.debug(response);
+        console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -186,22 +198,6 @@ class FileManipulationModalContent extends React.Component {
                 return f.path === targetFile.path; })) {
                 addedFiles.push(targetFile);
               }
-              // Update app state
-              self.setState({
-                newFileName: ''
-              }, function() {
-                app.setState({
-                  tree: tree,
-                  recursiveTree: recursiveTree,
-                  fileToManipulate: null,
-                  addedFiles: addedFiles,
-                  changedFiles: changedFiles,
-                  removedFiles: removedFiles
-                }, function() {
-                  self.reset();
-                  // console.log(self.state.tree, self.state.recursiveTree);
-                });
-              });
               break;
             case 'Delete':
               // Update tree
@@ -211,7 +207,7 @@ class FileManipulationModalContent extends React.Component {
               // Update recursiveTree
               folders = fileToManipulate.path.split('/');
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
-              // TODO: Git status
+              // Git status
               if(!_.find(removedFiles, function(f) { 
                 return f.path === oldFileDummy.path; })) {
                 removedFiles.push(oldFileDummy);
@@ -222,22 +218,27 @@ class FileManipulationModalContent extends React.Component {
               _.remove(addedFiles, function(f) {
                 return f.path === oldFileDummy.path;
               });
-              // Update app state
-              app.setState({
-                tree: tree,
-                recursiveTree: recursiveTree,
-                fileToManipulate: null,
-                addedFiles: addedFiles,
-                changedFiles: changedFiles,
-                removedFiles: removedFiles
-              }, function() {
-                self.reset();
-                // console.log(self.state.tree, self.state.recursiveTree);
-              });
               break;
             case 'Copy':
+              // TODO: Update tree
+              // TODO: Update recursiveTree
+              // TODO: Git status
               break;
           }
+          
+          // Update app state
+          app.setState({
+            tree: tree,
+            recursiveTree: recursiveTree,
+            fileManipulation: null,
+            fileToManipulate: null,
+            fileManipulationTarget: null,
+            addedFiles: addedFiles,
+            changedFiles: changedFiles,
+            removedFiles: removedFiles
+          }, function() {
+            self.reset();
+          });
         }
       }
     });
@@ -250,7 +251,8 @@ class FileManipulationModalContent extends React.Component {
       tree: this.props.tree,
       recursiveTree: this.props.recursiveTree,
       fileManipulation: this.props.fileManipulation,
-      fileToManipulate: this.props.fileToManipulate
+      fileToManipulate: this.props.fileToManipulate,
+      fileManipulationTarget: this.props.fileManipulationTarget
     });
   }
 
@@ -261,7 +263,8 @@ class FileManipulationModalContent extends React.Component {
       tree: nextProps.tree,
       recursiveTree: nextProps.recursiveTree,
       fileManipulation: nextProps.fileManipulation,
-      fileToManipulate: nextProps.fileToManipulate
+      fileToManipulate: nextProps.fileToManipulate,
+      fileManipulationTarget: nextProps.fileManipulationTarget
     });
   }
 
@@ -279,7 +282,6 @@ class FileManipulationModalContent extends React.Component {
         </div>
         
         <div className="modal-body">
-          
 
           {
             this.state.fileManipulation == 'Rename' &&
@@ -336,17 +338,24 @@ class FileManipulationModalContent extends React.Component {
                   <input
                     type="text" maxLength="255" disabled
                     ref={(c) => this.targetPathInput = c}
-                    className="form-control" />
+                    className="form-control" value={this.state.fileManipulationTarget ? this.state.fileManipulationTarget.path : '/'} />
                 </div>
                 {
                   this.state.recursiveTree &&
                   <div style={{maxHeight: '60vh', overflow: 'auto'}}>
+                    <button
+                      className="btn btn-link file-node-folder block"
+                      data-toggle="collapse" type="button"
+                      onClick={this.handleRootFolderClick}>
+                      <i className="folder icon"></i> /
+                    </button>
                     <FileNode
                       app={this.props.app}
                       repository={this.state.repository}
                       tree={this.state.tree}
                       folderOnly={true}
                       fileControlUi={false}
+                      componentPrefix='modal_'
                       currentPath=''
                       nodes={this.state.recursiveTree.nodes} />
                   </div>
@@ -360,7 +369,7 @@ class FileManipulationModalContent extends React.Component {
         <div className="modal-footer">
           <button
             type="button" className="btn btn-secondary"
-            data-dismiss="modal" onClick={this._reset}>
+            data-dismiss="modal" onClick={this.reset}>
             Close
           </button>
           <button
