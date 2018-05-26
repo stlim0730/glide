@@ -122,9 +122,9 @@ class FileManipulationModalContent extends React.Component {
     let changedFiles = app.state.changedFiles;
     let removedFiles = app.state.removedFiles;
     let fileToManipulate = this.state.fileToManipulate;
-    let oldFileDummy = JSON.parse(JSON.stringify(fileToManipulate));
+    let srcFileCopy = JSON.parse(JSON.stringify(fileToManipulate));
 
-    // TODO: Get ready for Ajax call
+    // Get ready for Ajax call
     let manipulation = this.state.fileManipulation;
     let source = null;
     let targetPath = '';
@@ -188,11 +188,11 @@ class FileManipulationModalContent extends React.Component {
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // Update Git status
               if(!_.find(removedFiles, function(f) { 
-                return f.path === oldFileDummy.path; })) {
-                removedFiles.push(oldFileDummy);
+                return f.path === srcFileCopy.path; })) {
+                removedFiles.push(srcFileCopy);
               }
               _.remove(changedFiles, function(f) {
-                return f.path === oldFileDummy.path;
+                return f.path === srcFileCopy.path;
               });
               if(!_.find(addedFiles, function(f) { 
                 return f.path === targetFile.path; })) {
@@ -209,18 +209,28 @@ class FileManipulationModalContent extends React.Component {
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // Git status
               if(!_.find(removedFiles, function(f) { 
-                return f.path === oldFileDummy.path; })) {
-                removedFiles.push(oldFileDummy);
+                return f.path === srcFileCopy.path; })) {
+                removedFiles.push(srcFileCopy);
               }
               _.remove(changedFiles, function(f) {
-                return f.path === oldFileDummy.path;
+                return f.path === srcFileCopy.path;
               });
               _.remove(addedFiles, function(f) {
-                return f.path === oldFileDummy.path;
+                return f.path === srcFileCopy.path;
               });
               break;
             case 'Copy':
               // TODO: Update tree
+              // if(FileUtil.isBinary(srcFileCopy)) {
+              //   // For binary files: atob decodes
+              //   srcFileCopy.originalContent = atob(response.content);
+              // }
+              // else {
+              //   // For text files
+              //   srcFileCopy.originalContent = Serializers.b64DecodeUnicode(response.content);
+              // }
+              // srcFileCopy.path = targetPath;
+              // srcFileCopy.name = self.state.newFileName;
               // TODO: Update recursiveTree
               // TODO: Git status
               break;
