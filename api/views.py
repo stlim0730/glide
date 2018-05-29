@@ -938,9 +938,9 @@ def manipulateFile(request):
   elif manipulation == 'copy':
     sourcePath = str(userBasePath / source['path'])
     targetPath = str(userBasePath / targetPath)
+    dupName = ''
     if sourcePath == targetPath + '/' + source['name']:
       # Duplicate in the same folder
-      dupName = ''
       nameSplit = source['name'].split('.')
       if len(nameSplit) > 1:
         # nameSplit.append(nameSplit[-1])
@@ -948,7 +948,10 @@ def manipulateFile(request):
         dupName = '.'.join(nameSplit)
       else:
         dupName = source['name'] + ' copy'
-      targetPath += '/' + dupName
+    else:
+      # Copy to another folder
+      dupName = source['name']
+    targetPath += '/' + dupName
     res = shutil.copy(sourcePath, targetPath)
     # Return content to update the new file
     fileContent = None
@@ -957,5 +960,6 @@ def manipulateFile(request):
     content = base64.b64encode(fileContent).decode('utf-8')
     return Response({
       'content': content,
-      'targetPath': res
+      'targetPath': res.replace(userBasePathStr + '/', ''),
+      'targetName': os.path.basename(res)
     })

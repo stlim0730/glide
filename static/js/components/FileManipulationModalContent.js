@@ -46,7 +46,7 @@ class FileManipulationModalContent extends React.Component {
     });
   }
 
-  updateRecursiveTree(recursiveTree, manipulation, fileToManipulate, folders) {
+  updateRecursiveTree(recursiveTree, manipulation, fileToManipulate, folders, dupPath, dupName) {
     if(folders.length == 1) {
       switch(manipulation) {
         case 'Rename':
@@ -64,6 +64,10 @@ class FileManipulationModalContent extends React.Component {
           });
           break;
         case 'Copy':
+          let duplicateFile = JSON.parse(JSON.stringify(fileToManipulate));
+          duplicateFile.path = dupPath;
+          duplicateFile.name = dupName;
+          recursiveTree.nodes.push(duplicateFile);
           break;
       }
     }
@@ -72,7 +76,7 @@ class FileManipulationModalContent extends React.Component {
       let folderName = folders.shift();
       let targetFolder = _.find(recursiveTree.nodes, {name: folderName, type: 'tree'});
       // The target path always exists; no need to check
-      this.updateRecursiveTree(targetFolder, manipulation, fileToManipulate, folders);
+      this.updateRecursiveTree(targetFolder, manipulation, fileToManipulate, folders, dupPath, dupName);
     }
   }
 
@@ -122,7 +126,7 @@ class FileManipulationModalContent extends React.Component {
     let changedFiles = app.state.changedFiles;
     let removedFiles = app.state.removedFiles;
     let fileToManipulate = this.state.fileToManipulate;
-    let srcFileCopy = JSON.parse(JSON.stringify(fileToManipulate));
+    let duplicateFile = JSON.parse(JSON.stringify(fileToManipulate));
 
     // Get ready for Ajax call
     let manipulation = this.state.fileManipulation;
@@ -188,11 +192,11 @@ class FileManipulationModalContent extends React.Component {
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // Update Git status
               if(!_.find(removedFiles, function(f) { 
-                return f.path === srcFileCopy.path; })) {
-                removedFiles.push(srcFileCopy);
+                return f.path === duplicateFile.path; })) {
+                removedFiles.push(duplicateFile);
               }
               _.remove(changedFiles, function(f) {
-                return f.path === srcFileCopy.path;
+                return f.path === duplicateFile.path;
               });
               if(!_.find(addedFiles, function(f) { 
                 return f.path === targetFile.path; })) {
@@ -209,30 +213,39 @@ class FileManipulationModalContent extends React.Component {
               self.updateRecursiveTree(recursiveTree, self.state.fileManipulation, fileToManipulate, folders);
               // Git status
               if(!_.find(removedFiles, function(f) { 
-                return f.path === srcFileCopy.path; })) {
-                removedFiles.push(srcFileCopy);
+                return f.path === duplicateFile.path; })) {
+                removedFiles.push(duplicateFile);
               }
               _.remove(changedFiles, function(f) {
-                return f.path === srcFileCopy.path;
+                return f.path === duplicateFile.path;
               });
               _.remove(addedFiles, function(f) {
-                return f.path === srcFileCopy.path;
+                return f.path === duplicateFile.path;
               });
               break;
             case 'Copy':
-              // TODO: Update tree
-              // if(FileUtil.isBinary(srcFileCopy)) {
-              //   // For binary files: atob decodes
-              //   srcFileCopy.originalContent = atob(response.content);
-              // }
-              // else {
-              //   // For text files
-              //   srcFileCopy.originalContent = Serializers.b64DecodeUnicode(response.content);
-              // }
-              // srcFileCopy.path = targetPath;
-              // srcFileCopy.name = self.state.newFileName;
-              // TODO: Update recursiveTree
-              // TODO: Git status
+              // Update tree
+              if(FileUtil.isBinary(duplicateFile)) {
+                // For binary files: atob decodes
+                duplicateFile.originalContent = atob(response.content);
+              }
+              else {
+                // For text files
+                duplicateFile.originalContent = Serializers.b64DecodeUnicode(response.content);
+              }
+              duplicateFile.path = response.targetPath;
+              duplicateFile.name = response.targetName;
+              // Update recursiveTree
+              folders = duplicateFile.path.split('/');
+              self.updateRecursiveTree(
+                recursiveTree, self.state.fileManipulation, fileToManipulate,
+                folders, duplicateFile.path, duplicateFile.name
+              );
+              // Git status
+              if(!_.find(addedFiles, function(f) { 
+                return f.path === duplicateFile.path; })) {
+                addedFiles.push(duplicateFile);
+              }
               break;
           }
           
