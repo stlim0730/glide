@@ -235,6 +235,7 @@ class FileManipulationModalContent extends React.Component {
               }
               duplicateFile.path = response.targetPath;
               duplicateFile.name = response.targetName;
+              tree.tree.push(duplicateFile);
               // Update recursiveTree
               folders = duplicateFile.path.split('/');
               self.updateRecursiveTree(
