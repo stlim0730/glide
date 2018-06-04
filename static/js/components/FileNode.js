@@ -11,6 +11,9 @@ class FileNode extends React.Component {
     this.state = {
       repository: null,
       tree: null,
+      folderOnly: null,
+      fileControlUi: null,
+      componentPrefix: '',
       filesOpened: [],
       fileActive: null,
       currentPath: '',
@@ -23,8 +26,8 @@ class FileNode extends React.Component {
     // this._getEditorId = this._getEditorId.bind(this);
     this.handleFileMouseOver = this.handleFileMouseOver.bind(this);
     this.handleFileMouseOut = this.handleFileMouseOut.bind(this);
-    this.handleFileManClick = this.handleFileManClick.bind(this);
-    this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
+    this.handleFileManipulationClick = this.handleFileManipulationClick.bind(this);
+    // this._loadScaffoldsFiles = this._loadScaffoldsFiles.bind(this);
     this.handleFileClick = this.handleFileClick.bind(this);
     this.handleCreateNewClick = this.handleCreateNewClick.bind(this);
   }
@@ -57,19 +60,19 @@ class FileNode extends React.Component {
   //   return fileObj.sha + suffix;
   // }
 
-  _loadScaffoldsFiles(tree) {
-    if(!tree) return [];
+  // _loadScaffoldsFiles(tree) {
+  //   if(!tree) return [];
 
-    let scaffolds = _.filter(tree.tree, function(file) {
-      let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
-      return scaffoldsPathRegex.test(file.path);
-    });
+  //   let scaffolds = _.filter(tree.tree, function(file) {
+  //     let scaffoldsPathRegex = /^scaffolds\/([a-z0-9\s\._-])+\.(md|markdown|mdown|mkdn|mkd)$/i;
+  //     return scaffoldsPathRegex.test(file.path);
+  //   });
 
-    let app = this.props.app;
-    app.setState({
-      scaffolds: scaffolds
-    });
-  }
+  //   let app = this.props.app;
+  //   app.setState({
+  //     scaffolds: scaffolds
+  //   });
+  // }
 
   handleFileMouseOver(e) {
     $('.file-manipulation.icon').addClass('invisible');
@@ -80,22 +83,32 @@ class FileNode extends React.Component {
     $(e.target).children('.file-manipulation.icon').addClass('invisible');
   }
 
-  handleFileManClick(operation, e) {
-    console.log(operation, this);
+  handleFileManipulationClick(manipulation, file, e) {
+    // console.log(manipulation, file);
     e.stopPropagation();
     
-    // switch(operation) {
-    //   case 'rename':
-    //     break;
-    //   case 'remove':
-    //     break;
-    //   case 'copy':
-    //     break;
-    // }
+    switch(manipulation) {
+      case 'Rename':
+        break;
+      case 'Delete':
+        break;
+      case 'Copy':
+        break;
+    }
+
+    let app = this.props.app;
+    app.setState({
+      fileManipulation: manipulation,
+      fileToManipulate: file
+    });
   }
 
-  handleFolderClick(e) {
+  handleFolderClick(folder, e) {
+    let app = this.props.app;
     $(e.target).children('i.folder.icon').toggleClass('open');
+    app.setState({
+      fileManipulationTarget: folder
+    });
   }
 
   handleFileClick(file, e) {
@@ -184,7 +197,7 @@ class FileNode extends React.Component {
     $('#create-file-modal input.pathInput').val(path);
 
     // Load Hexo-provided scaffolds
-    this._loadScaffoldsFiles(this.state.tree);
+    // this._loadScaffoldsFiles(this.state.tree);
   }
 
   componentDidMount() {
@@ -197,6 +210,9 @@ class FileNode extends React.Component {
     this.setState({
       repository: this.props.repository,
       tree: this.props.tree,
+      folderOnly: this.props.folderOnly,
+      fileControlUi: this.props.fileControlUi,
+      componentPrefix: this.props.componentPrefix,
       filesOpened: this.props.filesOpened,
       fileActive: this.props.fileActive,
       currentPath: this.props.currentPath
@@ -216,6 +232,9 @@ class FileNode extends React.Component {
     this.setState({
       repository: nextProps.repository,
       tree: nextProps.tree,
+      folderOnly: nextProps.folderOnly,
+      fileControlUi: nextProps.fileControlUi,
+      componentPrefix: nextProps.componentPrefix,
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive,
       currentPath: nextProps.currentPath
@@ -238,16 +257,18 @@ class FileNode extends React.Component {
                   <button
                     className="btn btn-link file-node-folder block"
                     data-toggle="collapse" type="button"
-                    onClick={this.handleFolderClick}
-                    data-target={"#" + this._getFolderId(item) + "-list-group"}>
+                    onClick={this.handleFolderClick.bind(this, item)}
+                    data-target={"#" + this.state.componentPrefix + this._getFolderId(item) + "-list-group"}>
                     <i className="folder icon"></i> {item.name}
                   </button>
-                  <ul id={this._getFolderId(item) + "-list-group"}
+                  <ul id={this.state.componentPrefix + this._getFolderId(item) + "-list-group"}
                     className="collapse subtree">
                     <FileNode
                       app={this.props.app}
                       repository={this.state.repository}
                       tree={this.state.tree}
+                      folderOnly={this.state.folderOnly}
+                      fileControlUi={this.state.fileControlUi}
                       filesOpened={this.state.filesOpened}
                       fileActive={this.state.fileActive}
                       currentPath={item.path}
@@ -256,7 +277,7 @@ class FileNode extends React.Component {
                 </div>
               );
             }
-            else {
+            else if(!this.state.folderOnly) {
               // Render a file.
               return (
                 <button
@@ -272,32 +293,44 @@ class FileNode extends React.Component {
                     <i className="file text outline icon"></i>
                   } {item.name}
                   {
+                    this.state.fileControlUi &&
                     <i
-                      style={{ marginLeft: 20 }} onClick={this.handleFileManClick.bind(this, 'rename')}
-                      className="olive write icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Rename', item)}
+                      className="olive write icon invisible file-manipulation"
+                      title="Rename this file" style={{ marginLeft: 20 }}></i>
                   }
                   {
+                    this.state.fileControlUi &&
                     <i
-                      onClick={this.handleFileManClick.bind(this, 'remove')}
-                      className="red remove icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Delete', item)}
+                      className="red remove icon invisible file-manipulation"
+                      title="Delete this file"></i>
                   }
                   {
+                    this.state.fileControlUi &&
                     <i
-                      onClick={this.handleFileManClick.bind(this, 'copy')}
-                      className="teal copy icon invisible file-manipulation"></i>
+                      data-target="#file-manipulation-modal" data-toggle="modal"
+                      onClick={this.handleFileManipulationClick.bind(this, 'Copy', item)}
+                      className="teal copy icon invisible file-manipulation"
+                      title="Copy this file to..."></i>
                   }
                 </button>
               );
             }
           }.bind(this))
         }
-        <button
-          className="btn btn-link new-file-button block"
-          onClick={this.handleCreateNewClick.bind(this)}
-          data-toggle="modal" type="button"
-          data-target="#create-file-modal">
-          <i className="add square icon"></i> Create New...
-        </button>
+        {
+          this.state.fileControlUi &&
+          <button
+            className="btn btn-link new-file-button block"
+            onClick={this.handleCreateNewClick.bind(this)}
+            data-toggle="modal" type="button"
+            data-target="#create-file-modal">
+            <i className="add square icon"></i> Create New...
+          </button>
+        }
       </div>
     );
   }

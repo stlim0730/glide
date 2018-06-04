@@ -18,8 +18,9 @@ class RuntimePane extends React.Component {
       // commit: null,
       // tree: null,
       // recursiveTree: null,
-      changedFiles: [],
       addedFiles: [],
+      changedFiles: [],
+      removedFiles: [],
       fileActive: null
     };
 
@@ -39,8 +40,9 @@ class RuntimePane extends React.Component {
       // commit: this.props.commit,
       // tree: this.props.tree,
       // recursiveTree: this.props.recursiveTree,
-      changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
+      changedFiles: this.props.changedFiles,
+      removedFiles: this.props.removedFiles,
       fileActive: this.props.fileActive
     });
   }
@@ -54,8 +56,9 @@ class RuntimePane extends React.Component {
       // commit: nextProps.commit,
       // tree: nextProps.tree,
       // recursiveTree: nextProps.recursiveTree,
-      changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
+      changedFiles: nextProps.changedFiles,
+      removedFiles: nextProps.removedFiles,
       fileActive: nextProps.fileActive
     });
   }
@@ -76,8 +79,9 @@ class RuntimePane extends React.Component {
           app={this.props.app}
           repository={this.state.repository}
           branch={this.state.branch}
+          addedFiles={this.state.addedFiles}
           changedFiles={this.state.changedFiles}
-          addedFiles={this.state.addedFiles} />
+          removedFiles={this.state.removedFiles} />
 
         {
           // <button

@@ -900,3 +900,66 @@ def updateFile(request):
     'res': actualPath.exists(),
     'size': os.stat(str(actualPath)).st_size
   })
+
+@api_view(['POST'])
+def manipulateFile(request):
+  accessToken = request.session['accessToken']
+  manipulation = request.data['manipulation']
+  source = request.data['source']
+  targetPath = request.data['targetPath']
+  repositoryFullName = request.data['repository'] # Full name means :owner/:repo_name
+  branch = request.data['branch']
+  username = request.session['username'].split('@')[0]
+  # Create dirs
+  userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repos', repositoryFullName, branch, username)
+  userBasePath = pathlib.Path(userBasePathStr)
+  # Manipulate file
+  if manipulation == 'rename':
+    sourcePath = str(userBasePath / source['path'])
+    targetPath = str(userBasePath / targetPath)
+    shutil.move(sourcePath, targetPath)
+    # Return content to update the new file
+    fileContent = None
+    with open(targetPath, 'rb') as f:
+      fileContent = f.read()
+    content = base64.b64encode(fileContent).decode('utf-8')
+    return Response({
+      'content': content
+    })
+  elif manipulation == 'delete':
+    targetPath = str(userBasePath / targetPath)
+    if os.path.isfile(targetPath):
+      os.remove(targetPath)
+    else:
+      shutil.rmtree(targetPath, ignore_errors=True)
+    return Response({
+      'targetPath': targetPath
+    })
+  elif manipulation == 'copy':
+    sourcePath = str(userBasePath / source['path'])
+    targetPath = str(userBasePath / targetPath)
+    dupName = ''
+    if sourcePath == targetPath + '/' + source['name']:
+      # Duplicate in the same folder
+      nameSplit = source['name'].split('.')
+      if len(nameSplit) > 1:
+        # nameSplit.append(nameSplit[-1])
+        nameSplit[-2] += ' copy'
+        dupName = '.'.join(nameSplit)
+      else:
+        dupName = source['name'] + ' copy'
+    else:
+      # Copy to another folder
+      dupName = source['name']
+    targetPath += '/' + dupName
+    res = shutil.copy(sourcePath, targetPath)
+    # Return content to update the new file
+    fileContent = None
+    with open(targetPath, 'rb') as f:
+      fileContent = f.read()
+    content = base64.b64encode(fileContent).decode('utf-8')
+    return Response({
+      'content': content,
+      'targetPath': res.replace(userBasePathStr + '/', ''),
+      'targetName': os.path.basename(res)
+    })

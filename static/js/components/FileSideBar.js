@@ -18,7 +18,6 @@ class FileSideBar extends React.Component {
     };
 
     this._ajaxTree = this._ajaxTree.bind(this);
-    this._isHexoPrj = this._isHexoPrj.bind(this);
     this._pushLoadingMsg = this._pushLoadingMsg.bind(this);
     this._popLoadingMsg = this._popLoadingMsg.bind(this);
     // this._reset = this._reset.bind(this);
@@ -60,17 +59,6 @@ class FileSideBar extends React.Component {
     });
   }
 
-  _isHexoPrj(tree) {
-    let docs = _.find(tree.tree, function(f) {
-      return f.path == 'docs' && f.type == 'tree';
-    });
-    let _config = _.find(tree.tree, function(f) {
-      return f.path == '_config.yml' && f.type == 'blob';
-    });
-
-    return docs && _config ? true : false;
-  }
-
   _ajaxTree(repository, branch, commit) {
     // GET project file structure
     // console.debug('FileSideBar _ajaxTree', this.state);
@@ -96,8 +84,7 @@ class FileSideBar extends React.Component {
           }, function() {
             app.setState({
               recursiveTree: response.recursiveTree,
-              tree: response.tree,
-              isHexoPrj: self._isHexoPrj(response.tree)
+              tree: response.tree
             }, function() {
               self._popLoadingMsg(loadingMsgHandle);
             });
@@ -158,7 +145,7 @@ class FileSideBar extends React.Component {
       filesOpened: nextProps.filesOpened,
       fileActive: nextProps.fileActive
     }, function() {
-      console.debug('FileSideBar WRP', this.state, nextProps);
+      // console.debug('FileSideBar WRP', this.state, nextProps);
       // self._ajaxTree(
       //   self.state.repository,
       //   self.state.branch,
@@ -198,6 +185,9 @@ class FileSideBar extends React.Component {
                 app={this.props.app}
                 repository={this.state.repository}
                 tree={this.state.tree}
+                folderOnly={false}
+                fileControlUi={true}
+                componentPrefix=''
                 filesOpened={this.state.filesOpened}
                 fileActive={this.state.fileActive}
                 currentPath=''
