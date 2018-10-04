@@ -17,59 +17,72 @@ class EditorPane extends React.Component {
       addedFiles: [],
       filesOpened: [],
       fileActive: null,
-      theme: null
+      theme: null,
+      editorExpanded: null
     };
 
-    this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    // this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
+    this.handleExpandClick = this.handleExpandClick.bind(this);
     this.handleThemeOptionChange = this.handleThemeOptionChange.bind(this);
   }
 
-  _addFileToRecursiveTree(recursiveTree, newFile, folders) {
-    if(folders.length == 1) {
-      // This is the location where we add the file
-      // Duplicate Check
-      //   Just remove potentially existing duplicate
-      //   and just push the new file.
-      _.remove(recursiveTree.nodes, function(file) {
-        // console.log(file.path, newFile.path);
-        return file.path == newFile.path;
-      });
+  // _addFileToRecursiveTree(recursiveTree, newFile, folders) {
+  //   if(folders.length == 1) {
+  //     // This is the location where we add the file
+  //     // Duplicate Check
+  //     //   Just remove potentially existing duplicate
+  //     //   and just push the new file.
+  //     _.remove(recursiveTree.nodes, function(file) {
+  //       // console.log(file.path, newFile.path);
+  //       return file.path == newFile.path;
+  //     });
       
-      // TODO: Add a leading '/'?
-      recursiveTree.nodes.push(newFile);
-    }
-    else {
-      // We should go deeper
-      let folderName = folders.shift();
-      // Duplicate check
-      let targetFolder = _.find(recursiveTree.nodes, {name: folderName, type: 'tree'});
-      if(targetFolder) {
-        // The target path exists
-        this._addFileToRecursiveTree(targetFolder, newFile, folders);
-      }
-      else {
-        // Create a subfolder
-        let subdirs = '/' + folders.join('/');
-        let path  = '/' + newFile.path.replace(subdirs, '');
-        // Create a folder
-        let newFolder = {
-          name: folderName,
-          nodes: [],
-          path: path,
-          type: 'tree',
-          mode: '040000'
-        };
+  //     // TODO: Add a leading '/'?
+  //     recursiveTree.nodes.push(newFile);
+  //   }
+  //   else {
+  //     // We should go deeper
+  //     let folderName = folders.shift();
+  //     // Duplicate check
+  //     let targetFolder = _.find(recursiveTree.nodes, {name: folderName, type: 'tree'});
+  //     if(targetFolder) {
+  //       // The target path exists
+  //       this._addFileToRecursiveTree(targetFolder, newFile, folders);
+  //     }
+  //     else {
+  //       // Create a subfolder
+  //       let subdirs = '/' + folders.join('/');
+  //       let path  = '/' + newFile.path.replace(subdirs, '');
+  //       // Create a folder
+  //       let newFolder = {
+  //         name: folderName,
+  //         nodes: [],
+  //         path: path,
+  //         type: 'tree',
+  //         mode: '040000'
+  //       };
 
-        recursiveTree.nodes.push(newFolder);
-        this._addFileToRecursiveTree(newFolder, newFile, folders);
-      }
-    }
-  }
+  //       recursiveTree.nodes.push(newFolder);
+  //       this._addFileToRecursiveTree(newFolder, newFile, folders);
+  //     }
+  //   }
+  // }
 
   handleThemeOptionChange(e) {
     let theme = e.target.value;
     this.setState({
       theme: theme
+    });
+  }
+
+  handleExpandClick(e) {
+    let app = this.props.app;
+    this.setState({
+      editorExpanded: !this.state.editorExpanded
+    }, function() {
+      app.setState({
+        editorExpanded: this.state.editorExpanded
+      });
     });
   }
 
@@ -82,7 +95,8 @@ class EditorPane extends React.Component {
       changedFiles: this.props.changedFiles,
       addedFiles: this.props.addedFiles,
       filesOpened: this.props.filesOpened,
-      fileActive: this.props.fileActive
+      fileActive: this.props.fileActive,
+      editorExpanded: this.props.editorExpanded
     });
   }
 
@@ -95,17 +109,24 @@ class EditorPane extends React.Component {
       changedFiles: nextProps.changedFiles,
       addedFiles: nextProps.addedFiles,
       filesOpened: nextProps.filesOpened,
-      fileActive: nextProps.fileActive
+      fileActive: nextProps.fileActive,
+      editorExpanded: nextProps.editorExpanded
     });
   }
 
   render () {
     return (
-      <div className="col-lg-5 col-md-5 no-padding" style={{height: '95vh'}}>
+      <div className={this.state.editorExpanded ? 'col-lg-10 col-md-10 no-padding' : 'col-lg-5 col-md-5 no-padding'} style={{height: '95vh'}}>
 
         <div className="card" style={{height: '95vh'}}>
           <div className="card-header" style={{paddingTop: 0, paddingBottom:0}}>
             <h6 className="inline-block" style={{paddingTop: 11}}>Editor</h6>
+
+            <button type="button" className="btn btn-link" style={{paddingTop: 0}}
+              onClick={this.handleExpandClick}>
+              <i className={this.state.editorExpanded ? 'caret square left outline icon' : 'caret square right outline icon'}></i>
+              {this.state.editorExpanded ? 'Compress' : 'Expand'} Editor
+            </button>
 
             <div className="form-group inline-block form-control-sm"
               style={{marginBottom: 0, paddingTop: 3, paddingBottom: 2, float: 'right'}}>

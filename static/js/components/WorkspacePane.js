@@ -98,7 +98,8 @@ class WorkspacePane extends React.Component {
             changedFiles={this.state.changedFiles}
             addedFiles={this.state.addedFiles}
             filesOpened={this.state.filesOpened}
-            fileActive={this.state.fileActive} />
+            fileActive={this.state.fileActive}
+            editorExpanded={this.props.editorExpanded} />
           <RuntimePane
             app={this.props.app}
             repository={this.state.repository}
@@ -112,7 +113,8 @@ class WorkspacePane extends React.Component {
             changedFiles={this.state.changedFiles}
             removedFiles={this.state.removedFiles}
             editorChangesSaved={this.props.editorChangesSaved}
-            fileActive={this.state.fileActive} />
+            fileActive={this.state.fileActive}
+            editorExpanded={this.props.editorExpanded} />
         </div>
 
       </div>

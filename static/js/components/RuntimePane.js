@@ -21,7 +21,8 @@ class RuntimePane extends React.Component {
       addedFiles: [],
       changedFiles: [],
       removedFiles: [],
-      fileActive: null
+      fileActive: null,
+      editorExpanded: null
     };
 
     this.handleProceedClick = this.handleProceedClick.bind(this);
@@ -43,7 +44,8 @@ class RuntimePane extends React.Component {
       addedFiles: this.props.addedFiles,
       changedFiles: this.props.changedFiles,
       removedFiles: this.props.removedFiles,
-      fileActive: this.props.fileActive
+      fileActive: this.props.fileActive,
+      editorExpanded: this.props.editorExpanded
     });
   }
 
@@ -59,14 +61,15 @@ class RuntimePane extends React.Component {
       addedFiles: nextProps.addedFiles,
       changedFiles: nextProps.changedFiles,
       removedFiles: nextProps.removedFiles,
-      fileActive: nextProps.fileActive
+      fileActive: nextProps.fileActive,
+      editorExpanded: nextProps.editorExpanded
     });
   }
 
   render() {
     return (
       <div
-        className="col-lg-5 col-md-5 no-padding"
+        className={this.state.editorExpanded ? 'd-none' : 'col-lg-5 col-md-5 no-padding'}
         style={{height: '95vh'}}>
         
         <RendererPane
