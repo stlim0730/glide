@@ -70,6 +70,7 @@ class App extends React.Component {
       addedFiles: [],
       changedFiles: [],
       removedFiles: [],
+      editorChangesSaved: null,
       loadingMessages: {}
     };
   }
@@ -174,6 +175,7 @@ class App extends React.Component {
               addedFiles={this.state.addedFiles}
               changedFiles={this.state.changedFiles}
               removedFiles={this.state.removedFiles}
+              editorChangesSaved={this.state.editorChangesSaved}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened} />
             <LoadingPane
