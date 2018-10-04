@@ -67,6 +67,7 @@ class App extends React.Component {
       fileManipulationTarget: null,
       filesOpened: [],
       fileActive: null,
+      editorExpanded: null,
       addedFiles: [],
       changedFiles: [],
       removedFiles: [],
@@ -177,7 +178,8 @@ class App extends React.Component {
               removedFiles={this.state.removedFiles}
               editorChangesSaved={this.state.editorChangesSaved}
               fileActive={this.state.fileActive}
-              filesOpened={this.state.filesOpened} />
+              filesOpened={this.state.filesOpened}
+              editorExpanded={this.state.editorExpanded} />
             <LoadingPane
               messages={this.state.loadingMessages} />
           </div>
