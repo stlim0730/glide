@@ -107,7 +107,8 @@ class TabbedEditors extends React.Component {
       recursiveTree: null,
       filesOpened: [],
       fileActive: null,
-      changedFiles: []
+      changedFiles: [],
+      timeoutId: null
     };
 
     this._addFileToRecursiveTree = this._addFileToRecursiveTree.bind(this);
@@ -243,22 +244,11 @@ class TabbedEditors extends React.Component {
     });
   }
 
-  handleEditorChange(file, newVal, aceEvent) {
+  save(file, newVal) {
     let app = this.props.app;
     let self = this;
     let changedFiles = this.state.changedFiles;
     
-    file.newContent = newVal;
-    if(file.originalContent != file.newContent) {
-      // This file has been modified.
-      file.modified = true;
-    }
-    else {
-      // This file hasn't been modified:
-      file.modified = false;
-      delete file.newContent;
-    }
-
     // POST the change
     let url = '/api/project/file/update';
 
@@ -275,7 +265,7 @@ class TabbedEditors extends React.Component {
       }),
       contentType: 'application/json; charset=utf-8',
       success: function(response) {
-        // console.debug(response);
+        console.debug(response);
         if('error' in response) {
           // TODO
         }
@@ -303,7 +293,8 @@ class TabbedEditors extends React.Component {
           }, function() {
             app.setState({
               fileActive: file,
-              changedFiles: changedFiles
+              changedFiles: changedFiles,
+              editorChangesSaved: true
             });
           });
 
@@ -319,6 +310,32 @@ class TabbedEditors extends React.Component {
         }
       }
     });
+  }
+
+  handleEditorChange(file, newVal, aceEvent) {
+    let self = this;
+    let app = this.props.app;
+
+    file.newContent = newVal;
+    if(file.originalContent != file.newContent) {
+      // This file has been modified.
+      file.modified = true;
+    }
+    else {
+      // This file hasn't been modified:
+      file.modified = false;
+      delete file.newContent;
+    }
+
+    app.setState({
+      editorChangesSaved: false
+    });
+
+    // Delayed save
+    clearTimeout(this.state.timeoutId);
+    this.state.timeoutId = setTimeout(function() {
+      self.save(file, newVal);
+    }, 3000);
   }
 
   componentDidMount() {

@@ -10,7 +10,8 @@ class RendererPane extends React.Component {
       branch: null,
       fileActive: null,
       srcDoc: null,
-      src: null
+      src: null,
+      editorChangesSaved: null
     };
 
     this.renderFile = this.renderFile.bind(this);
@@ -73,7 +74,8 @@ class RendererPane extends React.Component {
     this.setState({
       repository: this.props.repository,
       branch: this.props.branch,
-      fileActive: this.props.fileActive
+      fileActive: this.props.fileActive,
+      editorChangesSaved: this.props.editorChangesSaved
     }, function() {
       self.renderFile();
     });
@@ -84,7 +86,8 @@ class RendererPane extends React.Component {
     this.setState({
       repository: nextProps.repository,
       branch: nextProps.branch,
-      fileActive: nextProps.fileActive
+      fileActive: nextProps.fileActive,
+      editorChangesSaved: nextProps.editorChangesSaved
     }, function() {
       self.renderFile();
     });
@@ -97,7 +100,9 @@ class RendererPane extends React.Component {
 
     return (
       <div className="card" style={{height: '50vh'}}>
-        <h6 className="card-header">Preview</h6>
+        <h6 className="card-header">
+          Preview&emsp;{this.state.editorChangesSaved != null ? (!this.state.editorChangesSaved ? <img src="/static/img/spinner.gif" /> : null) : null}
+        </h6>
         {
           srcDoc &&
           <iframe
