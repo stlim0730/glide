@@ -331,11 +331,13 @@ class TabbedEditors extends React.Component {
       editorChangesSaved: false
     });
 
+    let delay = 3000;
+
     // Delayed save
     clearTimeout(this.state.timeoutId);
     this.state.timeoutId = setTimeout(function() {
       self.save(file, newVal);
-    }, 3000);
+    }, delay);
   }
 
   componentDidMount() {

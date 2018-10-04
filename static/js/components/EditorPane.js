@@ -119,17 +119,17 @@ class EditorPane extends React.Component {
       <div className={this.state.editorExpanded ? 'col-lg-10 col-md-10 no-padding' : 'col-lg-5 col-md-5 no-padding'} style={{height: '95vh'}}>
 
         <div className="card" style={{height: '95vh'}}>
-          <div className="card-header" style={{paddingTop: 0, paddingBottom:0}}>
+          <div className="card-header" style={{paddingTop: 0, paddingBottom:1, borderBottom: 0}}>
             <h6 className="inline-block" style={{paddingTop: 11}}>Editor</h6>
 
-            <button type="button" className="btn btn-link" style={{paddingTop: 0}}
+            <button type="button" className="btn btn-link" style={{paddingTop: 1}}
               onClick={this.handleExpandClick}>
               <i className={this.state.editorExpanded ? 'caret square left outline icon' : 'caret square right outline icon'}></i>
-              {this.state.editorExpanded ? 'Compress' : 'Expand'} Editor
+              {this.state.editorExpanded ? 'Compact' : 'Full-Sized'} Editor
             </button>
 
             <div className="form-group inline-block form-control-sm"
-              style={{marginBottom: 0, paddingTop: 3, paddingBottom: 2, float: 'right'}}>
+              style={{marginBottom: 0, paddingTop: 2, paddingBottom: 2, float: 'right'}}>
               <select className="custom-select" onChange={this.handleThemeOptionChange}>
                 <option value="">Select Your Favorite Editor Theme</option>
                 <option value="ambiance">Ambiance</option>
