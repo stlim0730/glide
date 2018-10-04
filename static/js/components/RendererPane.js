@@ -100,9 +100,16 @@ class RendererPane extends React.Component {
 
     return (
       <div className="card" style={{height: '50vh'}}>
-        <h6 className="card-header">
-          Preview&emsp;{this.state.editorChangesSaved != null ? (!this.state.editorChangesSaved ? <img src="/static/img/spinner.gif" /> : null) : null}
-        </h6>
+        <div className="card-header" style={{paddingTop: 6, paddingBottom: 6}}>
+          <h6 className="inline-block" style={{marginTop:6, marginBottom: 0}}>
+            Preview&emsp;{this.state.editorChangesSaved != null ? (!this.state.editorChangesSaved ? <img src="/static/img/spinner.gif" /> : null) : null}
+          </h6>
+          <a href={src ? src : "#"} target="_blank"
+            className={src ? "btn btn-link inline-block" : "btn btn-link inline-block disabled"}
+            style={{float: 'right', paddingTop: 3, paddingBottom: 3, textDecoration: 'none'}}>
+            <i className="external alternate icon"></i> Preview in New Tab
+          </a>
+        </div>
         {
           srcDoc &&
           <iframe
