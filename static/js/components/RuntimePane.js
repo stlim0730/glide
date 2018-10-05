@@ -77,6 +77,7 @@ class RuntimePane extends React.Component {
           repository={this.state.repository}
           branch={this.state.branch}
           editorChangesSaved={this.props.editorChangesSaved}
+          rendererUpdated={this.props.rendererUpdated}
           fileActive={this.state.fileActive} />
 
         <StatusPane

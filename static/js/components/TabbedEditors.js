@@ -294,7 +294,8 @@ class TabbedEditors extends React.Component {
             app.setState({
               fileActive: file,
               changedFiles: changedFiles,
-              editorChangesSaved: true
+              editorChangesSaved: true,
+              rendererUpdated: false
             });
           });
 

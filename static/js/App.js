@@ -72,6 +72,7 @@ class App extends React.Component {
       changedFiles: [],
       removedFiles: [],
       editorChangesSaved: null,
+      rendererUpdated: null,
       loadingMessages: {}
     };
   }
@@ -177,6 +178,7 @@ class App extends React.Component {
               changedFiles={this.state.changedFiles}
               removedFiles={this.state.removedFiles}
               editorChangesSaved={this.state.editorChangesSaved}
+              rendererUpdated={this.state.rendererUpdated}
               fileActive={this.state.fileActive}
               filesOpened={this.state.filesOpened}
               editorExpanded={this.state.editorExpanded} />
