@@ -11,7 +11,8 @@ class RendererPane extends React.Component {
       fileActive: null,
       srcDoc: null,
       src: null,
-      editorChangesSaved: null
+      editorChangesSaved: null,
+      rendererUpdated: null
     };
 
     this.renderFile = this.renderFile.bind(this);
@@ -27,6 +28,7 @@ class RendererPane extends React.Component {
     else {
       let url = '/api/project/file/render';
       let self = this;
+      let app = this.props.app;
       $.ajax({
         url: url,
         method: 'POST',
@@ -58,6 +60,14 @@ class RendererPane extends React.Component {
             self.setState({
               srcDoc: response.srcDoc,
               src: src
+            }, function() {
+              if(src && !self.state.rendererUpdated) {
+                // Only to update iframe with existing src
+                self.srcIFrame.contentWindow.location.reload();
+                app.setState({
+                  rendererUpdated: true
+                });
+              }
             });
           }
         }
@@ -71,7 +81,8 @@ class RendererPane extends React.Component {
       repository: this.props.repository,
       branch: this.props.branch,
       fileActive: this.props.fileActive,
-      editorChangesSaved: this.props.editorChangesSaved
+      editorChangesSaved: this.props.editorChangesSaved,
+      rendererUpdated: this.props.rendererUpdated
     }, function() {
       self.renderFile();
     });
@@ -83,7 +94,8 @@ class RendererPane extends React.Component {
       repository: nextProps.repository,
       branch: nextProps.branch,
       fileActive: nextProps.fileActive,
-      editorChangesSaved: nextProps.editorChangesSaved
+      editorChangesSaved: nextProps.editorChangesSaved,
+      rendererUpdated: nextProps.rendererUpdated
     }, function() {
       self.renderFile();
     });

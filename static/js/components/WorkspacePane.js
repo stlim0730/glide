@@ -113,6 +113,7 @@ class WorkspacePane extends React.Component {
             changedFiles={this.state.changedFiles}
             removedFiles={this.state.removedFiles}
             editorChangesSaved={this.props.editorChangesSaved}
+            rendererUpdated={this.props.rendererUpdated}
             fileActive={this.state.fileActive}
             editorExpanded={this.props.editorExpanded} />
         </div>
