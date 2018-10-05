@@ -58,10 +58,6 @@ class RendererPane extends React.Component {
             self.setState({
               srcDoc: response.srcDoc,
               src: src
-            }, function() {
-              self.state.srcDoc == null &&
-              self.state.src &&
-              self.srcIFrame.contentWindow.location.reload();
             });
           }
         }
