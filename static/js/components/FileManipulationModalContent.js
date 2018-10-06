@@ -126,6 +126,7 @@ class FileManipulationModalContent extends React.Component {
     let changedFiles = app.state.changedFiles;
     let removedFiles = app.state.removedFiles;
     let fileToManipulate = this.state.fileToManipulate;
+    let filesOpened = app.state.filesOpened;
     let duplicateFile = JSON.parse(JSON.stringify(fileToManipulate));
 
     // Get ready for Ajax call
@@ -137,17 +138,22 @@ class FileManipulationModalContent extends React.Component {
         source = fileToManipulate;
         let fileNameRegex = new RegExp(source.name + '$');
         targetPath = source.path.replace(fileNameRegex, this.state.newFileName);
+        _.remove(filesOpened, function(f) {
+          return f.path === fileToManipulate.path;
+        });
         break;
       case 'Delete':
         targetPath = this.state.fileToManipulate.path;
+        _.remove(filesOpened, function(f) {
+          return f.path === targetPath;
+        });
         break;
       case 'Copy':
         source = fileToManipulate;
-        targetPath = this.state.fileManipulationTarget
-          ? this.state.fileManipulationTarget.path.replace('/', '') : '';
+        targetPath = this.state.fileManipulationTarget == null ? '' : this.state.fileManipulationTarget.path;
         break;
     }
-
+    
     // Ajax call for server side file manipulation
     let url = '/api/project/file/manipulate';
     let self = this;
