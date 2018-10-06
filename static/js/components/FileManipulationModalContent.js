@@ -150,11 +150,10 @@ class FileManipulationModalContent extends React.Component {
         break;
       case 'Copy':
         source = fileToManipulate;
-        targetPath = this.state.fileManipulationTarget
-          ? this.state.fileManipulationTarget.path.replace('/', '') : '';
+        targetPath = this.state.fileManipulationTarget == null ? '' : this.state.fileManipulationTarget.path;
         break;
     }
-
+    
     // Ajax call for server side file manipulation
     let url = '/api/project/file/manipulate';
     let self = this;
