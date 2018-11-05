@@ -332,7 +332,7 @@ class TabbedEditors extends React.Component {
       editorChangesSaved: false
     });
 
-    let delay = 3000;
+    let delay = 1500;
 
     // Delayed save
     clearTimeout(this.state.timeoutId);

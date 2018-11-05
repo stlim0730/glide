@@ -1,3 +1,5 @@
+import Octicon, {GitBranch} from '@githubprimer/octicons-react'
+
 // 
 // BranchPane component
 // 
@@ -550,16 +552,18 @@ class BranchPane extends React.Component {
 
             {
               !this.state.branch &&
-              <div className="helper-text">
-                <p className="lead">
-                  <strong className="text-info">(Local) Branch</strong> represents a separate edition of a repository. Each collaborator will independently work on one's own branch. All the individual works on the branches are supposed to incorporated into master branch, once they're done.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Master branch</strong> is the representative branch of a repository. You'll incrementally make progress in this project by incorporating your work on your branch into master branch.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Checkout</strong> means choosing an existing branch to work on. You may need to create a new branch for your work.
-                </p>
+              <div className="card bg-light mb-3">
+                <div className="card-body">
+                  <p className="card-text lead">
+                    A <strong className="text-primary"><Octicon icon={GitBranch} size="medium" verticalAlign="middle" /> branch</strong> (local branch or feature branch) is a copy of a repository to add a feature to.
+                  </p>
+                  <p className="card-text lead">
+                    <strong className="text-primary">Master Branch</strong> is the representative branch of a repository. Your feature branch will be merged into master branch, so that your repository incorporates your contribution.
+                  </p>
+                  <p className="card-text lead">
+                    <strong className="text-primary">Checkout</strong> means choosing an <em>existing</em> branch to work on. You may need to create a new branch for your work if you don't have anything to checkout.
+                  </p>
+                </div>
               </div>
             }
 
