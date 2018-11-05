@@ -142,30 +142,30 @@ def logout(request, owner=None, repo=None, branch=None):
     logoutCurlCommand, shell=True, stdin=subprocess.PIPE,
     input=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
   )
-  if owner and repo and branch:
-    userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch, username)
-    branchPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch)
-    repoPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo)
-    ownerPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner)
+  # if owner and repo and branch:
+  #   userBasePathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch, username)
+  #   branchPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo, branch)
+  #   repoPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner, repo)
+  #   ownerPathStr = os.path.join(settings.MEDIA_ROOT, 'repo', owner)
     
-    userBasePath = pathlib.Path(userBasePathStr)
-    if userBasePath.exists():
-      shutil.rmtree(userBasePathStr, ignore_errors=True)
+  #   userBasePath = pathlib.Path(userBasePathStr)
+  #   if userBasePath.exists():
+  #     shutil.rmtree(userBasePathStr, ignore_errors=True)
     
-    branchPathList = os.listdir(branchPathStr)
-    if len(branchPathList) == 0:
-      branchPath = pathlib.Path(branchPathStr)
-      shutil.rmtree(branchPath, ignore_errors=True)
+  #   branchPathList = os.listdir(branchPathStr)
+  #   if len(branchPathList) == 0:
+  #     branchPath = pathlib.Path(branchPathStr)
+  #     shutil.rmtree(branchPath, ignore_errors=True)
 
-    repoPathList = os.listdir(repoPathStr)
-    if len(repoPathList) == 0:
-      repoPath = pathlib.Path(repoPathStr)
-      shutil.rmtree(repoPath, ignore_errors=True)
+  #   repoPathList = os.listdir(repoPathStr)
+  #   if len(repoPathList) == 0:
+  #     repoPath = pathlib.Path(repoPathStr)
+  #     shutil.rmtree(repoPath, ignore_errors=True)
 
-    ownerPathList = os.listdir(ownerPathStr)
-    if len(ownerPathList) == 0:
-      ownerPath = pathlib.Path(ownerPathStr)
-      shutil.rmtree(ownerPath, ignore_errors=True)
+  #   ownerPathList = os.listdir(ownerPathStr)
+  #   if len(ownerPathList) == 0:
+  #     ownerPath = pathlib.Path(ownerPathStr)
+  #     shutil.rmtree(ownerPath, ignore_errors=True)
 
   logoutUser(request)
   return redirect('/')
