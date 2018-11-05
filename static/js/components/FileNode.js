@@ -289,8 +289,8 @@ class FileNode extends React.Component {
                   {
                     _.find(this.state.filesOpened, function(f) {
                       return f.path == item.path; }) ?
-                    <i className="file text icon"></i> :
-                    <i className="file text outline icon"></i>
+                    <i className="file alternate text icon"></i> :
+                    <i className="file alternate text outline icon"></i>
                   } {item.name}
                   {
                     this.state.fileControlUi &&

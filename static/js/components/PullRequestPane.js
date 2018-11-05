@@ -1,4 +1,5 @@
 import Alert from 'react-s-alert';
+import Octicon, {GitPullRequest, GitMerge} from '@githubprimer/octicons-react'
 
 // 
 // PullRequestPane component
@@ -209,15 +210,17 @@ class PullRequestPane extends React.Component {
             </div>
 
           </div>
-
+          
           <div className="col-lg-7 col-md-7">
-            <div className="helper-text">
-              <p className="lead">
-                <strong className="text-info">Pull request</strong> is notyfying the repository owner that your branch is done, so it's ready to be merged into master branch.
-              </p>
-              <p className="lead">
-                <strong className="text-info">Merge</strong> is a process where your work is incorporated into master branch through code review and discussion with the collaborators. Once your branch is merged into master branch, this means your project became a new version. After merge process, your local branch may be deleted.
-              </p>
+            <div className="card bg-light mb-3">
+              <div className="card-body">
+                <p className="card-text lead">
+                  A <strong className="text-primary"><Octicon icon={GitPullRequest} size="medium" verticalAlign="middle" /> pull request</strong> means notyfying the repository owner (team leader) that your branch is complete, so it's ready to be merged into master branch.
+                </p>
+                <p className="card-text lead">
+                  <strong className="text-primary"><Octicon icon={GitMerge} size="medium" verticalAlign="middle" /> Merge</strong> means adding your branch to the commit on the master branch, where you've branched from. Before you merge your branch, you will have to review and discuss the code with the collaborators. Once your branch is merged into master branch, your project officially has all the progress you've made.
+                </p>
+              </div>
             </div>
           </div>
 

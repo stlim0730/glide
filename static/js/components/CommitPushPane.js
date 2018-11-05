@@ -1,5 +1,6 @@
 import Alert from 'react-s-alert';
 import FileUtil from '../util/FileUtil.js';
+import Octicon, {GitCommit, RepoPush} from '@githubprimer/octicons-react'
 
 // 
 // CommitPushPane component
@@ -423,21 +424,24 @@ class CommitPushPane extends React.Component {
           {
             commitable &&
             <div className="col-lg-7 col-md-7">
-              <div className="helper-text">
-                <p className="lead">
-                  <strong className="text-info">Commit</strong> is a checkpoint where the content is saved along with a message that describes what changes have been made.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Commit message</strong> is a short description of the commit you're making.
-                  This helps you and the collaboraors understand what changes are made on your branch later on.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Push</strong> means your branch is uploaded to remote repository from which you cloned the repository to begin with.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Commit</strong> and <strong className="text-info">push</strong> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
-                </p>
+
+              <div className="card bg-light mb-3">
+                <div className="card-body">
+                  <p className="card-text lead">
+                    A <strong className="text-primary"><Octicon icon={GitCommit} size="medium" verticalAlign="middle" /> commit</strong> is a checkpoint (or a savepoint) made on the branch to represent the state of your repository at a given time point.
+                  </p>
+                  <p className="card-text lead">
+                    A <strong className="text-primary">commit message</strong> is a short description of what changes you made for the commit. This helps you and the collaboraors understand what progress is made on the branch later on.
+                  </p>
+                  <p className="card-text lead">
+                    <strong className="text-primary"><Octicon icon={RepoPush} size="medium" verticalAlign="middle" /> Push</strong> means uploading your branch to the remote repository from which you cloned the repository to begin with.
+                  </p>
+                  <p className="card-text lead">
+                    <strong className="text-primary">Commit</strong> and <strong className="text-primary">push</strong> are separate operations, but GLIDE pushes every single commit just because you will lose unpushed commits when you close the web browser.
+                  </p>
+                </div>
               </div>
+
             </div>
           }
 

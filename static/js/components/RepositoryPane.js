@@ -1,4 +1,6 @@
 import Alert from 'react-s-alert';
+import Octicon, {Repo, RepoClone} from '@githubprimer/octicons-react'
+
 
 // 
 // RepositoryPane component
@@ -312,19 +314,21 @@ class RepositoryPane extends React.Component {
 
             {
               !this.state.repository &&
-              <div className="helper-text">
-                <p className="lead">
-                  <strong className="text-info">Repository</strong> is a storage for your project. It contains your files and keeps track of their changes.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Remote repository</strong> means a repository that lives online and is shared by collaborators. GLIDE works with remote repositories on GitHub.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Clone</strong> means downloading a specific version (usually, the latest) of a repository for you to work on.
-                </p>
-                <p className="lead">
-                  <strong className="text-info">Local repository</strong> is a downloaded copy of a remote repository.
-                </p>
+              <div className="card bg-light mb-3">
+                <div className="card-body">
+                  <p className="card-text lead">
+                    A <strong className="text-primary"><Octicon icon={Repo} size="medium" verticalAlign="middle" /> repository</strong> is a container for your project (just like the top level folder). It contains your files and keeps track of their changes.
+                  </p>
+                  <p className="card-text lead">
+                    A <strong className="text-primary">remote repository</strong> is a repository that lives online and is shared by collaborators. GLIDE works with remote repositories on GitHub.
+                  </p>
+                  <p className="card-text lead">
+                    <strong className="text-primary"><Octicon icon={RepoClone} size="medium" verticalAlign="middle" /> Clone</strong> means downloading a remote repository in its latest state to create a local repository.
+                  </p>
+                  <p className="card-text lead">
+                    A <strong className="text-primary">local repository</strong> is a cloned copy of a remote repository. It is usually your workspace.
+                  </p>
+                </div>
               </div>
             }
 
