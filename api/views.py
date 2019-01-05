@@ -13,7 +13,7 @@ import markdown
 import base64
 import mimetypes
 #import yaml
-from jinja2 import Template, Environment, meta
+# from jinja2 import Template, Environment, meta
 import traceback
 import re
 import os
@@ -110,35 +110,35 @@ def readme(request, owner, repo):
     })
 
 
-@api_view(['POST'])
-def cdn(request, owner, repo):
-  """
-  Responds with RawGit url for the specified file
-  """
-  res = {}
-  accessToken = request.session['accessToken']
-  file = request.data['file']
-  # branch = request.data['branch']
-  commit = _getLatestCommit(accessToken, owner, repo)
-  cdnUrl = 'https://cdn.rawgit.com/{}/{}/{}/{}'
-  cdnUrl = cdnUrl.format(owner, repo, commit['sha'], file['path'])
-  return Response({
-    'cdnUrl': cdnUrl
-  })
+# @api_view(['POST'])
+# def cdn(request, owner, repo):
+#   """
+#   Responds with RawGit url for the specified file
+#   """
+#   res = {}
+#   accessToken = request.session['accessToken']
+#   file = request.data['file']
+#   # branch = request.data['branch']
+#   commit = _getLatestCommit(accessToken, owner, repo)
+#   cdnUrl = 'https://cdn.rawgit.com/{}/{}/{}/{}'
+#   cdnUrl = cdnUrl.format(owner, repo, commit['sha'], file['path'])
+#   return Response({
+#     'cdnUrl': cdnUrl
+#   })
 
 
-@api_view(['POST'])
-def parse(request):
-  template = request.data['templateFileContent']
-  jinjaEnv = Environment()
-  absSynTree = jinjaEnv.parse(template)
-  keys = list(meta.find_undeclared_variables(absSynTree))
-  # TODO: Sort it properly:
-  #   Allow whitespaces after/before the curly braces
-  keys = sorted(keys, key=lambda x:template.index('{{'+x+'}}'))
-  return Response({
-    'keys': keys
-  })
+# @api_view(['POST'])
+# def parse(request):
+#   template = request.data['templateFileContent']
+#   jinjaEnv = Environment()
+#   absSynTree = jinjaEnv.parse(template)
+#   keys = list(meta.find_undeclared_variables(absSynTree))
+#   # TODO: Sort it properly:
+#   #   Allow whitespaces after/before the curly braces
+#   keys = sorted(keys, key=lambda x:template.index('{{'+x+'}}'))
+#   return Response({
+#     'keys': keys
+#   })
 
 
 @api_view(['GET'])
