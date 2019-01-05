@@ -46,10 +46,10 @@ INSTALLED_APPS = [
   'django.contrib.staticfiles',
 
   # Third-party apps
-  'channels',
+#  'channels',
   'webpack_loader',
-  'markdown',
-  'yaml',
+#  'markdown',
+#  'yaml',
   
   # Local apps
   'workspace',
