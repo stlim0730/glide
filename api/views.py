@@ -12,7 +12,7 @@ from copy import deepcopy
 import markdown
 import base64
 import mimetypes
-import yaml
+#import yaml
 from jinja2 import Template, Environment, meta
 import traceback
 import re
