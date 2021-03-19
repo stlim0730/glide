@@ -4,5 +4,5 @@ asgi_redis==1.4.3
 channels==1.1.8
 daphne==1.4.2
 django-webpack-loader==0.5.0
-djangorestframework==3.7.7
+djangorestframework==3.11.2
 Markdown==2.6.11
